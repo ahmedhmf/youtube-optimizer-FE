@@ -5,13 +5,13 @@
 
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Search videos</mat-label>
-      <input matInput placeholder="Type a title or keyword..." [(ngModel)]="searchTerm" />
+      <input matInput placeholder="Type a title or keyword..." (input)="store.setFilterText($event.target.value)" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </mat-card>
 
   <div class="history-grid">
-    @for(audits of store.audits(); track audits){
+    @for(audits of store.filteredAudits(); track audits){
     <mat-card class="video-card">
       <div class="thumbnail">
         <img alt="{{ audits.video_title }}" [src]="audits.thumbnail_url" />
@@ -31,7 +31,7 @@
     </mat-card>
     }
 
-    @if(filteredVideos().length === 0){
+    @if(store.filteredAudits()?.length === 0){
     <p class="no-data">
       No matching videos found.
     </p>

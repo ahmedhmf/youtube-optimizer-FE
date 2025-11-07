@@ -1,4 +1,5 @@
-import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { computed } from "@angular/core";
+import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 
 export type AnalyzeResponse = {
   video: {
@@ -36,7 +37,8 @@ const initialState = {
   audits: [] as Audits[] | null,
   loading: false,
   status: 'idle' as AnalyzeState,
-  message: ''
+  message: '',
+  filterText: ''
 };
 
 export const VideoAuditsStore = signalStore(
@@ -63,6 +65,30 @@ export const VideoAuditsStore = signalStore(
     },
     setMessage(message: string): void {
       patchState(store, { message });
-    }
+    },
+    setFilterText(filterText: string): void {
+      patchState(store, { filterText });
+    },
+    clearFilter(): void {
+      patchState(store, { filterText: '' });
+    },
+  })),
+  withComputed((store) => ({
+    // Computed signal for filtered audits
+    filteredAudits: computed(() => {
+      const audits = store.audits();
+      const filter = store.filterText().toLowerCase().trim();
+
+      if (!filter) {
+        return audits;
+      }
+
+      return audits?.filter(audit =>
+        audit.video_title?.toLowerCase().includes(filter) ||
+        JSON.stringify(audit).toLowerCase().includes(filter) ||
+        new Date(audit.created_at).toLocaleDateString().includes(filter)
+      );
+    }),
+    isFilterActive: computed(() => store.filterText().trim().length > 0)
   })),
 );
