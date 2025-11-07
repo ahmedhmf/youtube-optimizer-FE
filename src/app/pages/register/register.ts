@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
-import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -26,6 +26,7 @@ import { AuthService } from '../../services/auth';
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Register {
   private supabase = inject(AuthService);
@@ -49,7 +50,7 @@ export class Register {
   }
 
   // Custom validator to check if passwords match
-  passwordMatchValidator(form: FormGroup) {
+  passwordMatchValidator(form: FormGroup): { [key: string]: boolean } | null {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
 
@@ -103,7 +104,7 @@ export class Register {
     return !!(field && field.errors && field.touched);
   }
 
-  async signUp() {
+  async signUp(): Promise<void> {
     // Mark all fields as touched to show validation errors
     this.form.markAllAsTouched();
 
@@ -119,7 +120,7 @@ export class Register {
     this.message = '';
 
     try {
-      const { data, error } = await this.supabase.client.auth.signUp({
+      const { error } = await this.supabase.client.auth.signUp({
         email: this.form.value.email,
         password: this.form.value.password,
         options: {

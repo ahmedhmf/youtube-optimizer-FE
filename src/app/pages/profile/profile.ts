@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Validators, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 
 @Component({
@@ -15,7 +14,6 @@ import { MatInput } from '@angular/material/input';
     MatFormField,
     MatInput,
     MatButton,
-    MatIcon,
     MatDivider,
     MatLabel,
     CommonModule,
@@ -23,36 +21,37 @@ import { MatInput } from '@angular/material/input';
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Profile {
-  user = {
+  private fb=inject(FormBuilder);
+
+  protected user = {
     name: 'John Doe',
     email: 'john@example.com',
     plan: 'Pro Plan',
   };
+  protected planDescription = 'Unlimited video analyses, AI suggestions, and thumbnail prompts.';
+  protected accountForm: FormGroup;
 
-  planDescription = 'Unlimited video analyses, AI suggestions, and thumbnail prompts.';
-
-  accountForm: FormGroup;
-
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.accountForm = this.fb.group({
       name: [this.user.name, [Validators.required]],
       email: [this.user.email, [Validators.required, Validators.email]],
     });
   }
 
-  updateProfile() {
-    if (this.accountForm.invalid) return;
+  updateProfile(): void {
+    if (this.accountForm.invalid) {return;}
     console.log('Updated profile:', this.accountForm.value);
   }
 
-  changePassword() {
+  changePassword(): void {
     console.log('Password change flow');
   }
 
-  logout() {
+  logout(): void {
     console.log('Logging out...');
-    // Later integrate Supabase Auth logout
+    // Todo: integrate Supabase Auth logout
   }
 }

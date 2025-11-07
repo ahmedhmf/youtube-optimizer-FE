@@ -1,78 +1,72 @@
 <div class="signup-container">
   <mat-card class="signup-card">
     <div class="brand">
-      <img src="./logo-edit.png" alt="Descripta Logo" />
+      <img alt="Descripta Logo" ngSrc="./logo-edit.png" />
       <h2>Create your Descripta account</h2>
       <p>Join thousands of creators optimizing their videos with AI</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="signUp()">
-      <mat-form-field appearance="outline" class="full-width" 
-                      [class.mat-form-field-invalid]="hasFieldError('name')">
+      <mat-form-field appearance="outline" class="full-width" [class.mat-form-field-invalid]="hasFieldError('name')">
         <mat-label>Name</mat-label>
-        <input matInput formControlName="name" placeholder="Your full name" />
+        <input formControlName="name" matInput placeholder="Your full name" />
         <mat-icon matSuffix>person</mat-icon>
-        <mat-error *ngIf="hasFieldError('name')">
+        @if(hasFieldError('name')){
+        <mat-error>
           {{ getFieldError('name') }}
         </mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width"
-                      [class.mat-form-field-invalid]="hasFieldError('email')">
+      <mat-form-field appearance="outline" class="full-width" [class.mat-form-field-invalid]="hasFieldError('email')">
         <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email" placeholder="you@example.com" />
+        <input formControlName="email" matInput placeholder="you@example.com" type="email" />
         <mat-icon matSuffix>mail</mat-icon>
-        <mat-error *ngIf="hasFieldError('email')">
+        @if(hasFieldError('email')){
+        <mat-error>
           {{ getFieldError('email') }}
         </mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width"
-                      [class.mat-form-field-invalid]="hasFieldError('password')">
+        [class.mat-form-field-invalid]="hasFieldError('password')">
         <mat-label>Password</mat-label>
-        <input
-          matInput
-          [type]="hidePassword ? 'password' : 'text'"
-          formControlName="password"
-          placeholder="••••••••"
-        />
+        <input formControlName="password" matInput placeholder="••••••••" [type]="hidePassword ? 'password' : 'text'" />
         <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
-        <mat-error *ngIf="hasFieldError('password')">
+        @if(hasFieldError('password')){
+        <mat-error>
           {{ getFieldError('password') }}
         </mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width"
-                      [class.mat-form-field-invalid]="hasFieldError('confirmPassword')">
+        [class.mat-form-field-invalid]="hasFieldError('confirmPassword')">
         <mat-label>Confirm Password</mat-label>
-        <input
-          matInput
-          [type]="hideConfirm ? 'password' : 'text'"
-          formControlName="confirmPassword"
-          placeholder="••••••••"
-        />
+        <input formControlName="confirmPassword" matInput placeholder="••••••••"
+          [type]="hideConfirm ? 'password' : 'text'" />
         <button mat-icon-button matSuffix type="button" (click)="hideConfirm = !hideConfirm">
           <mat-icon>{{ hideConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
-        <mat-error *ngIf="hasFieldError('confirmPassword')">
+        @if(hasFieldError('confirmPassword')){
+        <mat-error>
           {{ getFieldError('confirmPassword') }}
         </mat-error>
+        }
       </mat-form-field>
 
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="form.invalid || loading"
-        class="signup-btn"
-      >
-        <span *ngIf="!loading">Create Account</span>
-        <span *ngIf="loading">
+      <button class="signup-btn" color="primary" mat-raised-button type="submit" [disabled]="form.invalid || loading">
+        @if(!loading){
+        <span>Create Account</span>
+        } @else{
+        <span>
           <mat-icon class="loading-icon">hourglass_empty</mat-icon>
           Creating Account...
         </span>
+        }
       </button>
     </form>
 

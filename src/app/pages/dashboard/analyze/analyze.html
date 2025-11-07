@@ -16,29 +16,32 @@
         </div>
 
         <div class="actions">
-            <button mat-raised-button color="primary" [disabled]="!canAnalyze() || this.store.status() === 'analyzing'"
+            @if(this.store.status() !== 'analyzing'){
+            <button color="primary" mat-raised-button type="button" [disabled]="!canAnalyze() || this.store.status() === 'analyzing'"
                 (click)="analyze()">
-                @if(this.store.status() !== 'analyzing'){
                 <mat-icon>play_arrow</mat-icon>
                 <span>Analyze</span>
-                } @else{
-                <mat-spinner diameter="20"></mat-spinner>
-                <span>Analyzing...</span>
-                }
             </button>
+            } @else{
+            <button color="primary" mat-raised-button type="button" [disabled]="!canAnalyze() || this.store.status() === 'analyzing'"
+                (click)="analyze()">
+                <mat-spinner diameter="20" />
+                <span>Analyzing...</span>
+            </button>
+            }
 
             @if(sourceUrl()){
-            <button mat-button color="warn" (click)="reset()">
+            <button color="warn" mat-button type="button" (click)="reset()">
                 Reset
             </button>
             }
         </div>
 
         <!-- Results -->
-        @if(this.store.status() === 'done' && store.analysis()){
+        @if(this.store.status() === 'done' && store.audits()){
         <div class="result">
-            <h3>Analysis Result</h3>
-            <pre>{{ store.analysis()?.at(-1) | json }}</pre>
+            <h3>Audits Result</h3>
+            <pre>{{ store.audits()?.at(-1) | json }}</pre>
         </div>
         }
         @if(this.store.status() === 'error'){

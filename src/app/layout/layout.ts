@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -28,6 +28,7 @@ import { LayoutStore } from '../stores/layout.store';
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Layout {
   protected store = inject(LayoutStore);
@@ -36,9 +37,9 @@ export class Layout {
 
   constructor() {
     this.store.setPagesLinks([
-      { label: 'Features', action: () => this.scrollToSection('features') },
-      { label: 'How It Works', action: () => this.scrollToSection('how-it-works') },
-      { label: 'Pricing', action: () => this.scrollToSection('pricing') }
+      { label: 'Features', action: (): void => this.scrollToSection('features') },
+      { label: 'How It Works', action: (): void => this.scrollToSection('how-it-works') },
+      { label: 'Pricing', action: (): void => this.scrollToSection('pricing') }
     ])
     this.checkAuthStatus();
 
@@ -48,7 +49,7 @@ export class Layout {
     });
   }
 
-  private async checkAuthStatus() {
+  private async checkAuthStatus(): Promise<void> {
     try {
       const { data: { session } } = await this.authService.client.auth.getSession();
       this.store.setIsAuthenticated(!!session);
@@ -60,7 +61,7 @@ export class Layout {
     }
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     try {
       await this.authService.client.auth.signOut();
       this.store.setIsAuthenticated(false);
@@ -71,27 +72,27 @@ export class Layout {
     }
   }
 
-  goToLogin() {
+  goToLogin(): void {
     this.router.navigate([LOGIN_URL]);
   }
 
-  goToProfile() {
+  goToProfile(): void {
     this.router.navigate([PROFILE_URL]);
   }
 
-  goToDashboard() {
+  goToDashboard(): void {
     this.router.navigate([DASHBOARD_URL]);
   }
 
-  toggleSidenav() {
+  toggleSidenav(): void {
     this.store.setSidenav(!this.store.sidenavOpened());
   }
 
-  closeSidenav() {
+  closeSidenav(): void {
     this.store.setSidenav(false);
   }
 
-  scrollToSection(sectionId: string) {
+  scrollToSection(sectionId: string): void {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });

@@ -1,6 +1,6 @@
-import { Component, EventEmitter, HostListener, inject, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -9,7 +9,7 @@ import { AuthService } from '../../../services/auth';
 import { MatIcon } from '@angular/material/icon';
 import { JsonPipe } from '@angular/common';
 import { ApiService } from '../../../services/api';
-import { VideoAnalysisStore } from '../../../stores/video-analysis.store';
+import { VideoAuditsStore } from '../../../stores/video-audits.store';
 
 
 @Component({
@@ -26,42 +26,41 @@ import { VideoAnalysisStore } from '../../../stores/video-analysis.store';
     MatCardModule,
     MatIcon,
     JsonPipe
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzeComponent {
-  protected store = inject(VideoAnalysisStore);
+  protected store = inject(VideoAuditsStore);
   private supabase = inject(AuthService);
   private api = inject(ApiService);
 
   // Inputs
-  sourceUrl = signal<string>('');
-  title = signal<string>('');
+  readonly sourceUrl = signal<string>('');
+  readonly title = signal<string>('');
 
-  constructor() { }
-
-  canAnalyze() {
+  canAnalyze(): boolean {
     return !!this.sourceUrl();
   }
 
-  async analyze() {
+  async analyze(): Promise<void> {
     try {
-      if (!this.canAnalyze()) return;
+      if (!this.canAnalyze()) {return;}
 
       this.store.setMessage('');
       const form = new FormData();
-      if (this.sourceUrl()) form.append('sourceUrl', this.sourceUrl().trim());
-      if (this.title()) form.append('title', this.title().trim());
+      if (this.sourceUrl()) {form.append('sourceUrl', this.sourceUrl().trim());}
+      if (this.title()) {form.append('title', this.title().trim());}
 
       const userId = (await this.supabase.getUser())?.id;
-      if (userId) form.append('userId', userId);
+      if (userId) {form.append('userId', userId);}
 
       this.api.analyzeVideo(this.sourceUrl());
     } catch (err: any) {
-      this.store.setMessage(err?.message ?? 'Analysis failed');
+      this.store.setMessage((err?.message as string) ?? 'Audits failed');
     }
   }
 
-  reset() {
+  reset(): void {
     this.sourceUrl.set('');
     this.title.set('');
     this.store.setStatus('idle');

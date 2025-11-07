@@ -1,4 +1,3 @@
-import { S } from "@angular/cdk/keycodes";
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
 
 export type AnalyzeResponse = {
@@ -28,35 +27,41 @@ export type Audits = {
   ai_tags: string[];
   ai_thumbnail_prompts: string[];
   created_at: string;
+  thumbnail_url: string;
 }
 
 type AnalyzeState = 'idle' | 'analyzing' | 'done' | 'error';
 
 const initialState = {
-  analysis: [] as Audits[] | null,
+  audits: [] as Audits[] | null,
   loading: false,
   status: 'idle' as AnalyzeState,
   message: ''
 };
 
-export const VideoAnalysisStore = signalStore(
+export const VideoAuditsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store) => ({
-    setLoading: (loading: boolean) => {
+    setLoading: (loading: boolean): void => {
       patchState(store, { loading });
     },
-    setAnalysis: (analysis: Audits[]) => {
-      patchState(store, { analysis });
+    setAudits: (audits: Audits[]): void => {
+      patchState(store, { audits });
     },
-    addAnalysis: (analysis: Audits) => {
-      const current = store.analysis() || [];
-      patchState(store, { analysis: [analysis, ...current] });
+    addAudits: (audits: Audits): void => {
+      const current = store.audits() || [];
+      patchState(store, { audits: [audits, ...current] });
     },
-    setStatus(status: AnalyzeState) {
+    removeAudits: (id: string): void => {
+      const current = store.audits() || [];
+      const updated = current.filter(a => a.id !== id);
+      patchState(store, { audits: updated });
+    },
+    setStatus(status: AnalyzeState): void {
       patchState(store, { status });
     },
-    setMessage(message: string) {
+    setMessage(message: string): void {
       patchState(store, { message });
     }
   })),

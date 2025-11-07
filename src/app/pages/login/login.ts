@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,7 @@ import { AuthService } from '../../services/auth';
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginPageComponent {
   private supabase = inject(AuthService);
@@ -75,7 +76,7 @@ export class LoginPageComponent {
     return !!(field && field.errors && field.touched);
   }
 
-  async login() {
+  async login(): Promise<void> {
     // Mark all fields as touched to show validation errors
     this.form.markAllAsTouched();
 
@@ -91,7 +92,7 @@ export class LoginPageComponent {
     this.message = '';
 
     try {
-      const { data, error } = await this.supabase.client.auth.signInWithPassword({
+      const { error } = await this.supabase.client.auth.signInWithPassword({
         email: this.form.value.email,
         password: this.form.value.password,
       });

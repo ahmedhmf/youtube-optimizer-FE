@@ -12,7 +12,7 @@ export class AuthService {
     );
   }
 
-  get client() {
+  get client(): SupabaseClient {
     return this.supabase;
   }
 

@@ -1,12 +1,12 @@
 # YouTube Optimizer Frontend
 
-A modern Angular application that provides YouTube content optimization tools and analytics. This frontend application works in conjunction with a NestJS backend to deliver comprehensive YouTube video analysis and optimization recommendations.
+A modern Angular application that provides YouTube content optimization tools and analytics. This frontend application works in conjunction with a NestJS backend to deliver comprehensive YouTube video audits and optimization recommendations.
 
 ## 🚀 Features
 
-- **Video Analysis**: Analyze YouTube videos for optimization opportunities
+- **Video Audits**: Analyze YouTube videos for optimization opportunities
 - **Dashboard**: Comprehensive analytics dashboard with video insights
-- **History**: Track analysis history and progress over time
+- **History**: Track audits history and progress over time
 - **User Authentication**: Secure login and registration system with JWT tokens
 - **Profile Management**: User profile and settings management
 - **Responsive Design**: Modern UI built with Angular Material

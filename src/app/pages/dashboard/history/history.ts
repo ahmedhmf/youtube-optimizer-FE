@@ -1,22 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { AuthService } from '../../../services/auth';
-import { MatCard, MatCardActions, MatCardContent, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { MatCard } from '@angular/material/card';
 import { ApiService } from '../../../services/api';
 import { MatIcon } from '@angular/material/icon';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
-import { VideoAnalysisStore } from '../../../stores/video-analysis.store';
+import { VideoAuditsStore } from '../../../stores/video-audits.store';
 
 @Component({
   selector: 'app-history',
   imports: [
     MatCard,
-    MatCardContent,
-    MatCardTitle,
-    MatCardSubtitle,
-    MatCardActions,
     MatIcon,
     DatePipe,
     MatFormField,
@@ -26,13 +21,13 @@ import { VideoAnalysisStore } from '../../../stores/video-analysis.store';
   ],
   templateUrl: './history.html',
   styleUrl: './history.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class History implements OnInit {
-  protected store = inject(VideoAnalysisStore);
+  protected store = inject(VideoAuditsStore);
   private api = inject(ApiService);
 
   loading = false;
-  audits: any[] = [];
   error?: string;
   searchTerm = '';
 
@@ -41,28 +36,22 @@ export class History implements OnInit {
 
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.fetchHistory();
   }
 
-  fetchHistory() {
+  fetchHistory(): void {
   }
 
-  filteredVideos() {
-    const term = this.searchTerm.toLowerCase();
-    return this.audits.filter(
-      (v) =>
-        v.video_title?.toLowerCase().includes(term)
-    );
+  filteredVideos(): void {
+    // const term = this.searchTerm.toLowerCase();
+    // return this.audits.filter(
+    //   (v) =>
+    //     v.video_title?.toLowerCase().includes(term)
+    // );
   }
 
-  delete(video: any) {
-
+  delete(videoId: string): void {
+    this.api.deleteAudit(videoId);
   }
-
-  regenerate(video: any) {
-
-  }
-
-  view(video: any) { }
 }

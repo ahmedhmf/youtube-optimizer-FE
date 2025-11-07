@@ -1,11 +1,4 @@
 import { Routes } from '@angular/router';
-import { History } from './pages/dashboard/history/history';
-import { Home } from './pages/home/home';
-import { LoginPageComponent } from './pages/login/login';
-import { Register } from './pages/register/register';
-import { Layout } from './layout/layout';
-import { Profile } from './pages/profile/profile';
-import { Dashboard } from './pages/dashboard/dashboard';
 import { publicGuard } from './guard/public.guard';
 import { authGuard } from './guard/auth.guard';
 

@@ -8,22 +8,22 @@
       </div>
     </div>
 
-    <mat-divider></mat-divider>
+    <mat-divider />
 
     <div class="section">
       <h3>Account Information</h3>
       <form [formGroup]="accountForm" (ngSubmit)="updateProfile()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" />
+          <input formControlName="name" matInput />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email" />
+          <input formControlName="email" matInput type="email" />
         </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="accountForm.invalid">
+        <button color="primary" mat-raised-button type="submit" [disabled]="accountForm.invalid">
           Save Changes
         </button>
       </form>
@@ -31,7 +31,7 @@
 
     <div class="section">
       <h3>Security</h3>
-      <button mat-stroked-button color="secondary" (click)="changePassword()">
+      <button color="secondary" mat-stroked-button type="button" (click)="changePassword()">
         Change Password
       </button>
     </div>
@@ -41,12 +41,12 @@
       <mat-card class="plan-card">
         <h4>{{ user.plan || 'Free Plan' }}</h4>
         <p>{{ planDescription }}</p>
-        <button mat-raised-button color="primary">Upgrade Plan</button>
+        <button color="primary" mat-raised-button type="button">Upgrade Plan</button>
       </mat-card>
     </div>
 
     <div class="logout-section">
-      <button mat-flat-button color="tertiary" (click)="logout()">Logout</button>
+      <button color="tertiary" mat-flat-button type="button" (click)="logout()">Logout</button>
     </div>
   </mat-card>
 </div>

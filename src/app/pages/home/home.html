@@ -7,8 +7,8 @@
             hashtags, and image prompts — so you can focus on creating.
         </p>
         <div class="cta-buttons">
-            <button mat-raised-button color="primary">Try Descripta Now</button>
-            <button mat-stroked-button color="secondary">See How It Works</button>
+            <button color="primary" mat-raised-button type="button">Try Descripta Now</button>
+            <button color="secondary" mat-stroked-button type="button">See How It Works</button>
         </div>
     </div>
 </section>
@@ -17,11 +17,13 @@
 <section class="features" id="features">
     <h2>Why Creators Love Descripta</h2>
     <div class="features-grid">
-        <mat-card class="feature" *ngFor="let f of features">
+        @for(f of features; track f){
+        <mat-card class="feature">
             <mat-icon color="primary">{{ f.icon }}</mat-icon>
             <h3>{{ f.title }}</h3>
             <p>{{ f.desc }}</p>
         </mat-card>
+        }
     </div>
 </section>
 
@@ -29,40 +31,48 @@
 <section class="how-it-works" id="how-it-works">
     <h2>How It Works</h2>
     <div class="steps">
-        <mat-card *ngFor="let step of steps">
+        @for(step of steps; track step){
+        <mat-card>
             <h3>{{ step.title }}</h3>
             <p>{{ step.desc }}</p>
         </mat-card>
+        }
     </div>
 </section>
 
 <section class="testimonials" id="testimonials">
     <h2>Loved by Creators Everywhere</h2>
     <div class="testimonial-grid">
-        <mat-card *ngFor="let t of testimonials" class="testimonial">
+        @for(t of testimonials; track t){
+        <mat-card class="testimonial">
             <p>"{{ t.quote }}"</p>
             <div class="author">
-                <img [src]="t.avatar" alt="{{ t.name }}" />
+                <img alt="{{ t.name }}" [src]="t.avatar" />
                 <div>
                     <h4>{{ t.name }}</h4>
                     <span>{{ t.role }}</span>
                 </div>
             </div>
         </mat-card>
+        }
     </div>
 </section>
 
 <section class="pricing" id="pricing">
     <h2>Choose Your Plan</h2>
     <div class="pricing-grid">
-        <mat-card *ngFor="let plan of pricing" class="plan">
+        @for(plan of pricing; track plan){
+        <mat-card class="plan">
             <h3>{{ plan.name }}</h3>
             <h1>{{ plan.price }}</h1>
             <ul>
-                <li *ngFor="let feature of plan.features">{{ feature }}</li>
+                @for(feature of plan.features; track feature){
+                <li>{{ feature }}</li>
+                }
             </ul>
-            <button mat-raised-button color="primary">{{ plan.button }}</button>
+            <button color="primary" mat-raised-button type="button">{{ plan.button }}</button>
         </mat-card>
+        }
     </div>
 </section>
 

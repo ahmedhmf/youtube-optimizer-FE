@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" class="toolbar">
+<mat-toolbar class="toolbar" color="primary">
   <span>🎥 Video Analyzer</span>
   <span class="spacer"></span>
 </mat-toolbar>
@@ -12,23 +12,23 @@
       You’ll see insights instantly, and all your past analyses are saved below.
     </p>
 
-    <app-analyze (analysisComplete)="refreshHistory()"></app-analyze>
+    <app-analyze />
   </div>
 </section>
 
 <!-- HISTORY SECTION -->
 <section class="history-section">
   <mat-card class="history-card">
-    <mat-card-header (click)="toggleHistory()" class="history-header">
+    <mat-card-header class="history-header" (click)="toggleHistory()">
       <mat-card-title>
         <mat-icon>{{ historyVisible() ? 'expand_less' : 'expand_more' }}</mat-icon>
-        &nbsp; Analysis History
+        &nbsp; Audits History
       </mat-card-title>
     </mat-card-header>
 
     @if(historyVisible()) {
     <mat-card-content>
-      <app-history></app-history>
+      <app-history />
     </mat-card-content>
     }
   </mat-card>

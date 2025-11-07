@@ -1,36 +1,30 @@
 <div class="history-container">
   <mat-card class="history-header">
-    <h2>Your Analysis History</h2>
+    <h2>Your Videos History</h2>
     <p>See all the videos Descripta has analyzed for you.</p>
 
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Search videos</mat-label>
-      <input matInput [(ngModel)]="searchTerm" placeholder="Type a title or keyword..." />
+      <input matInput placeholder="Type a title or keyword..." [(ngModel)]="searchTerm" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </mat-card>
 
   <div class="history-grid">
-    @for(analysis of store.analysis(); track analysis){
+    @for(audits of store.audits(); track audits){
     <mat-card class="video-card">
       <div class="thumbnail">
-        <!-- <img [src]="analysis.thumbnail" alt="{{ analysis.video_title }}" /> -->
+        <img alt="{{ audits.video_title }}" [src]="audits.thumbnail_url" />
       </div>
 
       <div class="video-info">
-        <h3>{{ analysis.video_title }}</h3>
-        <p class="date">Analyzed on {{ analysis.created_at | date: 'mediumDate' }}</p>
-        <p class="desc">{{ analysis.ai_description }}</p>
+        <h3>{{ audits.video_title }}</h3>
+        <p class="date">Analyzed on {{ audits.created_at | date: 'mediumDate' }}</p>
+        <p class="desc">{{ audits.ai_description }}</p>
       </div>
 
       <div class="actions">
-        <button mat-icon-button color="primary" (click)="view(analysis)">
-          <mat-icon>visibility</mat-icon>
-        </button>
-        <button mat-icon-button color="secondary" (click)="regenerate(analysis)">
-          <mat-icon>autorenew</mat-icon>
-        </button>
-        <button mat-icon-button color="tertiary" (click)="delete(analysis)">
+        <button color="tertiary" mat-icon-button (click)="delete(audits.id)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth';
 
-export const publicGuard: CanActivateFn = async (route, state) => {
+export const publicGuard: CanActivateFn = async () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -21,6 +21,7 @@ export const publicGuard: CanActivateFn = async (route, state) => {
       return true;
     }
   } catch (error) {
+    // Todo : handle error properly
     return true;
   }
 };

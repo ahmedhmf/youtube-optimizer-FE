@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AnalyzeComponent } from './analyze/analyze';
 import { History } from './history/history';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -19,14 +19,15 @@ import { MatIcon } from '@angular/material/icon';
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Dashboard {
-    historyVisible = signal(true);
-  toggleHistory() {
+    readonly historyVisible = signal(true);
+  toggleHistory(): void {
     this.historyVisible.update((v) => !v);
   }
 
-  refreshHistory() {
+  refreshHistory(): void {
   }
 
 }

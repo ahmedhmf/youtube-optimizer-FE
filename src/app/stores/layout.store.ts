@@ -1,8 +1,6 @@
 import { computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { User } from '@supabase/supabase-js';
-import { interval } from 'rxjs';
 
 type pagesLinks = {
     label: string;
@@ -21,19 +19,19 @@ export const LayoutStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
     withMethods((store) => ({
-        setPagesLinks(links: pagesLinks[]) {
+        setPagesLinks(links: pagesLinks[]): void {
             patchState(store, { pagesLinks: links });
         },
-        setMenuItems(items: pagesLinks[]) {
+        setMenuItems(items: pagesLinks[]): void {
             patchState(store, { menuItems: items });
         },
-        setSidenav(isOpened: boolean) {
+        setSidenav(isOpened: boolean): void {
             patchState(store, { sidenavOpened: isOpened });
         },
-        setIsAuthenticated(isAuth: boolean) {
+        setIsAuthenticated(isAuth: boolean): void {
             patchState(store, { isAuthenticated: isAuth });
         },
-        setUser(user: User | null) {
+        setUser(user: User | null): void {
             patchState(store, { user });
         }
     })),
