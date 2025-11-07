@@ -1,0 +1,48 @@
+<mat-card class="analyze-card">
+    <mat-card-header>
+        <mat-card-title>🎬 Analyze a New Video</mat-card-title>
+        <mat-card-subtitle>
+            Paste a link. Our AI will analyze the content and show insights instantly.
+        </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+        <div class="upload-section">
+            <mat-form-field appearance="fill" class="link-field">
+                <mat-label>Video Link (YouTube, Vimeo, etc.)</mat-label>
+                <input matInput placeholder="https://example.com/video" [value]="sourceUrl()"
+                    (input)="sourceUrl.set(($any($event.target)).value)" />
+            </mat-form-field>
+        </div>
+
+        <div class="actions">
+            <button mat-raised-button color="primary" [disabled]="!canAnalyze() || this.store.status() === 'analyzing'"
+                (click)="analyze()">
+                @if(this.store.status() !== 'analyzing'){
+                <mat-icon>play_arrow</mat-icon>
+                <span>Analyze</span>
+                } @else{
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Analyzing...</span>
+                }
+            </button>
+
+            @if(sourceUrl()){
+            <button mat-button color="warn" (click)="reset()">
+                Reset
+            </button>
+            }
+        </div>
+
+        <!-- Results -->
+        @if(this.store.status() === 'done' && store.analysis()){
+        <div class="result">
+            <h3>Analysis Result</h3>
+            <pre>{{ store.analysis()?.at(-1) | json }}</pre>
+        </div>
+        }
+        @if(this.store.status() === 'error'){
+        <div class="error">{{ store.message() }}</div>
+        }
+    </mat-card-content>
+</mat-card>

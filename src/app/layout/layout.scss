@@ -1,0 +1,384 @@
+.layout-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .menu-button {
+    margin-right: 1rem;
+  }
+
+  .toolbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .toolbar-logo {
+      height: 32px;
+      width: auto;
+    }
+
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+  }
+
+  .toolbar-spacer {
+    flex: 1;
+  }
+
+  // Right Navigation Section
+  .right-nav-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  // Desktop Navigation (moved to right)
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &.authenticated-nav {
+      // Styles for authenticated user navigation
+      .nav-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &.active-nav-button {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: white;
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        span {
+          font-weight: 500;
+        }
+      }
+    }
+
+    &.public-nav {
+      // Styles for public/non-authenticated navigation
+      .nav-button {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        color: rgba(255, 255, 255, 0.9);
+        span {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Authentication Section
+  .auth-section {
+    display: flex;
+    align-items: center;
+
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .user-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .user-avatar-trigger {
+        margin-left: 0.25rem;
+        padding: 4px;
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, 
+            var(--mat-sys-secondary) 0%, 
+            var(--mat-sys-tertiary) 100%);
+          color: var(--mat-sys-on-secondary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.75rem;
+          font-weight: 600;
+          font-family: 'Poppins', sans-serif;
+          letter-spacing: 0.5px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  // Hide desktop-only elements on mobile
+  .desktop-only {
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+
+  // Hide mobile menu button on desktop
+  .mobile-only {
+    display: none;
+  }
+}
+
+.sidenav-container {
+  flex: 1;
+  margin-top: 64px; // Height of toolbar
+  height: calc(100vh - 64px);
+}
+
+// Mobile Sidenav (hidden on desktop)
+.mobile-sidenav {
+  width: 280px;
+  background-color: var(--mat-sys-surface-container);
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  display: none; // Hidden on desktop
+
+  .sidenav-content {
+    padding-top: 1rem;
+
+    .mobile-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      margin-bottom: 1rem;
+
+      .mobile-logo {
+        height: 32px;
+        width: auto;
+      }
+
+      .mobile-brand-name {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: var(--mat-sys-on-surface);
+      }
+    }
+
+    // Mobile navigation items
+    .nav-item {
+      margin: 0.25rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: var(--mat-sys-secondary-container);
+      }
+
+      &.active-nav-item {
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+
+        mat-icon {
+          color: var(--mat-sys-on-primary-container);
+        }
+      }
+
+      &.login-item {
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+
+        &:hover {
+          background-color: var(--mat-sys-primary);
+        }
+
+        mat-icon {
+          color: var(--mat-sys-on-primary-container);
+        }
+      }
+
+      mat-icon {
+        margin-right: 1rem;
+        color: var(--mat-sys-on-surface-variant);
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .nav-item {
+    margin: 0.25rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--mat-sys-secondary-container);
+    }
+
+    &.active-nav-item {
+      background-color: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+
+      mat-icon {
+        color: var(--mat-sys-on-primary-container);
+      }
+    }
+
+    mat-icon {
+      margin-right: 1rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    span {
+      font-weight: 500;
+    }
+  }
+}
+
+.main-content {
+  background-color: var(--mat-sys-surface);
+  width: 100%; // Full width on desktop since no sidenav
+}
+
+.content-wrapper {
+  padding: 1.5rem;
+  min-height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%; // Full width utilization
+}
+
+// Responsive design - Mobile First
+@media (max-width: 768px) {
+  // Show mobile elements
+  .app-toolbar {
+    .mobile-only {
+      display: inline-flex !important;
+    }
+
+    .right-nav-section .desktop-nav {
+      display: none !important;
+    }
+
+    .toolbar-brand .brand-name {
+      display: none; // Hide brand name on small screens
+    }
+
+    // Adjust avatar size on mobile
+    .auth-section .user-section .user-avatar-trigger .user-avatar {
+      width: 28px;
+      height: 28px;
+      font-size: 0.7rem;
+    }
+  }
+
+  // Show mobile sidenav
+  .mobile-sidenav {
+    display: block !important;
+    width: 280px;
+  }
+
+  .content-wrapper {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-sidenav {
+    width: 240px;
+  }
+
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+}
+
+// Animation for sidenav toggle
+.mat-sidenav {
+  transition: all 0.3s ease-in-out;
+}
+
+// Custom scrollbar for sidenav
+.app-sidenav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-sidenav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-sidenav::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-outline-variant);
+  border-radius: 3px;
+}
+
+.app-sidenav::-webkit-scrollbar-thumb:hover {
+  background: var(--mat-sys-outline);
+}
+
+// User Menu Styles
+.user-info {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+
+    .user-name-menu {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--mat-sys-on-surface);
+      margin-bottom: 0.25rem;
+    }
+
+    .user-email {
+      font-size: 0.8rem;
+      color: var(--mat-sys-on-surface-variant);
+      opacity: 0.8;
+    }
+  }
+}
+
+.mat-mdc-menu-panel {
+  min-width: 200px !important;
+}

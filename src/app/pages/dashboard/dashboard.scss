@@ -1,0 +1,86 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.analyze-hero {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    app-analyze-video {
+      display: block;
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      color: #333;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.history-section {
+  padding: 2rem 1.5rem;
+
+  .history-card {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    .history-header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      background: #f3f4f6;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #ddd;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+      }
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+  .analyze-hero {
+    padding: 3rem 1rem 2rem;
+
+    .hero-content {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}

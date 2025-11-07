@@ -1,0 +1,110 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--md-sys-color-primary) 10%, white),
+    color-mix(in srgb, var(--md-sys-color-secondary) 8%, white)
+  );
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem 2.5rem;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  .brand {
+    img {
+      height: 48px;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-family: var(--md-ref-typeface-brand);
+      font-size: 1.6rem;
+      margin: 0.25rem 0;
+    }
+
+    p {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+
+    &.mat-form-field-invalid {
+      .mat-mdc-form-field-focus-overlay {
+        background-color: rgba(244, 67, 54, 0.1);
+      }
+    }
+  }
+
+  // Error message styling
+  mat-error {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+    color: var(--mat-sys-error);
+  }
+
+  // Enhanced error state styling
+  .mat-mdc-form-field.mat-form-field-invalid {
+    .mat-mdc-text-field-wrapper {
+      border-color: var(--mat-sys-error);
+    }
+    
+    .mat-mdc-form-field-label {
+      color: var(--mat-sys-error);
+    }
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    text-transform: none;
+    border-radius: 10px;
+
+    .loading-icon {
+      animation: spin 1s linear infinite;
+      margin-right: 0.5rem;
+      font-size: 18px;
+    }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .signup-text {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    a {
+      color: var(--md-sys-color-primary);
+      text-decoration: none;
+      font-weight: 500;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+}

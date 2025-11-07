@@ -1,0 +1,27 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// 🌈 Brand color tokens
+:root {
+  --md-sys-color-primary: #3366ff;
+  --md-sys-color-secondary: #7a42ff;
+  --md-sys-color-tertiary: #ff4f4f;
+  --md-sys-color-background: #f9fafb;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-on-surface: #1e1e1e;
+
+  --md-ref-typeface-plain: 'Inter', sans-serif;
+  --md-ref-typeface-brand: 'Poppins', sans-serif;
+}
+
+// 🌙 Optional dark theme
+.dark-theme {
+  --md-sys-color-primary: #7a9cff;
+  --md-sys-color-secondary: #a782ff;
+  --md-sys-color-tertiary: #ff8a8a;
+  --md-sys-color-background: #121212;
+  --md-sys-color-surface: #1e1e1e;
+  --md-sys-color-on-surface: #ffffff;
+}

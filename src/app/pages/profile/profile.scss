@@ -1,0 +1,128 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: var(--md-sys-color-background);
+  min-height: 100vh;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 700px;
+  padding: 2rem;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    .avatar {
+      position: relative;
+      margin-right: 1.5rem;
+
+      img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--md-sys-color-primary);
+      }
+
+      .edit-avatar {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+      }
+    }
+
+    .user-info {
+      h2 {
+        margin: 0;
+        font-family: var(--md-ref-typeface-brand);
+        font-size: 1.4rem;
+      }
+
+      p {
+        margin: 0.25rem 0;
+        opacity: 0.8;
+      }
+
+      .plan-badge {
+        display: inline-block;
+        margin-top: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        background: color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
+        color: var(--md-sys-color-primary);
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .section {
+    margin-top: 2rem;
+
+    h3 {
+      font-family: var(--md-ref-typeface-brand);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .full-width {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .plan-card {
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+      background: color-mix(in srgb, var(--md-sys-color-surface) 90%, var(--md-sys-color-primary) 5%);
+
+      h4 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin: 0.5rem 0 1rem 0;
+      }
+    }
+  }
+
+  .logout-section {
+    margin-top: 3rem;
+    text-align: center;
+
+    button {
+      width: 100%;
+      font-weight: 600;
+      text-transform: none;
+      border-radius: 10px;
+      padding: 0.75rem 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+    .header {
+      justify-content: center;
+      text-align: center;
+      .avatar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+<div class="layout-container">
+  <mat-toolbar class="app-toolbar" color="primary">
+    <button mat-icon-button (click)="toggleSidenav()" class="menu-button mobile-only">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="toolbar-brand">
+      <img src="./logo-edit.png" alt="Logo" class="toolbar-logo" routerLink="/">
+    </div>
+
+    <span class="toolbar-spacer"></span>
+
+    <div class="right-nav-section">
+      @if(store.isAuthenticated() && store.menuItems().length > 0){
+      <nav class="desktop-nav authenticated-nav">
+      </nav>
+      }
+      @if(!store.isAuthenticated()){
+      <nav class="desktop-nav authenticated-nav">
+        @for(section of store.pagesLinks(); track section){
+        <button mat-button (click)="section.action()" routerLinkActive="active-nav-button" class="nav-button">
+          <span>{{ section.label }}</span>
+        </button>
+        }
+      </nav>
+      }
+      <div class="auth-section">
+        @if(store.isAuthenticated()){
+        <div class="user-section">
+          <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-avatar-trigger">
+            <div class="user-avatar">
+              {{ store.userInitials() }}
+            </div>
+          </button>
+
+          <mat-menu #userMenu="matMenu">
+            <div class="user-info">
+              <div class="user-details">
+                <span class="user-name-menu">{{ store.displayName() }}</span>
+                @if(store.user()?.email){
+                <span class="user-email">{{ store.user()?.email }}</span>
+                }
+              </div>
+            </div>
+            <button mat-menu-item (click)="goToDashboard()">
+              <mat-icon>dashboard</mat-icon>
+              <span>Dashboard</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="goToProfile()">
+              <mat-icon>person</mat-icon>
+              <span>Profile</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>settings</mat-icon>
+              <span>Settings</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
+        </div>
+        }
+        @if(!store.isAuthenticated()){
+        <div class="login-section">
+          <button mat-button (click)="goToLogin()" color="secondary" mat-raised-button class="login-button">
+            <mat-icon>login</mat-icon>
+            <span class="desktop-only">Login</span>
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav [opened]="store.sidenavOpened()" mode="over" class="app-sidenav mobile-sidenav"
+      fixedInViewport="true" fixedTopGap="64">
+
+      <div class="sidenav-content">
+        <div class="mobile-brand">
+          <img src="./logo-edit.png" alt="Logo" class="mobile-logo">
+          <span class="mobile-brand-name">Descripta</span>
+        </div>
+        @if(store.isAuthenticated() && store.menuItems().length > 0){
+        <mat-nav-list>
+        </mat-nav-list>
+        }
+        @if(!store.isAuthenticated()){
+        <mat-nav-list>
+          @for(section of store.pagesLinks(); track section){
+          <mat-list-item class="nav-item"
+            (click)="section.action(); closeSidenav()">
+            <span matListItemTitle>{{ section.label }}</span>
+          </mat-list-item>
+          }
+          <mat-divider></mat-divider>
+          <mat-list-item class="nav-item login-item" (click)="goToLogin(); closeSidenav()">
+            <mat-icon matListItemIcon>login</mat-icon>
+            <span matListItemTitle>Login</span>
+          </mat-list-item>
+        </mat-nav-list>
+        }
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
