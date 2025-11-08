@@ -84,3 +84,162 @@
     }
   }
 }
+
+// ...existing styles...
+
+// Tab content
+.tab-content {
+  padding: 24px 0;
+}
+
+// File upload styles
+.file-upload-container {
+  width: 100%;
+
+  .file-drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    margin-bottom: 20px;
+
+    &:hover {
+      border-color: #1976d2;
+      background: #f0f7ff;
+    }
+
+    &.dragover {
+      border-color: #1976d2;
+      background: #e3f2fd;
+      transform: scale(1.02);
+    }
+
+    .drop-zone-content {
+      .upload-icon {
+        font-size: 48px;
+        color: #666;
+        margin-bottom: 16px;
+      }
+
+      h3 {
+        margin: 0 0 8px 0;
+        color: rgba(0, 0, 0, 0.87);
+        font-weight: 500;
+      }
+
+      p {
+        margin: 4px 0;
+        color: rgba(0, 0, 0, 0.6);
+
+        &.file-info {
+          font-size: 12px;
+          margin-top: 12px;
+        }
+      }
+    }
+
+    .selected-file-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+
+      .file-icon {
+        font-size: 48px;
+        color: #1976d2;
+      }
+
+      .file-details {
+        flex: 1;
+
+        h4 {
+          margin: 0 0 8px 0;
+          color: rgba(0, 0, 0, 0.87);
+          font-weight: 500;
+        }
+
+        p {
+          margin: 0 0 12px 0;
+          color: rgba(0, 0, 0, 0.6);
+          font-size: 14px;
+        }
+
+        .file-actions {
+          display: flex;
+          gap: 8px;
+
+          .mat-mdc-button {
+            .mat-icon {
+              margin-right: 6px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .file-config-section {
+    .config-toggle-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+
+      .mat-icon {
+        transition: transform 0.3s ease;
+
+        &.rotated {
+          transform: rotate(45deg);
+        }
+      }
+    }
+
+    .file-config-panel {
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
+
+      .config-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  }
+}
+
+// Tab group styling
+.mat-mdc-tab-group {
+  margin-bottom: 20px;
+
+  .mat-mdc-tab-label {
+    font-weight: 500;
+  }
+}
+
+// Responsive design for file upload
+@media (max-width: 768px) {
+  .file-upload-container {
+    .file-drop-zone {
+      padding: 20px 10px;
+
+      .selected-file-info {
+        flex-direction: column;
+        text-align: center;
+
+        .file-details {
+          .file-actions {
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+        }
+      }
+    }
+  }
+}

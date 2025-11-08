@@ -1,23 +1,6 @@
 import { computed } from "@angular/core";
 import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 
-export type AnalyzeResponse = {
-  video: {
-    id: string;
-    title: string;
-    description: string;
-    tags: string[];
-    thumbnail: string;
-    views: number;
-  };
-  suggestions: {
-    titles: string[];
-    description: string;
-    tags: string[];
-    thumbnailPrompts: string[];
-  };
-}
-
 export type Audits = {
   id: string;
   user_id: string;
@@ -38,7 +21,8 @@ const initialState = {
   loading: false,
   status: 'idle' as AnalyzeState,
   message: '',
-  filterText: ''
+  filterText: '',
+  newestAudit: null as Audits | null,
 };
 
 export const VideoAuditsStore = signalStore(
@@ -53,7 +37,7 @@ export const VideoAuditsStore = signalStore(
     },
     addAudits: (audits: Audits): void => {
       const current = store.audits() || [];
-      patchState(store, { audits: [audits, ...current] });
+      patchState(store, { audits: [audits, ...current], newestAudit: audits });
     },
     removeAudits: (id: string): void => {
       const current = store.audits() || [];
