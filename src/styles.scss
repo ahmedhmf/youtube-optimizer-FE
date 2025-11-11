@@ -1,58 +1,166 @@
+/* filepath: c:\Ahmed\projects\Github\youtube-optimizer-FE\src\styles.scss */
+@use "tailwindcss";
 
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
-@use '@angular/material' as mat;
-
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+@theme {
+  /* Primary Colors */
+  --color-primary: #c5a8ff;
+  --color-primary-light: #E8D8FF;
+  
+  /* Background Colors */
+  --color-background-light: #F9F9FF;
+  --color-background-dark: #160f23;
+  
+  /* Text Colors */
+  --color-text-light: #1A1A2E;
+  --color-text-dark: #F9F9FF;
+  --color-text-secondary-light: #6D6D80;
+  --color-text-secondary-dark: #b0b0c0;
+  
+  /* Border Colors */
+  --color-border-light: #dedae7;
+  --color-border-dark: #3a3a5a;
+  
+  /* Font Family */
+  --font-family-display: "Inter", sans-serif;
+  --font-family-sans: "Inter", sans-serif;
+  
+  /* Border Radius */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
 }
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
+/* Component Classes */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 font-semibold text-white transition-all duration-200 rounded-lg;
+    background-color: var(--color-primary);
+  }
+  
+  .btn-primary:hover {
+    @apply transform -translate-y-0.5;
+    background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+  }
+  
+  .card {
+    @apply p-6 transition-all duration-200 rounded-xl shadow-sm;
+    background-color: var(--color-background-light);
+    border: 1px solid var(--color-border-light);
+  }
+  
+  .card:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+  
+  .text-primary {
+    color: var(--color-primary);
+  }
+  
+  .text-light {
+    color: var(--color-text-light);
+  }
+  
+  .text-dark {
+    color: var(--color-text-dark);
+  }
+  
+  .text-secondary-light {
+    color: var(--color-text-secondary-light);
+  }
+  
+  .text-secondary-dark {
+    color: var(--color-text-secondary-dark);
+  }
+  
+  .bg-light {
+    background-color: var(--color-background-light);
+  }
+  
+  .bg-dark {
+    background-color: var(--color-background-dark);
+  }
+  
+  .border-light {
+    border-color: var(--color-border-light);
+  }
+  
+  .border-dark {
+    border-color: var(--color-border-dark);
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all duration-200;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-background-light);
+    border-color: var(--color-border-light);
+    color: var(--color-text-light);
+  }
+  
+  .input-field:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
 }
-/* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-/* Snackbar notification styles */
-.success-snackbar {
-  background-color: var(--mat-sys-primary) !important;
-  color: var(--mat-sys-on-primary) !important;
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: var(--color-background-dark);
+    border-color: var(--color-border-dark);
+  }
+  
+  .input-field {
+    background-color: var(--color-background-dark);
+    border-color: var(--color-border-dark);
+    color: var(--color-text-dark);
+  }
 }
 
-.error-snackbar {
-  background-color: var(--mat-sys-error) !important;
-  color: var(--mat-sys-on-error) !important;
+/* Base Styles */
+@layer base {
+  body {
+    font-family: var(--font-family-display);
+    background-color: var(--color-background-light);
+    color: var(--color-text-light);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-display);
+    font-weight: 600;
+  }
 }
 
-.mat-mdc-snack-bar-container {
-  border-radius: 8px !important;
-}
-
-.mat-mdc-snack-bar-label {
-  font-weight: 500 !important;
+/* Utility Classes */
+@layer utilities {
+  .font-display {
+    font-family: var(--font-family-display);
+  }
+  
+  .rounded-default {
+    border-radius: var(--radius);
+  }
+  
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  
+  .rounded-full {
+    border-radius: var(--radius-full);
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-light)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }

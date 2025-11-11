@@ -1,9 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { Subject } from 'rxjs';
+import { ApiError } from '../models/api-error.model';
+import { ErrorHandlerService } from '../util/error-handler.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private supabase: SupabaseClient;
+  private errorHandler = inject(ErrorHandlerService);
+  public error$ = new Subject<ApiError>();
 
   constructor() {
     this.supabase = createClient(
@@ -19,5 +24,21 @@ export class AuthService {
   async getUser(): Promise<User | null> {
     const { data } = await this.supabase.auth.getUser();
     return data?.user ?? null;
+  }
+
+  async signOut(): Promise<void> {
+    try {
+      const { error } = await this.client.auth.signOut();
+      if (error) {
+        const handledError = this.errorHandler.handle({
+          status: error.status || 400,
+          error: { message: error.message }
+        });
+        this.error$.next(handledError);
+      }
+    } catch (error: any) {
+      const handledError = this.errorHandler.handle(error);
+      this.error$.next(handledError);
+    }
   }
 }

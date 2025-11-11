@@ -1,5 +1,4 @@
-export type Language = {
-  code: string;
+export type AIConfigurationSettings = {
   name: string;
-  flag: string;
+  value: string;
 };

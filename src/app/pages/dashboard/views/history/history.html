@@ -1,0 +1,129 @@
+<div class="layout-content-container flex flex-col w-full max-w-4xl flex-1 gap-8">
+    <div class="flex flex-wrap justify-between gap-3 px-4">
+        <p class="text-[#131018] dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">
+            Analysis History
+        </p>
+        <div class="text-sm text-gray-500 dark:text-gray-400 self-end">
+            @if (pagination().total > 0) {
+                Showing {{ getShowingStart() }} - {{ getShowingEnd() }} of {{ pagination().total }} results
+            }
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading() && audits().length === 0) {
+        <div class="flex items-center justify-center py-12">
+            <div class="flex items-center gap-3">
+                <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-lg font-semibold text-primary">Loading your analysis history...</span>
+            </div>
+        </div>
+    }
+
+    <!-- History Items -->
+    @if (audits().length > 0) {
+        <div class="flex flex-col gap-4" [class.opacity-50]="loading()">
+            @for(audit of audits(); track audit.id){
+                <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 p-4 pr-6">
+                        <div class="w-full sm:w-32 h-20 sm:h-auto sm:aspect-video rounded-lg bg-cover bg-center flex-shrink-0"
+                            [style.background-image]="'url(' + audit.thumbnail_url + ')'">
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h3 class="font-bold text-[#131018] dark:text-white mb-1">{{ audit.video_title }}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                Analyzed on: {{ audit.created_at | date:'medium' }}
+                            </p>
+                            <div class="flex flex-wrap gap-1 justify-center sm:justify-start">
+                                @for(tag of audit.ai_tags.slice(0, 3); track tag) {
+                                    <span class="inline-block bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
+                                        {{ tag }}
+                                    </span>
+                                }
+                                @if(audit.ai_tags.length > 3) {
+                                    <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                                        +{{ audit.ai_tags.length - 3 }} more
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button
+                                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary/20 text-[#131018] dark:text-white dark:bg-primary/30 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/40 transition-colors">
+                                <span class="truncate">View Details</span>
+                            </button>
+                            <button
+                                (click)="deleteAudit(audit.id)"
+                                class="flex items-center justify-center w-10 h-10 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (pagination().totalPages > 1) {
+            <div class="flex items-center justify-center gap-2 py-6">
+                <!-- Previous Button -->
+                <button
+                    (click)="loadPreviousPage()"
+                    [disabled]="!pagination().hasPrev || loading()"
+                    [class.opacity-50]="!pagination().hasPrev || loading()"
+                    [class.cursor-not-allowed]="!pagination().hasPrev || loading()"
+                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    ← Previous
+                </button>
+
+                <!-- Page Numbers -->
+                @for(pageNum of getPageNumbers(); track pageNum) {
+                    <button
+                        (click)="goToPage(pageNum)"
+                        [disabled]="loading()"
+                        [class.bg-primary]="pageNum === pagination().page"
+                        [class.text-white]="pageNum === pagination().page"
+                        [class.bg-white]="pageNum !== pagination().page"
+                        [class.text-gray-700]="pageNum !== pagination().page"
+                        [class.dark:bg-background-dark]="pageNum !== pagination().page"
+                        [class.dark:text-gray-300]="pageNum !== pagination().page"
+                        class="w-10 h-10 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        {{ pageNum }}
+                    </button>
+                }
+
+                <!-- Next Button -->
+                <button
+                    (click)="loadNextPage()"
+                    [disabled]="!pagination().hasNext || loading()"
+                    [class.opacity-50]="!pagination().hasNext || loading()"
+                    [class.cursor-not-allowed]="!pagination().hasNext || loading()"
+                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    Next →
+                </button>
+            </div>
+        }
+    }
+
+    <!-- Empty State -->
+    @if (audits().length === 0 && !loading() && !error()) {
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                📊
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Analysis History</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-4">
+                You haven't analyzed any videos yet. Start by analyzing your first video!
+            </p>
+            <button
+                type="button"
+                class="btn-primary"
+                routerLink="/dashboard/analyze-video">
+                Analyze Your First Video
+            </button>
+        </div>
+    }
+</div>

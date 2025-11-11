@@ -1,5 +1,6 @@
-import { computed } from "@angular/core";
-import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
+import { computed } from '@angular/core';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { ApiError } from '../models/api-error.model';
 
 export type Audits = {
   id: string;
@@ -12,67 +13,120 @@ export type Audits = {
   ai_thumbnail_prompts: string[];
   created_at: string;
   thumbnail_url: string;
-}
+};
 
 type AnalyzeState = 'idle' | 'analyzing' | 'done' | 'error';
 
-const initialState = {
-  audits: [] as Audits[] | null,
+export type PaginationInfo = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+};
+
+export type HistoryResponse = {
+  data: Audits[];
+  pagination: PaginationInfo;
+};
+
+export type VideoAuditsState = {
+  audits: Audits[];
+  pagination: PaginationInfo;
+  loading: boolean;
+  error: any;
+  status: 'idle' | 'analyzing' | 'done' | 'error';
+  needsPaginationRefresh: boolean;
+};
+
+const initialState: VideoAuditsState = {
+  audits: [],
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false,
+  },
   loading: false,
-  status: 'idle' as AnalyzeState,
-  message: '',
-  filterText: '',
-  newestAudit: null as Audits | null,
+  error: null,
+  status: 'idle',
+  needsPaginationRefresh: false,
 };
 
 export const VideoAuditsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store) => ({
-    setLoading: (loading: boolean): void => {
+    setAudits(response: HistoryResponse) {
+      patchState(store, {
+        audits: response.data,
+        pagination: response.pagination,
+        loading: false,
+        error: null,
+      });
+    },
+
+    addAudits(audit: Audits) {
+      patchState(store, (state) => ({
+        audits: [audit, ...state.audits],
+      }));
+    },
+
+    appendAudits(response: HistoryResponse) {
+      patchState(store, (state) => ({
+        audits: [...state.audits, ...response.data],
+        pagination: response.pagination,
+        loading: false,
+      }));
+    },
+
+    removeAudits(id: string) {
+      patchState(store, (state) => {
+        const updatedAudits = state.audits.filter((audit) => audit.id !== id);
+        const newTotalPages = Math.ceil((state.pagination.total - 1) / state.pagination.limit);
+
+        return {
+          audits: updatedAudits,
+          pagination: {
+            ...state.pagination,
+            total: state.pagination.total - 1,
+            totalPages: newTotalPages,
+            hasNext: state.pagination.page < newTotalPages,
+            hasPrev: state.pagination.page > 1,
+          },
+          // Add a flag to indicate pagination refresh is needed
+          needsPaginationRefresh: true,
+        };
+      });
+    },
+
+    clearPaginationRefreshFlag() {
+      patchState(store, { needsPaginationRefresh: false });
+    },
+    setLoading(loading: boolean) {
       patchState(store, { loading });
     },
-    setAudits: (audits: Audits[]): void => {
-      patchState(store, { audits });
+
+    setError(error: any) {
+      patchState(store, { error, loading: false });
     },
-    addAudits: (audits: Audits): void => {
-      const current = store.audits() || [];
-      patchState(store, { audits: [audits, ...current], newestAudit: audits });
-    },
-    removeAudits: (id: string): void => {
-      const current = store.audits() || [];
-      const updated = current.filter(a => a.id !== id);
-      patchState(store, { audits: updated });
-    },
-    setStatus(status: AnalyzeState): void {
+
+    setStatus(status: VideoAuditsState['status']) {
       patchState(store, { status });
     },
-    setMessage(message: string): void {
-      patchState(store, { message });
-    },
-    setFilterText(filterText: string): void {
-      patchState(store, { filterText });
-    },
-    clearFilter(): void {
-      patchState(store, { filterText: '' });
-    },
-  })),
-  withComputed((store) => ({
-    // Computed signal for filtered audits
-    filteredAudits: computed(() => {
-      const audits = store.audits();
-      const filter = store.filterText().toLowerCase().trim();
 
-      if (!filter) {
-        return audits;
-      }
+    clearError() {
+      patchState(store, { error: null });
+    },
 
-      return audits?.filter(audit =>
-        audit.video_title?.toLowerCase().includes(filter) ||
-        JSON.stringify(audit).toLowerCase().includes(filter) ||
-        new Date(audit.created_at).toLocaleDateString().includes(filter)
-      );
-    }),
-    isFilterActive: computed(() => store.filterText().trim().length > 0)
+    resetPagination() {
+      patchState(store, {
+        audits: [],
+        pagination: initialState.pagination,
+      });
+    },
   })),
 );

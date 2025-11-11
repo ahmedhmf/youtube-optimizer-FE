@@ -30,7 +30,6 @@
               }
             ],
             "styles": [
-              "src/styles/_descripta-theme.scss",
               "src/styles.scss"
             ]
           },

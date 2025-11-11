@@ -1,131 +1,91 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, Subject, takeUntil, tap, throwError } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { catchError, Observable, Subject, takeUntil, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Audits, VideoAuditsStore } from '../stores/video-audits.store';
+import { Audits, HistoryResponse, VideoAuditsStore } from '../stores/video-audits.store';
 import { AiMessageConfiguration } from '../models/ai-message-configuration.model';
-
-
+import { ErrorHandlerService } from '../util/error-handler.service';
+import { AiSettings } from '../models/ai-settings.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService implements OnDestroy {
   private store = inject(VideoAuditsStore);
   private http = inject(HttpClient);
+  private errorHandler = inject(ErrorHandlerService);
 
   private baseUrl = environment.backendURL;
   private destroy$ = new Subject<void>();
 
-  constructor() { }
-
-  analyzeVideo(configuration: AiMessageConfiguration): void {
-    this.store.setStatus('analyzing');
-    this.http.post<Audits>(`${this.baseUrl}/analyze/video`, { configuration }).pipe(
-      tap(response => {
-        this.store.addAudits(response);
-        this.store.setStatus('done');
-      }),
-      catchError(err => {
-        // Todo: set error message
-        this.store.setStatus('error');
-        this.store.setMessage(err?.message || 'Audits failed');
-        return err;
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
+  analyzeVideoUrl(configuration: AiMessageConfiguration): Observable<Audits> {
+    return this.http.post<Audits>(`${this.baseUrl}/analyze/video`, { configuration });
   }
 
-  analyzeVideoFile(file: File, config?: any): void {
-    this.store.setStatus('analyzing');
-
+  analyzeVideoUpload(file: File, configuration: AiSettings): Observable<Audits> {
     const formData = new FormData();
     formData.append('video', file);
-    formData.append('configuration', JSON.stringify({
-      language: config?.language || 'en',
-      aiModel: config?.aiModel || 'gpt-4',
-      tone: config?.tone || 'professional',
-      title: config?.title || '',
-      userId: config?.userId || null,
-      timestamp: new Date().toISOString()
-    }));
+    formData.append('configuration', JSON.stringify(configuration));
 
-    this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData).pipe(
-      tap(response => {
-        this.store.addAudits(response);
-        this.store.setStatus('done');
-      }),
-      catchError(err => {
-        this.store.setStatus('error');
-        this.store.setMessage(err?.error?.message || err?.message || 'File analysis failed');
-        return throwError(() => err);
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
+    return this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData);
   }
 
-  analyzeTranscript(transcript: string, config?: any): void {
-    this.store.setStatus('analyzing');
-
+  analyzeText(text: string, configuration: AiSettings): Observable<Audits> {
     const payload = {
-      transcript,
-      configuration: {
-        language: config?.language || 'en',
-        aiModel: config?.aiModel || 'gpt-4',
-        tone: config?.tone || 'professional',
-        title: config?.title || '',
-        userId: config?.userId || null,
-        cleanTranscript: config?.cleanTranscript || true,
-        includeSentimentAnalysis: config?.includeSentimentAnalysis || true,
-        extractKeywords: config?.extractKeywords || true,
-        timestamp: new Date().toISOString()
-      }
+      transcript: text, // Changed from 'text' to 'transcript'
+      configuration: configuration,
     };
-
-    this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload).pipe(
-      tap(response => {
-        this.store.addAudits(response);
-        this.store.setStatus('done');
-      }),
-      catchError(err => {
-        this.store.setStatus('error');
-        this.store.setMessage(err?.error?.message || err?.message || 'Transcript analysis failed');
-        return throwError(() => err);
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
+    return this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload);
   }
 
-  getUserHistory(): void {
+  getUserHistory(page = 1, limit = 10, reset = false): void {
     this.store.setLoading(true);
-    this.http.get<Audits[]>(`${this.baseUrl}/analyze/history`).pipe(
-      tap(response => {
-        this.store.setAudits(response);
-        this.store.setLoading(false);
-      }),
-      catchError(err => {
-        this.store.setLoading(false);
-        // Todo: handle error appropriately
-        return throwError(err);
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
+
+    if (reset) {
+      this.store.resetPagination();
+    }
+
+    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+
+    this.http
+      .get<HistoryResponse>(`${this.baseUrl}/analyze/history`, { params })
+      .pipe(
+        tap((response) => {
+          if (page === 1 || reset) {
+            this.store.setAudits(response);
+          } else {
+            this.store.appendAudits(response);
+          }
+        }),
+        catchError((err) => {
+          const handledError = this.errorHandler.handle(err);
+          this.store.setLoading(false);
+          this.store.setError(handledError);
+          return throwError(() => handledError);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
   }
 
   deleteAudit(id: string): void {
     this.store.setLoading(true);
-    this.http.delete(`${this.baseUrl}/analyze/delete/${id}`).pipe(
-      tap(() => {
-        this.store.removeAudits(id);
-        this.store.setLoading(false);
-      }),
-      catchError(err => {
-        this.store.setLoading(false);
-        this.store.setMessage(err?.message || 'Failed to delete audit');
-        return throwError(err);
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
+    this.http
+      .delete(`${this.baseUrl}/analyze/delete/${id}`)
+      .pipe(
+        tap(() => {
+          this.store.removeAudits(id);
+          this.store.setLoading(false);
+        }),
+        catchError((err) => {
+          const handledError = this.errorHandler.handle(err);
+          this.store.setLoading(false);
+          this.store.setError(handledError);
+          return throwError(() => handledError);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
