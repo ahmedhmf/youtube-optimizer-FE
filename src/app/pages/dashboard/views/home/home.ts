@@ -1,11 +1,182 @@
-import { Component } from '@angular/core';
+import type { OnDestroy, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { JobStatusService } from '../../../../services/job-status.service';
+import { interval, Subject, switchMap, takeUntil } from 'rxjs';
+import { TitleCasePipe } from '@angular/common';
+import type { UserJob } from '../../../../models/jobs/user-job.model';
+import type { RetryJobResponce } from '../../../../models/jobs/retry-job-responce.model';
+import type { CanceledJobResponse } from '../../../../models/jobs/canceled-job-responce.model';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [TitleCasePipe],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
+export class Home implements OnInit, OnDestroy {
+  protected jobs: UserJob[] = [];
+  protected isLoading = false;
+  private readonly cancellingJobs = new Set<string>();
+  private readonly retryingJobs = new Set<string>();
+  private readonly autoRefresh = true;
+  private readonly destroy$ = new Subject<void>();
+  private readonly jobStatusService = inject(JobStatusService);
 
+  private readonly DAYS_IN_YEAR = 365;
+  private readonly DAYS_IN_MONTH = 30;
+  private readonly HOURES_IN_DAY = 24;
+  private readonly MINUTES_PER_HOUR_SECONDS_PER_MIN = 60;
+  private readonly MS_IN_SECONT = 1000;
+  private readonly FIVE_SECONDS = 5000;
+
+  public ngOnInit(): void {
+    this.loadJobs();
+    this.startAutoRefresh();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  protected loadJobs(): void {
+    this.isLoading = true;
+    this.jobStatusService
+      .getUserJobs()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (jobs) => {
+          this.jobs = jobs;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading jobs:', error);
+          this.isLoading = false;
+        },
+      });
+  }
+
+  protected refreshJobs(): void {
+    this.loadJobs();
+  }
+
+  protected startAutoRefresh(): void {
+    interval(this.FIVE_SECONDS)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => {
+          const hasActiveJobs = this.jobs.some((job) => this.isActiveJob(job));
+          return hasActiveJobs ? this.jobStatusService.getUserJobs() : [];
+        }),
+      )
+      .subscribe({
+        next: (jobs) => {
+          if (jobs.length > 0) {
+            this.jobs = jobs;
+          }
+        },
+        error: (error) => {
+          console.error('Error auto-refreshing jobs:', error);
+        },
+      });
+  }
+
+  protected cancelJob(jobId: string): void {
+    this.cancellingJobs.add(jobId);
+    this.jobStatusService
+      .cancelJob(jobId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: CanceledJobResponse) => {
+          console.warn('Job cancelled:', response);
+          this.cancellingJobs.delete(jobId);
+          this.refreshJobs(); // Refresh to get updated status
+        },
+        error: (error) => {
+          console.error('Error cancelling job:', error);
+          this.cancellingJobs.delete(jobId);
+        },
+      });
+  }
+
+  protected getTimeDifference(completedAt: string): string {
+    const completed = new Date(completedAt);
+    const now = new Date();
+    const diffMs = now.getTime() - completed.getTime();
+    const units = [
+      {
+        label: 'year',
+        ms:
+          this.DAYS_IN_YEAR *
+          this.HOURES_IN_DAY *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MS_IN_SECONT,
+      },
+      {
+        label: 'month',
+        ms:
+          this.DAYS_IN_MONTH *
+          this.HOURES_IN_DAY *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MS_IN_SECONT,
+      },
+      {
+        label: 'day',
+        ms:
+          this.HOURES_IN_DAY *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MS_IN_SECONT,
+      },
+      {
+        label: 'hour',
+        ms:
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MINUTES_PER_HOUR_SECONDS_PER_MIN *
+          this.MS_IN_SECONT,
+      },
+      { label: 'minute', ms: this.MINUTES_PER_HOUR_SECONDS_PER_MIN * this.MS_IN_SECONT },
+    ];
+
+    for (const unit of units) {
+      const count = Math.floor(diffMs / unit.ms);
+      if (count > 0) {
+        return `${count} ${unit.label}${count !== 1 ? 's' : ''} ago`;
+      }
+    }
+
+    return 'Just now';
+  }
+
+  protected retryJob(jobId: string): void {
+    this.retryingJobs.add(jobId);
+    this.jobStatusService
+      .retryJob(jobId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: RetryJobResponce) => {
+          this.retryingJobs.delete(jobId);
+          this.refreshJobs(); // Refresh to show new job
+
+          // Todo: show success message
+          console.warn('Job retried successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error retrying job:', error);
+          this.retryingJobs.delete(jobId);
+          // Todo: show error message
+        },
+      });
+  }
+
+  protected viewJobDetails(jobId: string): void {
+    // Navigate to results page
+    console.log('Viewing results for job:', jobId);
+  }
+
+  private isActiveJob(job: UserJob): boolean {
+    return job.status === 'pending' || job.status === 'processing';
+  }
 }

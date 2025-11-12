@@ -1,44 +1,7 @@
-import { computed } from '@angular/core';
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { ApiError } from '../models/api-error.model';
-
-export type Audits = {
-  id: string;
-  user_id: string;
-  video_url: string;
-  video_title: string;
-  ai_titles: string[];
-  ai_description: string;
-  ai_tags: string[];
-  ai_thumbnail_prompts: string[];
-  created_at: string;
-  thumbnail_url: string;
-};
-
-type AnalyzeState = 'idle' | 'analyzing' | 'done' | 'error';
-
-export type PaginationInfo = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-};
-
-export type HistoryResponse = {
-  data: Audits[];
-  pagination: PaginationInfo;
-};
-
-export type VideoAuditsState = {
-  audits: Audits[];
-  pagination: PaginationInfo;
-  loading: boolean;
-  error: any;
-  status: 'idle' | 'analyzing' | 'done' | 'error';
-  needsPaginationRefresh: boolean;
-};
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import type { VideoAuditsState } from '../models/video-audits-state.model';
+import type { Audits } from '../models/audits.model';
+import type { HistoryResponse } from '../models/history-response.model';
 
 const initialState: VideoAuditsState = {
   audits: [],
@@ -51,31 +14,29 @@ const initialState: VideoAuditsState = {
     hasPrev: false,
   },
   loading: false,
-  error: null,
   status: 'idle',
   needsPaginationRefresh: false,
 };
 
-export const VideoAuditsStore = signalStore(
+export const videoAuditsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store) => ({
-    setAudits(response: HistoryResponse) {
+    setAudits(response: HistoryResponse): void {
       patchState(store, {
         audits: response.data,
         pagination: response.pagination,
         loading: false,
-        error: null,
       });
     },
 
-    addAudits(audit: Audits) {
+    addAudits(audit: Audits): void {
       patchState(store, (state) => ({
         audits: [audit, ...state.audits],
       }));
     },
 
-    appendAudits(response: HistoryResponse) {
+    appendAudits(response: HistoryResponse): void {
       patchState(store, (state) => ({
         audits: [...state.audits, ...response.data],
         pagination: response.pagination,
@@ -83,7 +44,7 @@ export const VideoAuditsStore = signalStore(
       }));
     },
 
-    removeAudits(id: string) {
+    removeAudits(id: string): void {
       patchState(store, (state) => {
         const updatedAudits = state.audits.filter((audit) => audit.id !== id);
         const newTotalPages = Math.ceil((state.pagination.total - 1) / state.pagination.limit);
@@ -103,26 +64,18 @@ export const VideoAuditsStore = signalStore(
       });
     },
 
-    clearPaginationRefreshFlag() {
+    clearPaginationRefreshFlag(): void {
       patchState(store, { needsPaginationRefresh: false });
     },
-    setLoading(loading: boolean) {
+    setLoading(loading: boolean): void {
       patchState(store, { loading });
     },
 
-    setError(error: any) {
-      patchState(store, { error, loading: false });
-    },
-
-    setStatus(status: VideoAuditsState['status']) {
+    setStatus(status: VideoAuditsState['status']): void {
       patchState(store, { status });
     },
 
-    clearError() {
-      patchState(store, { error: null });
-    },
-
-    resetPagination() {
+    resetPagination(): void {
       patchState(store, {
         audits: [],
         pagination: initialState.pagination,

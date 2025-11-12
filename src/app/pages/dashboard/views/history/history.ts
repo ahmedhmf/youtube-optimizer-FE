@@ -1,6 +1,7 @@
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { ApiService } from '../../../../services/api';
-import { VideoAuditsStore } from '../../../../stores/video-audits.store';
+import { videoAuditsStore } from '../../../../stores/video-audits.store';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -12,13 +13,15 @@ import { FormsModule } from '@angular/forms';
 })
 export class History implements OnInit {
   protected api = inject(ApiService);
-  protected store = inject(VideoAuditsStore);
+  protected store = inject(videoAuditsStore);
 
-  readonly audits = computed(() => this.store.audits());
-  readonly loading = computed(() => this.store.loading());
-  readonly error = computed(() => this.store.error());
-  readonly pagination = computed(() => this.store.pagination());
-  readonly needsPaginationRefresh = computed(() => this.store.needsPaginationRefresh?.() || false);
+  protected readonly audits = computed(() => this.store.audits());
+  protected readonly loading = computed(() => this.store.loading());
+  protected readonly pagination = computed(() => this.store.pagination());
+  protected readonly needsPaginationRefresh = computed(
+    () => this.store.needsPaginationRefresh() || false,
+  );
+  private readonly PAGE_SIZE = 5;
 
   constructor() {
     effect(() => {
@@ -40,55 +43,51 @@ export class History implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.loadHistory(1, true);
   }
 
-  getShowingStart(): number {
+  protected getShowingStart(): number {
     const pag = this.pagination();
     return (pag.page - 1) * pag.limit + 1;
   }
 
-  getShowingEnd(): number {
+  protected getShowingEnd(): number {
     const pag = this.pagination();
     return Math.min(pag.page * pag.limit, pag.total);
   }
 
-  loadHistory(page = 1, reset = false): void {
-    this.api.getUserHistory(page, 5, reset);
+  protected loadHistory(page = 1, reset = false): void {
+    this.api.getUserHistory(page, this.PAGE_SIZE, reset);
   }
 
-  loadNextPage(): void {
+  protected loadNextPage(): void {
     const currentPagination = this.pagination();
     if (currentPagination.hasNext) {
       this.loadHistory(currentPagination.page + 1, false);
     }
   }
 
-  loadPreviousPage(): void {
+  protected loadPreviousPage(): void {
     const currentPagination = this.pagination();
     if (currentPagination.hasPrev) {
       this.loadHistory(currentPagination.page - 1, true);
     }
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.loadHistory(page, true);
   }
 
-  onRetryLoad(): void {
-    this.store.clearError();
-    this.loadHistory(1, true);
-  }
-
-  deleteAudit(id: string): void {
+  protected deleteAudit(id: string): void {
+    // eslint-disable-next-line no-alert
     if (confirm('Are you sure you want to delete this analysis?')) {
       this.api.deleteAudit(id);
     }
   }
 
   // Helper method to get page numbers for pagination
-  getPageNumbers(): number[] {
+  protected getPageNumbers(): number[] {
     const currentPage = this.pagination().page;
     const totalPages = this.pagination().totalPages;
     const pages: number[] = [];

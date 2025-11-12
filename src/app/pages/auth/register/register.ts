@@ -1,8 +1,10 @@
+/* eslint-disable complexity */
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import type { FormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth';
-import { ApiError } from '../../../models/api-error.model';
+import type { ApiError } from '../../../models/api-error.model';
 
 @Component({
   selector: 'app-register',
@@ -11,47 +13,34 @@ import { ApiError } from '../../../models/api-error.model';
   styleUrl: './register.scss',
 })
 export class Register {
-  private supabase = inject(AuthService);
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-
   protected form: FormGroup;
   protected hidePassword = signal<boolean>(true);
   protected hideConfirm = signal<boolean>(true);
   protected loading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
 
+  private readonly supabase = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly MIN_PASSWORD_LENGTH = 6;
+  private readonly MIN_NAME_LENGTH = 2;
+
   constructor() {
-    this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
-      terms: [false, [Validators.requiredTrue]]
-    }, { validators: this.passwordMatchValidator });
-  }
-
-  private passwordMatchValidator(form: FormGroup): { [key: string]: boolean } | null {
-    const password = form.get('password');
-    const confirmPassword = form.get('confirmPassword');
-
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    } else {
-      // Clear the passwordMismatch error if passwords now match
-      if (confirmPassword?.hasError('passwordMismatch')) {
-        const errors = confirmPassword.errors;
-        delete errors!['passwordMismatch'];
-        confirmPassword.setErrors(Object.keys(errors!).length ? errors : null);
-      }
-    }
-    return null;
+    this.form = this.fb.group(
+      {
+        name: ['', [Validators.required, Validators.minLength(this.MIN_NAME_LENGTH)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(this.MIN_PASSWORD_LENGTH)]],
+        confirmPassword: ['', [Validators.required]],
+        terms: [false, [Validators.requiredTrue]],
+      },
+      { validators: this.passwordMatchValidator },
+    );
   }
 
   protected hasFieldError(fieldName: string): boolean {
     const field = this.form.get(fieldName);
-    return !!(field && field.errors && field.touched);
+    return !!(field?.errors && field.touched);
   }
 
   protected async signUp(): Promise<void> {
@@ -71,9 +60,9 @@ export class Register {
         options: {
           data: {
             display_name: this.form.value.name,
-            name: this.form.value.name
-          }
-        }
+            name: this.form.value.name,
+          },
+        },
       });
 
       this.loading.set(false);
@@ -83,16 +72,17 @@ export class Register {
         this.error.set(handledError);
       } else {
         this.form.reset();
-        this.router.navigate(['/login']);
+        void this.router.navigate(['/login']);
       }
-    } catch (error: any) {
+    } catch (error) {
       this.loading.set(false);
+      console.error('Registration error:', error);
     }
   }
 
   protected getFieldError(fieldName: string): string {
     const field = this.form.get(fieldName);
-    if (field && field.errors && field.touched) {
+    if (field?.errors && field.touched) {
       if (field.errors['required']) {
         return `${this.getFieldDisplayName(fieldName)} is required`;
       }
@@ -114,64 +104,87 @@ export class Register {
   }
 
   private getFieldDisplayName(fieldName: string): string {
-    const names: { [key: string]: string } = {
-      'name': 'Name',
-      'email': 'Email',
-      'password': 'Password',
-      'confirmPassword': 'Confirm Password',
-      'terms': 'Terms and Conditions'
+    const names: Record<string, string> = {
+      name: 'Name',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      terms: 'Terms and Conditions',
     };
     return names[fieldName] || fieldName;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private handleAuthError(error: any): ApiError {
-    const message = error.message?.toLowerCase() || '';
+    const message = error.message?.toLowerCase() ?? '';
 
     if (message.includes('user already registered') || message.includes('email already exists')) {
       return {
-        message: 'An account with this email already exists. Please use a different email or sign in instead.',
-        code: 'EMAIL_ALREADY_EXISTS'
+        message:
+          'An account with this email already exists. Please use a different email or sign in instead.',
+        code: 'EMAIL_ALREADY_EXISTS',
       };
     }
 
     if (message.includes('invalid email')) {
       return {
         message: 'Please enter a valid email address.',
-        code: 'INVALID_EMAIL'
+        code: 'INVALID_EMAIL',
       };
     }
 
     if (message.includes('password') && message.includes('weak')) {
       return {
-        message: 'Password is too weak. Please use at least 6 characters with a mix of letters, numbers, and symbols.',
-        code: 'WEAK_PASSWORD'
+        message:
+          'Password is too weak. Please use at least 6 characters with a mix of letters, numbers, and symbols.',
+        code: 'WEAK_PASSWORD',
       };
     }
 
     if (message.includes('too many requests')) {
       return {
         message: 'Too many registration attempts. Please wait a few minutes before trying again.',
-        code: 'RATE_LIMIT_EXCEEDED'
+        code: 'RATE_LIMIT_EXCEEDED',
       };
     }
 
     if (message.includes('network') || message.includes('fetch')) {
       return {
         message: 'Network error. Please check your internet connection and try again.',
-        code: 'NETWORK_ERROR'
+        code: 'NETWORK_ERROR',
       };
     }
 
     if (message.includes('signup disabled')) {
       return {
-        message: 'Account registration is currently disabled. Please contact support for assistance.',
-        code: 'SIGNUP_DISABLED'
+        message:
+          'Account registration is currently disabled. Please contact support for assistance.',
+        code: 'SIGNUP_DISABLED',
       };
     }
     return {
-      message: error.message || 'Registration failed. Please try again.',
-      code: 'REGISTRATION_ERROR'
+      message: error.message ?? 'Registration failed. Please try again.',
+      code: 'REGISTRATION_ERROR',
     };
   }
 
+  private passwordMatchValidator(form: FormGroup): Record<string, boolean> | null {
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    } else {
+      // Clear the passwordMismatch error if passwords now match
+      if (confirmPassword?.hasError('passwordMismatch')) {
+        const errors = confirmPassword.errors;
+        if (errors) {
+          delete errors['passwordMismatch'];
+          confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
+        }
+      }
+    }
+    return null;
+  }
 }

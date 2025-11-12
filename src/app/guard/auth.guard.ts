@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CanActivateFn } from '@angular/router';
+import type { CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth';
 
 export const authGuard: CanActivateFn = async (route, state) => {
@@ -9,23 +9,27 @@ export const authGuard: CanActivateFn = async (route, state) => {
 
   try {
     // Check if user is authenticated
-    const { data: { session }, error } = await authService.client.auth.getSession();
-    
+    const {
+      data: { session },
+      error,
+    } = await authService.client.auth.getSession();
+
     if (error) {
-      router.navigate(['/login']);
+      void router.navigate(['/login']);
       return false;
     }
 
-    if (session && session.user) {
+    if (session?.user) {
       return true;
     } else {
-      router.navigate(['/login'], { 
-        queryParams: { returnUrl: state.url } 
+      void router.navigate(['/login'], {
+        queryParams: { returnUrl: state.url },
       });
       return false;
     }
   } catch (error) {
-    router.navigate(['/login']);
+    void router.navigate(['/login']);
+    console.error('Error checking session in auth guard', error);
     return false;
   }
 };

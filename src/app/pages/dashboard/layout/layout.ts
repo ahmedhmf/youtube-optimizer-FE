@@ -4,18 +4,15 @@ import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-layout',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
 export class Layout {
- private authService = inject(AuthService);
-  logout() {
+  private readonly authService = inject(AuthService);
+
+  protected async logout(): Promise<void> {
     // Implement logout functionality here
-    this.authService.signOut();
+    await this.authService.signOut();
   }
 }

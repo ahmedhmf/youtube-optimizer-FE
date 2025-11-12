@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CanActivateFn } from '@angular/router';
+import type { CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth';
 
 export const publicGuard: CanActivateFn = async () => {
@@ -8,20 +8,24 @@ export const publicGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   try {
-    const { data: { session }, error } = await authService.client.auth.getSession();
-    
+    const {
+      data: { session },
+      error,
+    } = await authService.client.auth.getSession();
+
     if (error) {
       return true;
     }
 
-    if (session && session.user) {
-      router.navigate(['/dashboard']);
+    if (session?.user) {
+      void router.navigate(['/dashboard']);
       return false;
     } else {
       return true;
     }
   } catch (error) {
     // Todo : handle error properly
+    console.error('Error checking session in public guard', error);
     return true;
   }
 };

@@ -1,5 +1,6 @@
 export type AiSettings = {
-    language: string;
-    aiModel: string;
-    tone: string;
-}
+  language: string;
+  aiModel: string;
+  tone: string;
+  url?: string;
+};

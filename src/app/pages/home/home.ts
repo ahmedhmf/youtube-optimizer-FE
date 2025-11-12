@@ -3,11 +3,9 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   templateUrl: './home.html',
-  styleUrl: './home.scss'
+  styleUrl: './home.scss',
 })
-export class Home {
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class Home {}
