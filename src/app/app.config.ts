@@ -1,5 +1,6 @@
 import type { ApplicationConfig } from '@angular/core';
 import {
+  ErrorHandler,
   importProvidersFrom,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
@@ -9,13 +10,19 @@ import { FormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './interceptors/auth-interceptor';
+import { globalErrorHandlingInterceptor } from './error-handling/global-error-handling.interceptors';
+import { GlobalErrorHandler } from './error-handling/global-error-handling.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, globalErrorHandlingInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     importProvidersFrom(FormsModule),
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler,
+    },
   ],
 };

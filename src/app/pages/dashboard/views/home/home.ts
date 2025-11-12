@@ -50,8 +50,8 @@ export class Home implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Error loading jobs:', error);
           this.isLoading = false;
+          throw error;
         },
       });
   }
@@ -76,7 +76,7 @@ export class Home implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error auto-refreshing jobs:', error);
+          throw error;
         },
       });
   }
@@ -93,8 +93,8 @@ export class Home implements OnInit, OnDestroy {
           this.refreshJobs(); // Refresh to get updated status
         },
         error: (error) => {
-          console.error('Error cancelling job:', error);
           this.cancellingJobs.delete(jobId);
+          throw error;
         },
       });
   }
@@ -164,16 +164,15 @@ export class Home implements OnInit, OnDestroy {
           console.warn('Job retried successfully:', response);
         },
         error: (error) => {
-          console.error('Error retrying job:', error);
           this.retryingJobs.delete(jobId);
-          // Todo: show error message
+          throw error;
         },
       });
   }
 
   protected viewJobDetails(jobId: string): void {
     // Navigate to results page
-    console.log('Viewing results for job:', jobId);
+    console.warn('Viewing results for job:', jobId);
   }
 
   private isActiveJob(job: UserJob): boolean {

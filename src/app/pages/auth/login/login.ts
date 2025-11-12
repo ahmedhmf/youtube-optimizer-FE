@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import type { ApiError } from '../../../models/api-error.model';
 import { ErrorMessage } from '../../../ui-components/error-message/error-message';
-import type { AuthError } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-login',
@@ -67,13 +66,13 @@ export class Login {
       this.loading.set(false);
 
       if (error) {
-        this.handleError(error);
+        throw error;
       } else {
         await this.router.navigate(['/dashboard/']);
       }
     } catch (error) {
       this.loading.set(false);
-      this.handleError(error as AuthError);
+      throw error;
     }
   }
 
@@ -83,50 +82,5 @@ export class Login {
       password: 'Password',
     };
     return names[fieldName] || fieldName;
-  }
-
-  private handleAuthError(error: AuthError): ApiError {
-    const message = error.message.toLowerCase();
-
-    if (
-      message.includes('invalid login credentials') ||
-      message.includes('invalid_credentials') ||
-      message.includes('user not found')
-    ) {
-      return {
-        message: 'Invalid email or password. Please check your credentials and try again.',
-        code: 'INVALID_CREDENTIALS',
-      };
-    }
-
-    if (message.includes('email not confirmed')) {
-      return {
-        message: 'Please check your email and click the confirmation link before signing in.',
-        code: 'EMAIL_NOT_CONFIRMED',
-      };
-    }
-
-    if (message.includes('too many requests')) {
-      return {
-        message: 'Too many login attempts. Please wait a few minutes before trying again.',
-        code: 'RATE_LIMIT_EXCEEDED',
-      };
-    }
-
-    if (message.includes('network') || message.includes('fetch')) {
-      return {
-        message: 'Network error. Please check your internet connection and try again.',
-        code: 'NETWORK_ERROR',
-      };
-    }
-    return {
-      message: 'Something went wrong, please try again later.',
-      code: 'AUTH_ERROR',
-    };
-  }
-
-  private handleError(error: AuthError): void {
-    const handledError = this.handleAuthError(error);
-    this.error.set(handledError);
   }
 }

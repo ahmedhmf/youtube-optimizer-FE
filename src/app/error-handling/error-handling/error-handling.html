@@ -1,0 +1,27 @@
+@if (errorStore.showErrorModal()) {
+  <div class="error-modal-overlay">
+    <div class="error-modal">
+      <h3>Critical Error</h3>
+      <p>A critical error has occurred. Please try refreshing the page.</p>
+      <button (click)="dismissModal()">Close</button>
+      <button (click)="refreshPage()">Refresh Page</button>
+    </div>
+  </div>
+}
+
+<div class="error-toast-container">
+  @for (error of recentErrors(); track error.id) {
+    @if (!error.dismissed && error.severity !== 'low') {
+      <div class="error-toast" [class]="'severity-' + error.severity">
+        <span>{{ error.message }}</span>
+        <button (click)="dismissError(error.id)">×</button>
+      </div>
+    }
+  }
+</div>
+
+@if (errorStore.networkStatus() !== 'online') {
+  <div class="network-status" [class]="'status-' + errorStore.networkStatus()">
+    {{ getNetworkStatusMessage() }}
+  </div>
+}

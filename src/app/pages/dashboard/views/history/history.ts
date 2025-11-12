@@ -29,15 +29,12 @@ export class History implements OnInit {
         const currentPagination = this.pagination();
         const currentAuditsCount = this.audits().length;
 
-        // If current page is empty and we're not on page 1, go to previous page
         if (currentAuditsCount === 0 && currentPagination.page > 1) {
           this.loadHistory(currentPagination.page - 1, true);
         } else if (currentAuditsCount < currentPagination.limit) {
-          // Reload current page to fill gaps
           this.loadHistory(currentPagination.page, true);
         }
 
-        // Clear the flag
         this.store.clearPaginationRefreshFlag();
       }
     });

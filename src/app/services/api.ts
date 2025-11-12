@@ -63,7 +63,7 @@ export class ApiService implements OnDestroy {
         }),
         catchError((err) => {
           this.store.setLoading(false);
-          return err;
+          throw err;
         }),
         takeUntil(this.destroy$),
       )

@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import { Component, inject, signal } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -68,15 +67,14 @@ export class Register {
       this.loading.set(false);
 
       if (error) {
-        const handledError = this.handleAuthError(error);
-        this.error.set(handledError);
+        throw error;
       } else {
         this.form.reset();
         void this.router.navigate(['/login']);
       }
     } catch (error) {
       this.loading.set(false);
-      console.error('Registration error:', error);
+      throw error;
     }
   }
 
@@ -112,60 +110,6 @@ export class Register {
       terms: 'Terms and Conditions',
     };
     return names[fieldName] || fieldName;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handleAuthError(error: any): ApiError {
-    const message = error.message?.toLowerCase() ?? '';
-
-    if (message.includes('user already registered') || message.includes('email already exists')) {
-      return {
-        message:
-          'An account with this email already exists. Please use a different email or sign in instead.',
-        code: 'EMAIL_ALREADY_EXISTS',
-      };
-    }
-
-    if (message.includes('invalid email')) {
-      return {
-        message: 'Please enter a valid email address.',
-        code: 'INVALID_EMAIL',
-      };
-    }
-
-    if (message.includes('password') && message.includes('weak')) {
-      return {
-        message:
-          'Password is too weak. Please use at least 6 characters with a mix of letters, numbers, and symbols.',
-        code: 'WEAK_PASSWORD',
-      };
-    }
-
-    if (message.includes('too many requests')) {
-      return {
-        message: 'Too many registration attempts. Please wait a few minutes before trying again.',
-        code: 'RATE_LIMIT_EXCEEDED',
-      };
-    }
-
-    if (message.includes('network') || message.includes('fetch')) {
-      return {
-        message: 'Network error. Please check your internet connection and try again.',
-        code: 'NETWORK_ERROR',
-      };
-    }
-
-    if (message.includes('signup disabled')) {
-      return {
-        message:
-          'Account registration is currently disabled. Please contact support for assistance.',
-        code: 'SIGNUP_DISABLED',
-      };
-    }
-    return {
-      message: error.message ?? 'Registration failed. Please try again.',
-      code: 'REGISTRATION_ERROR',
-    };
   }
 
   private passwordMatchValidator(form: FormGroup): Record<string, boolean> | null {

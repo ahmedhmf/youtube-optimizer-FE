@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 /* eslint-disable max-lines */
 import { Component, inject, signal } from '@angular/core';
 import type { AiSettings } from '../../../../models/ai-settings.model';
@@ -6,22 +5,8 @@ import { ApiService } from '../../../../services/api';
 import type { AiMessageConfiguration } from '../../../../models/ai-message-configuration.model';
 import { FormsModule } from '@angular/forms';
 import type { AIConfigurationSettings } from '../../../../models/language.model';
-import { HttpErrorResponse } from '@angular/common/http';
 import type { ApiError } from '../../../../models/api-error.model';
 import type { Audits } from '../../../../models/audits.model';
-import {
-  HTTP_400_ERROR_MESSAGES,
-  HTTP_401_ERROR_MESSAGES,
-  HTTP_403_ERROR_MESSAGES,
-  HTTP_404_ERROR_MESSAGES,
-  HTTP_413_ERROR_MESSAGES,
-  HTTP_422_ERROR_MESSAGES,
-  HTTP_429_ERROR_MESSAGES,
-  HTTP_500_ERROR_MESSAGES,
-  HTTP_502_ERROR_MESSAGES,
-  HTTP_503_ERROR_MESSAGES,
-  HTTP_504_ERROR_MESSAGES,
-} from '../../../../constants/http-errors.constants';
 
 type TabType = {
   id: 'url' | 'upload' | 'text';
@@ -126,98 +111,63 @@ export class AnalyzeUrl {
   }
 
   protected setActiveTab(tabId: TabType['id']): void {
-    this.clearError();
     this.activeTab.set(tabId);
   }
 
   protected onFileSelected(event: Event): void {
-    this.clearError();
-    try {
-      const target = event.target as HTMLInputElement;
-      const file = target.files?.[0];
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
 
-      if (!file) {
-        this.setError({
-          message: 'No file selected',
-        });
-        return;
-      }
-      if (!this.isValidFileType(file)) {
-        this.setError({
-          message: `Invalid file type. Please select a video file (${this.VALID_VIDEO_TYPES.map((type) => type.split('/')[1].toUpperCase()).join(', ')})`,
-          details: { selectedType: file.type, allowedTypes: this.VALID_VIDEO_TYPES },
-        });
-        this.resetFileInput();
-        return;
-      }
-      if (!this.isValidFileSize(file)) {
-        this.setError({
-          message: `File size too large. Maximum allowed size is ${this.MAX_FILE_SIZE / (this.SIZE_1024 * this.SIZE_1024)}MB. Your file is ${(file.size / (this.SIZE_1024 * this.SIZE_1024)).toFixed(2)}MB`,
-          details: { fileSize: file.size, maxSize: this.MAX_FILE_SIZE },
-        });
-        this.resetFileInput();
-        return;
-      }
-      if (file.size === 0) {
-        this.setError({
-          message: 'The selected file appears to be empty or corrupted',
-        });
-        this.resetFileInput();
-        return;
-      }
-      this.selectedFile.set(file);
-    } catch (error) {
-      this.setError({
-        message: 'An unexpected error occurred while selecting the file',
-        details: error,
-      });
-      this.resetFileInput();
+    if (!file) {
+      throw new Error('No file selected');
     }
+    if (!this.isValidFileType(file)) {
+      throw new Error(
+        `Invalid file type. Please select a video file (${this.VALID_VIDEO_TYPES.map((type) => type.split('/')[1].toUpperCase()).join(', ')})`,
+      );
+    }
+    if (!this.isValidFileSize(file)) {
+      throw new Error(
+        `File size too large. Maximum allowed size is ${this.MAX_FILE_SIZE / (this.SIZE_1024 * this.SIZE_1024)}MB. Your file is ${(file.size / (this.SIZE_1024 * this.SIZE_1024)).toFixed(2)}MB`,
+      );
+    }
+    if (file.size === 0) {
+      throw new Error('The selected file appears to be empty or corrupted');
+    }
+    this.selectedFile.set(file);
   }
 
   protected removeFile(): void {
-    this.clearError();
     this.selectedFile.set(null);
     this.resetFileInput();
   }
 
   protected analyzeVideo(): void {
-    this.clearError();
-
     const currentTab = this.activeTab();
-
-    try {
-      if (currentTab === 'url') {
-        this.analyzeFromUrl();
-      } else if (currentTab === 'upload') {
-        this.analyzeFromFile();
-      } else {
-        this.analyzeFromText();
-      }
-    } catch (error) {
-      this.handleUnexpectedError(error);
+    if (currentTab === 'url') {
+      this.analyzeFromUrl();
+    } else if (currentTab === 'upload') {
+      this.analyzeFromFile();
+    } else {
+      this.analyzeFromText();
     }
   }
 
   protected onLanguageChange(language: string): void {
-    this.clearError();
     this.settings.set({ ...this.settings(), language });
   }
 
   protected onModelChange(model: string): void {
-    this.clearError();
     this.settings.set({ ...this.settings(), aiModel: model });
   }
 
   protected onToneChange(tone: string): void {
-    this.clearError();
     this.settings.set({ ...this.settings(), tone });
   }
 
   protected onTextAreaInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     this.textContent.set(textarea.value);
-    this.clearError();
   }
 
   private analyzeFromUrl(): void {
@@ -225,28 +175,18 @@ export class AnalyzeUrl {
     const url = this.videoUrl().trim();
 
     if (!url) {
-      this.setError({
-        message: 'Please enter a YouTube URL',
-      });
-      return;
+      throw new Error('Please enter a YouTube URL');
     }
 
     if (!this.isValidYouTubeUrl(url)) {
-      this.setError({
-        message:
-          'Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)',
-        details: { url },
-      });
-      return;
+      throw new Error(
+        'Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)',
+      );
     }
 
     // Check if URL is accessible (basic format validation)
     if (!this.isUrlAccessible(url)) {
-      this.setError({
-        message: 'The URL format appears to be invalid or incomplete',
-        details: { url },
-      });
-      return;
+      throw new Error('The URL format appears to be invalid or incomplete');
     }
 
     this.showSettings.set(false);
@@ -266,7 +206,7 @@ export class AnalyzeUrl {
       },
       error: (err) => {
         this.loading.set(false);
-        this.handleApiError(err, 'URL analysis');
+        throw err;
       },
     });
   }
@@ -275,18 +215,14 @@ export class AnalyzeUrl {
     const file = this.selectedFile();
 
     if (!file) {
-      this.setError({
-        message: 'Please select a video file',
-      });
-      return;
+      throw new Error('No file selected for upload');
     }
 
     // Re-validate file before upload
     if (!this.isValidFileType(file) || !this.isValidFileSize(file)) {
-      this.setError({
-        message: 'Selected file is no longer valid. Please select a new file.',
-      });
-      return;
+      throw new Error(
+        'Selected file type is not supported or the file size is too large. Please select a new file.',
+      );
     }
 
     this.loading.set(true);
@@ -299,7 +235,7 @@ export class AnalyzeUrl {
       },
       error: (err) => {
         this.loading.set(false);
-        this.handleApiError(err, 'Video upload analysis');
+        throw err;
       },
     });
   }
@@ -308,34 +244,24 @@ export class AnalyzeUrl {
     const text = this.textContent().trim();
 
     if (!text) {
-      this.setError({
-        message: 'Please enter some text to analyze',
-      });
-      return;
+      throw new Error('Please enter some text to analyze');
     }
 
     if (text.length < this.MIN_TEXT_LENGTH) {
-      this.setError({
-        message: `Text is too short. Please enter at least ${this.MIN_TEXT_LENGTH} characters. Current length: ${text.length}`,
-        details: { currentLength: text.length, minLength: this.MIN_TEXT_LENGTH },
-      });
-      return;
+      throw new Error(
+        `Text is too short. Please enter at least ${this.MIN_TEXT_LENGTH} characters. Current length: ${text.length}`,
+      );
     }
 
     if (text.length > this.MAX_TEXT_LENGTH) {
-      this.setError({
-        message: `Text is too long. Maximum allowed length is ${this.MAX_TEXT_LENGTH} characters. Current length: ${text.length}`,
-        details: { currentLength: text.length, maxLength: this.MAX_TEXT_LENGTH },
-      });
-      return;
+      throw new Error(
+        `Text is too long. Maximum allowed length is ${this.MAX_TEXT_LENGTH} characters. Current length: ${text.length}`,
+      );
     }
 
     // Check for suspicious content or patterns
     if (this.containsSuspiciousContent(text)) {
-      this.setError({
-        message: 'Text contains potentially harmful content or excessive special characters',
-      });
-      return;
+      throw new Error('Text contains potentially harmful content or excessive special characters');
     }
 
     this.loading.set(true);
@@ -348,7 +274,7 @@ export class AnalyzeUrl {
       },
       error: (err) => {
         this.loading.set(false);
-        this.handleApiError(err, 'Text analysis');
+        throw err;
       },
     });
   }
@@ -392,121 +318,6 @@ export class AnalyzeUrl {
     }
 
     return false;
-  }
-
-  // eslint-disable-next-line complexity
-  private handleApiError(error: ApiError, operation: string): void {
-    console.error(`${operation} failed:`, error);
-
-    if (error instanceof HttpErrorResponse) {
-      switch (error.status) {
-        case HTTP_400_ERROR_MESSAGES:
-          this.setError({
-            message:
-              error.error?.message ?? 'Invalid request. Please check your input and try again.',
-            code: 'BAD_REQUEST',
-            details: error.error,
-          });
-          break;
-
-        case HTTP_401_ERROR_MESSAGES:
-          this.setError({
-            message: 'You are not authorized. Please log in and try again.',
-            code: 'UNAUTHORIZED',
-          });
-          break;
-
-        case HTTP_403_ERROR_MESSAGES:
-          this.setError({
-            message: 'Access forbidden. You may not have permission for this operation.',
-            code: 'FORBIDDEN',
-          });
-          break;
-
-        case HTTP_404_ERROR_MESSAGES:
-          this.setError({
-            message: 'Service not found. Please try again later.',
-            code: 'NOT_FOUND',
-          });
-          break;
-
-        case HTTP_413_ERROR_MESSAGES:
-          this.setError({
-            message: 'File or request too large. Please reduce the size and try again.',
-            code: 'PAYLOAD_TOO_LARGE',
-          });
-          break;
-
-        case HTTP_422_ERROR_MESSAGES:
-          this.setError({
-            message:
-              error.error?.message ??
-              'The content could not be processed. Please check your input.',
-            code: 'UNPROCESSABLE_ENTITY',
-            details: error.error,
-          });
-          break;
-
-        case HTTP_429_ERROR_MESSAGES:
-          this.setError({
-            message: 'Too many requests. Please wait a moment and try again.',
-            code: 'RATE_LIMIT',
-          });
-          break;
-
-        case HTTP_500_ERROR_MESSAGES:
-          this.setError({
-            message: 'Server error occurred. Please try again later.',
-            code: 'INTERNAL_SERVER_ERROR',
-          });
-          break;
-
-        case HTTP_502_ERROR_MESSAGES:
-        case HTTP_503_ERROR_MESSAGES:
-        case HTTP_504_ERROR_MESSAGES:
-          this.setError({
-            message: 'Service is temporarily unavailable. Please try again in a few minutes.',
-            code: 'SERVICE_UNAVAILABLE',
-          });
-          break;
-
-        default:
-          this.setError({
-            message: `An unexpected error occurred (${error.status}). Please try again.`,
-            code: `HTTP_${error.status}`,
-            details: error.error,
-          });
-      }
-    } else if (error.message.includes('TimeoutError')) {
-      this.setError({
-        message: 'Request timed out. Please check your connection and try again.',
-        code: 'TIMEOUT',
-      });
-    } else if (error.message.includes('NetworkError')) {
-      this.setError({
-        message: 'Network connection error. Please check your internet connection.',
-        code: 'NETWORK_ERROR',
-      });
-    } else {
-      this.handleUnexpectedError(error);
-    }
-  }
-
-  private handleUnexpectedError(error: unknown): void {
-    console.error('Unexpected error:', error);
-    this.setError({
-      message: 'An unexpected error occurred. Please refresh the page and try again.',
-      details: error,
-    });
-  }
-
-  private setError(error: ApiError): void {
-    this.error.set(error);
-    this.loading.set(false);
-  }
-
-  private clearError(): void {
-    this.error.set(null);
   }
 
   private resetFileInput(): void {

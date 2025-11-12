@@ -26,7 +26,6 @@ export class AuthService {
   public async signOut(): Promise<void> {
     const { error } = await this.client.auth.signOut();
     if (error) {
-      // Todo: Handle sign-out error
       throw error;
     }
   }
