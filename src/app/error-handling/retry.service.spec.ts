@@ -21,7 +21,7 @@ describe('RetryService', () => {
   });
 
   it('should succeed on first attempt without retry', (done) => {
-    const mockOperation = jasmine.createSpy('operation').and.returnValue(of('success'));
+    const mockOperation = jest.fn().mockReturnValue(of('success'));
 
     service
       .retryWithCategory(mockOperation, 'crud', {
@@ -38,11 +38,11 @@ describe('RetryService', () => {
   });
 
   it('should retry on server error and eventually succeed', (done) => {
-    const mockOperation = jasmine.createSpy('operation').and.returnValues(
-      throwError(() => ({ status: 500 })), // First call fails
-      throwError(() => ({ status: 500 })), // Second call fails
-      of('success'), // Third call succeeds
-    );
+    const mockOperation = jest
+      .fn()
+      .mockReturnValueOnce(throwError(() => ({ status: 500 }))) // First call fails
+      .mockReturnValueOnce(throwError(() => ({ status: 500 }))) // Second call fails
+      .mockReturnValueOnce(of('success')); // Third call succeeds
 
     service
       .retryWithCategory(mockOperation, 'crud', {
@@ -60,9 +60,9 @@ describe('RetryService', () => {
   });
 
   it('should not retry on client error (4xx)', (done) => {
-    const mockOperation = jasmine
-      .createSpy('operation')
-      .and.returnValue(throwError(() => ({ status: errorCodes.notFound })));
+    const mockOperation = jest
+      .fn()
+      .mockReturnValue(throwError(() => ({ status: errorCodes.notFound })));
 
     service
       .retryWithCategory(mockOperation, 'crud', {
@@ -81,9 +81,9 @@ describe('RetryService', () => {
   });
 
   it('should respect maxRetries limit', (done) => {
-    const mockOperation = jasmine
-      .createSpy('operation')
-      .and.returnValue(throwError(() => ({ status: errorCodes.internalServerError })));
+    const mockOperation = jest
+      .fn()
+      .mockReturnValue(throwError(() => ({ status: errorCodes.internalServerError })));
 
     service
       .retryWithCategory(mockOperation, 'crud', {
