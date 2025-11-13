@@ -9,6 +9,7 @@ import type { AiMessageConfiguration } from '../models/ai-message-configuration.
 import type { AiSettings } from '../models/ai-settings.model';
 import type { Audits } from '../models/audits.model';
 import type { HistoryResponse } from '../models/history-response.model';
+import { RetryService } from '../error-handling/retry.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ import type { HistoryResponse } from '../models/history-response.model';
 export class ApiService implements OnDestroy {
   private readonly store = inject(videoAuditsStore);
   private readonly http = inject(HttpClient);
+  private readonly retryService = inject(RetryService);
 
   private readonly baseUrl = environment.backendURL;
   private readonly destroy$ = new Subject<void>();
@@ -23,23 +25,41 @@ export class ApiService implements OnDestroy {
   private readonly PAGE_LIMIT = 10;
 
   public analyzeVideoUrl(configuration: AiMessageConfiguration): Observable<Audits> {
-    return this.http.post<Audits>(`${this.baseUrl}/analyze/video`, { configuration });
+    const operation = (): Observable<Audits> =>
+      this.http.post<Audits>(`${this.baseUrl}/analyze/video`, { configuration });
+    return this.retryService.retryWithCategory(operation, 'analysis', {
+      operation: 'analyzeVideoUrl',
+      metadata: { videoUrl: configuration.url },
+    });
   }
 
   public analyzeVideoUpload(file: File, configuration: AiSettings): Observable<Audits> {
-    const formData = new FormData();
-    formData.append('video', file);
-    formData.append('configuration', JSON.stringify(configuration));
+    const operation = (): Observable<Audits> => {
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('configuration', JSON.stringify(configuration));
+      return this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData);
+    };
 
-    return this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData);
+    return this.retryService.retryWithCategory(operation, 'upload', {
+      operation: 'analyzeVideoUpload',
+      metadata: { fileName: file.name, fileSize: file.size },
+    });
   }
 
   public analyzeText(text: string, configuration: AiSettings): Observable<Audits> {
-    const payload = {
-      transcript: text, // Changed from 'text' to 'transcript'
-      configuration: configuration,
+    const operation = (): Observable<Audits> => {
+      const payload = {
+        transcript: text,
+        configuration: configuration,
+      };
+      return this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload);
     };
-    return this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload);
+
+    return this.retryService.retryWithCategory(operation, 'analysis', {
+      operation: 'analyzeText',
+      metadata: { textLength: text.length },
+    });
   }
 
   public getUserHistory(page = 1, limit = this.PAGE_LIMIT, reset = false): void {
@@ -49,10 +69,16 @@ export class ApiService implements OnDestroy {
       this.store.resetPagination();
     }
 
-    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+    const operation = (): Observable<HistoryResponse> => {
+      const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+      return this.http.get<HistoryResponse>(`${this.baseUrl}/analyze/history`, { params });
+    };
 
-    this.http
-      .get<HistoryResponse>(`${this.baseUrl}/analyze/history`, { params })
+    this.retryService
+      .retryWithCategory(operation, 'listing', {
+        operation: 'getUserHistory',
+        metadata: { page, limit, reset },
+      })
       .pipe(
         tap((response) => {
           if (page === 1 || reset) {
@@ -61,31 +87,47 @@ export class ApiService implements OnDestroy {
             this.store.appendAudits(response);
           }
         }),
-        catchError((err) => {
+        catchError((error) => {
           this.store.setLoading(false);
-          throw err;
+          this.store.setStatus('error');
+          throw error;
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe();
+      .subscribe({
+        error: (error) => {
+          console.error('getUserHistory final error:', error);
+        },
+      });
   }
 
   public deleteAudit(id: string): void {
     this.store.setLoading(true);
-    this.http
-      .delete(`${this.baseUrl}/analyze/delete/${id}`)
+
+    const operation = (): Observable<object> =>
+      this.http.delete(`${this.baseUrl}/analyze/delete/${id}`);
+
+    this.retryService
+      .retryWithCategory(operation, 'crud', {
+        operation: 'deleteAudit',
+        metadata: { auditId: id },
+      })
       .pipe(
         tap(() => {
           this.store.removeAudits(id);
           this.store.setLoading(false);
         }),
-        catchError((err) => {
+        catchError((error) => {
           this.store.setLoading(false);
-          throw err;
+          throw error;
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe();
+      .subscribe({
+        error: (error) => {
+          console.error('deleteAudit final error:', error);
+        },
+      });
   }
 
   public ngOnDestroy(): void {

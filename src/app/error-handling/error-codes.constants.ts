@@ -1,0 +1,16 @@
+export const errorCodes = {
+  unknown: 0,
+  badRequest: 400,
+  unauthorized: 401,
+  forbidden: 403,
+  notFound: 404,
+  methodNotAllowed: 405,
+  requestTimeout: 408,
+  conflict: 409,
+  payloadTooLarge: 413,
+  tooManyRequests: 429,
+  internalServerError: 500,
+  badGateway: 502,
+  serviceUnavailable: 503,
+  gatewayTimeout: 504,
+};
