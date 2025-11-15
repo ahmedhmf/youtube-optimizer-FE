@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth';
+import { Router, RouterLink } from '@angular/router';
+import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
@@ -18,7 +18,7 @@ export class Register {
   protected loading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
 
-  private readonly supabase = inject(AuthService);
+  private readonly jwtAuthService = inject(JwtAuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly MIN_PASSWORD_LENGTH = 6;
@@ -42,7 +42,7 @@ export class Register {
     return !!(field?.errors && field.touched);
   }
 
-  protected async signUp(): Promise<void> {
+  protected signUp(): void {
     // Mark all fields as touched to show validation errors
     this.form.markAllAsTouched();
 
@@ -52,30 +52,27 @@ export class Register {
 
     this.loading.set(true);
 
-    try {
-      const { error } = await this.supabase.client.auth.signUp({
-        email: this.form.value.email,
-        password: this.form.value.password,
-        options: {
-          data: {
-            display_name: this.form.value.name,
-            name: this.form.value.name,
-          },
-        },
-      });
+    const userData = {
+      email: this.form.value.email,
+      password: this.form.value.password,
+      name: this.form.value.name,
+    };
 
-      this.loading.set(false);
-
-      if (error) {
-        throw error;
-      } else {
+    this.jwtAuthService.register(userData).subscribe({
+      next: (response) => {
+        this.loading.set(false);
+        console.log('Registration successful:', response.user);
         this.form.reset();
-        void this.router.navigate(['/login']);
-      }
-    } catch (error) {
-      this.loading.set(false);
-      throw error;
-    }
+        void this.router.navigate(['/dashboard']); // Login automatically after registration
+      },
+      error: (error) => {
+        this.loading.set(false);
+        this.error.set({
+          message: error.error?.message || 'Registration failed. Please try again.',
+          code: error.status || 500,
+        });
+      },
+    });
   }
 
   protected getFieldError(fieldName: string): string {

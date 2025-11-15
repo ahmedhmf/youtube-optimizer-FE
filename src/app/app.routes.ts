@@ -1,8 +1,6 @@
 import type { Routes } from '@angular/router';
 import { publicGuard } from './guard/public.guard';
-import { authGuard } from './guard/auth.guard';
-// import { publicGuard } from './guard/public.guard';
-// import { authGuard } from './guard/auth.guard';
+import { jwtAuthGuard } from './guard/jwt-auth.guard';
 
 export const routes: Routes = [
   {
@@ -23,7 +21,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/layout/layout').then((m) => m.Layout),
-    canActivate: [authGuard],
+    canActivate: [jwtAuthGuard],
     children: [
       {
         path: '',

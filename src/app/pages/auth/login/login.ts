@@ -1,14 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth';
+import { Router, RouterLink } from '@angular/router';
+import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
 import { ErrorMessage } from '../../../ui-components/error-message/error-message';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, ErrorMessage],
+  imports: [ReactiveFormsModule, ErrorMessage, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -18,7 +18,7 @@ export class Login {
   protected loading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
 
-  private readonly supabase = inject(AuthService);
+  private readonly jwtAuthService = inject(JwtAuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly MIN_PASSWORD_LENGTH = 6;
@@ -52,28 +52,35 @@ export class Login {
     return !!(field?.errors && field.touched);
   }
 
-  protected async login(): Promise<void> {
+  protected login(): void {
     this.form.markAllAsTouched();
     this.error.set(null);
+
+    if (this.form.invalid) {
+      return;
+    }
+
     this.loading.set(true);
 
-    try {
-      const { error } = await this.supabase.client.auth.signInWithPassword({
-        email: this.form.value.email,
-        password: this.form.value.password,
-      });
+    const credentials = {
+      email: this.form.value.email,
+      password: this.form.value.password,
+    };
 
-      this.loading.set(false);
-
-      if (error) {
-        throw error;
-      } else {
-        await this.router.navigate(['/dashboard/']);
-      }
-    } catch (error) {
-      this.loading.set(false);
-      throw error;
-    }
+    this.jwtAuthService.login(credentials).subscribe({
+      next: (response) => {
+        this.loading.set(false);
+        console.log('Login successful:', response.user);
+        void this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        this.loading.set(false);
+        this.error.set({
+          message: error.error?.message || 'Login failed. Please check your credentials.',
+          code: error.status || 500,
+        });
+      },
+    });
   }
 
   private getFieldDisplayName(fieldName: string): string {

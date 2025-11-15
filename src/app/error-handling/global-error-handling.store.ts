@@ -12,7 +12,7 @@ export type ErrorType =
 
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 
-export type ErrorCategory = 'system' | 'business' | 'user';
+export type ErrorCategory = 'system' | 'business' | 'user' | 'component';
 
 export type ApplicationError = {
   readonly id: string;

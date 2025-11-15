@@ -1,0 +1,251 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import type { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { BehaviorSubject, throwError } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { JwtTokenService } from './jwt-token.service';
+import { JwtTokenRefreshService } from './jwt-token-refresh.service';
+import { environment } from '../../environments/environment';
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type RegisterRequest = {
+  email: string;
+  password: string;
+  name?: string;
+};
+
+export type AuthResponse = {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+    role?: string;
+  };
+};
+
+export type User = {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+};
+
+@Injectable({ providedIn: 'root' })
+export class JwtAuthService {
+  public currentUser$;
+
+  private readonly httpClient = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly jwtTokenService = inject(JwtTokenService);
+  private readonly tokenRefreshService = inject(JwtTokenRefreshService);
+  private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
+
+  constructor() {
+    this.currentUser$ = this.currentUserSubject.asObservable();
+    this.initializeAuthState();
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  public isAuthenticated(): boolean {
+    return this.jwtTokenService.isAuthenticated();
+  }
+
+  /**
+   * Get current user
+   */
+  public getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  /**
+   * Get current user observable
+   */
+  public getCurrentUser$(): Observable<User | null> {
+    return this.currentUser$;
+  }
+
+  /**
+   * Check if current user has specific role
+   */
+  public hasRole(role: string): boolean {
+    const currentUser = this.getCurrentUser();
+    return currentUser?.role === role;
+  }
+
+  /**
+   * Check if current user has any of the specified roles
+   */
+  public hasAnyRole(roles: string[]): boolean {
+    const currentUser = this.getCurrentUser();
+    return currentUser?.role ? roles.includes(currentUser.role) : false;
+  }
+
+  /**
+   * Get user profile from server
+   */
+  public getUserProfile(): Observable<User> {
+    return this.httpClient.get<User>(`${environment.backendURL}/auth/profile`).pipe(
+      tap((user) => {
+        this.currentUserSubject.next(user);
+      }),
+      catchError(this.handleAuthError.bind(this)),
+    );
+  }
+
+  /**
+   * Update user profile
+   */
+  public updateProfile(profileData: Partial<User>): Observable<User> {
+    return this.httpClient.put<User>(`${environment.backendURL}/auth/profile`, profileData).pipe(
+      tap((updatedUser) => {
+        this.currentUserSubject.next(updatedUser);
+      }),
+      catchError(this.handleAuthError.bind(this)),
+    );
+  }
+
+  /**
+   * Change password
+   */
+  public changePassword(oldPassword: string, newPassword: string): Observable<any> {
+    return this.httpClient
+      .post<any>(`${environment.backendURL}/auth/change-password`, {
+        oldPassword,
+        newPassword,
+      })
+      .pipe(catchError(this.handleAuthError.bind(this)));
+  }
+
+  /**
+   * Request password reset
+   */
+  public requestPasswordReset(email: string): Observable<any> {
+    return this.httpClient
+      .post<any>(`${environment.backendURL}/auth/forgot-password`, { email })
+      .pipe(catchError(this.handleAuthError.bind(this)));
+  }
+
+  /**
+   * Reset password with token
+   */
+  public resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.httpClient
+      .post(`${environment.backendURL}/auth/reset-password`, {
+        token,
+        newPassword,
+      })
+      .pipe(catchError(this.handleAuthError.bind(this)));
+  }
+
+  /**
+   * Login user with email and password
+   */
+  public login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.httpClient
+      .post<AuthResponse>(`${environment.backendURL}/auth/login`, credentials)
+      .pipe(
+        tap((response) => {
+          // Store tokens
+          this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+          // Update current user
+          this.currentUserSubject.next(response.user);
+        }),
+        catchError(this.handleAuthError.bind(this)),
+      );
+  }
+
+  /**
+   * Register new user
+   */
+  public register(userData: RegisterRequest): Observable<AuthResponse> {
+    return this.httpClient
+      .post<AuthResponse>(`${environment.backendURL}/auth/register`, userData)
+      .pipe(
+        tap((response) => {
+          // Store tokens
+          this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+          // Update current user
+          this.currentUserSubject.next(response.user);
+        }),
+        catchError(this.handleAuthError.bind(this)),
+      );
+  }
+
+  /**
+   * Logout user
+   */
+  public logout(): Observable<any> {
+    return this.httpClient.post<any>(`${environment.backendURL}/auth/logout`, {}).pipe(
+      tap(() => {
+        this.performLogout();
+      }),
+      catchError(() => {
+        // Even if logout API fails, clear local tokens
+        this.performLogout();
+        return throwError(() => new Error('Logout failed'));
+      }),
+    );
+  }
+
+  /**
+   * Perform local logout operations
+   */
+  private performLogout(): void {
+    this.jwtTokenService.clearTokens();
+    this.tokenRefreshService.stopRefreshTimer();
+    this.currentUserSubject.next(null);
+    void this.router.navigate(['/login']);
+  }
+
+  /**
+   * Initialize authentication state from stored tokens
+   */
+  private initializeAuthState(): void {
+    if (this.jwtTokenService.isAuthenticated()) {
+      const tokenInfo = this.jwtTokenService.getTokenInfo();
+      if (tokenInfo) {
+        const user: User = {
+          id: tokenInfo.sub,
+          email: tokenInfo.email ?? '',
+          name: this.extractStringFromToken(tokenInfo, 'name'),
+          role: this.extractStringFromToken(tokenInfo, 'role'),
+        };
+        this.currentUserSubject.next(user);
+      }
+    }
+  }
+
+  /**
+   * Safely extract string values from token
+   */
+  private extractStringFromToken(tokenInfo: any, key: string): string | undefined {
+    const value = tokenInfo[key];
+    return typeof value === 'string' ? value : undefined;
+  }
+
+  /**
+   * Handle authentication errors
+   */
+  private handleAuthError(error: HttpErrorResponse): Observable<never> {
+    const UNAUTHORIZED_STATUS = 401;
+    const FORBIDDEN_STATUS = 403;
+
+    if (error.status === UNAUTHORIZED_STATUS || error.status === FORBIDDEN_STATUS) {
+      // Clear tokens and redirect to login
+      this.performLogout();
+    }
+
+    return throwError(() => error);
+  }
+}

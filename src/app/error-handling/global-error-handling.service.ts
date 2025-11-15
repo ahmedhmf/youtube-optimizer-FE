@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ErrorHandler } from '@angular/core';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
@@ -8,6 +9,7 @@ import {
   type ApplicationError,
 } from './global-error-handling.store';
 import { environment } from '../../environments/environment';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type ApplicationErrorInput = Error | string | unknown;
 
@@ -32,7 +34,7 @@ export class GlobalErrorHandler implements ErrorHandler {
   /**
    * Main error handler - processes all uncaught errors
    */
-  public handleError(error: ApplicationErrorInput): void {
+  public handleError(error: any): void {
     try {
       const errorDetails = this.extractErrorDetails(error);
 
@@ -44,6 +46,8 @@ export class GlobalErrorHandler implements ErrorHandler {
 
       // Schedule batch reporting for non-critical errors
       this.scheduleBatchReport();
+
+      this.reportToBackend(error);
     } catch (handlingError) {
       console.error('Error in GlobalErrorHandler:', handlingError);
       console.error('Original error:', error);
@@ -234,5 +238,52 @@ export class GlobalErrorHandler implements ErrorHandler {
    */
   private getCurrentUserId(): string | undefined {
     return 'anonymous'; // Implement based on your auth system
+  }
+
+  private reportToBackend(error: any): void {
+    const errorReport = {
+      message: error.message,
+      stack: error.stack,
+      type: this.getErrorType(error),
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      context: this.buildErrorContext(),
+    };
+
+    // Fire and forget - don't handle errors from error reporting
+    fetch('/api/errors/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(errorReport),
+    }).catch(() => {
+      // Silently fail - we don't want error reporting to cause more errors
+    });
+  }
+
+  private getErrorType(error: any): string {
+    if (error instanceof HttpErrorResponse) {
+      return 'HTTP_ERROR';
+    }
+    if (error instanceof TypeError) {
+      return 'TYPE_ERROR';
+    }
+    if (error.name) {
+      return error.name;
+    }
+    return 'UNKNOWN_ERROR';
+  }
+
+  private buildErrorContext(): any {
+    return {
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+      online: navigator.onLine,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+    };
   }
 }

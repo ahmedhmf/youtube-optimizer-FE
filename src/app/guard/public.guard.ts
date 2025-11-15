@@ -1,31 +1,18 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import type { CanActivateFn } from '@angular/router';
-import { AuthService } from '../services/auth';
+import { JwtAuthService } from '../services/jwt-auth.service';
 
-export const publicGuard: CanActivateFn = async () => {
-  const authService = inject(AuthService);
+export const publicGuard: CanActivateFn = () => {
+  const jwtAuthService = inject(JwtAuthService);
   const router = inject(Router);
 
-  try {
-    const {
-      data: { session },
-      error,
-    } = await authService.client.auth.getSession();
-
-    if (error) {
-      return true;
-    }
-
-    if (session?.user) {
-      void router.navigate(['/dashboard']);
-      return false;
-    } else {
-      return true;
-    }
-  } catch (error) {
-    // Todo : handle error properly
-    console.error('Error checking session in public guard', error);
-    return true;
+  // If user is already authenticated, redirect to dashboard
+  if (jwtAuthService.isAuthenticated()) {
+    void router.navigate(['/dashboard']);
+    return false;
   }
+
+  // Allow access to public routes for unauthenticated users
+  return true;
 };

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../../../services/auth';
+import { JwtAuthService } from '../../../services/jwt-auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -9,10 +9,18 @@ import { AuthService } from '../../../services/auth';
   styleUrl: './layout.scss',
 })
 export class Layout {
-  private readonly authService = inject(AuthService);
+  private readonly jwtAuthService = inject(JwtAuthService);
 
-  protected async logout(): Promise<void> {
-    // Implement logout functionality here
-    await this.authService.signOut();
+  protected logout(): void {
+    this.jwtAuthService.logout().subscribe({
+      next: () => {
+        console.log('Logout successful');
+        // Navigation is handled automatically in the service
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Even if logout API fails, tokens are cleared
+      },
+    });
   }
 }
