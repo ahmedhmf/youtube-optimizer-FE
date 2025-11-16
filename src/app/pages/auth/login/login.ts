@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import type { ElementRef, AfterViewInit } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,11 +13,15 @@ import { ErrorMessage } from '../../../ui-components/error-message/error-message
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements AfterViewInit {
   protected form: FormGroup;
   protected hide = signal<boolean>(true);
   protected loading = signal<boolean>(false);
+  protected socialLoginLoading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
+
+  @ViewChild('googleButtonContainer', { static: false })
+  googleButtonContainer?: ElementRef<HTMLElement>;
 
   private readonly jwtAuthService = inject(JwtAuthService);
   private readonly fb = inject(FormBuilder);
@@ -89,5 +94,51 @@ export class Login {
       password: 'Password',
     };
     return names[fieldName] || fieldName;
+  }
+
+  // Social login methods
+
+  public ngAfterViewInit(): void {
+    // Initialize Google button if available
+    if (
+      this.socialLoginAvailable() &&
+      this.availableProviders().includes('google') &&
+      this.googleButtonContainer
+    ) {
+      void this.jwtAuthService.renderGoogleButton(this.googleButtonContainer.nativeElement);
+    }
+  }
+
+  protected socialLoginAvailable(): boolean {
+    return this.jwtAuthService.isSocialLoginAvailable();
+  }
+
+  protected availableProviders(): string[] {
+    return this.jwtAuthService.getAvailableProviders();
+  }
+
+  protected signInWithGoogle(): void {
+    // Google sign-in is handled by the rendered button
+    // This method can be used for manual Google sign-in if needed
+  }
+
+  protected signInWithGitHub(): void {
+    this.socialLoginLoading.set(true);
+    this.error.set(null);
+
+    this.jwtAuthService.signInWithGitHub().subscribe({
+      next: (user) => {
+        this.socialLoginLoading.set(false);
+        console.log('GitHub sign-in successful:', user);
+        void this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        this.socialLoginLoading.set(false);
+        this.error.set({
+          message: error.error?.message || 'GitHub sign-in failed. Please try again.',
+          code: error.status || 500,
+        });
+      },
+    });
   }
 }

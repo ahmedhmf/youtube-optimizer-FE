@@ -5,9 +5,10 @@ import type { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, throwError } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { JwtTokenService } from './jwt-token.service';
 import { JwtTokenRefreshService } from './jwt-token-refresh.service';
+import { SocialAuthService } from './social-auth.service';
 import { environment } from '../../environments/environment';
 
 export type LoginRequest = {
@@ -38,6 +39,7 @@ export type User = {
   id: string;
   email: string;
   name?: string;
+  picture?: string;
   role: UserRole; // Add this field
   createdAt?: Date;
   updatedAt?: Date;
@@ -51,6 +53,7 @@ export class JwtAuthService {
   private readonly router = inject(Router);
   private readonly jwtTokenService = inject(JwtTokenService);
   private readonly tokenRefreshService = inject(JwtTokenRefreshService);
+  private readonly socialAuthService = inject(SocialAuthService);
   private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
 
   constructor() {
@@ -211,6 +214,129 @@ export class JwtAuthService {
     // Define permissions based on role
     const permissions = this.getRolePermissions(role);
     return permissions[permission] || false;
+  }
+
+  // Social authentication methods
+
+  /**
+   * Sign in with Google
+   */
+  public signInWithGoogle(credentialToken: string): Observable<User> {
+    return this.socialAuthService.signInWithGoogle(credentialToken).pipe(
+      tap((response: any) => {
+        // Convert SocialAuthResponse to AuthResponse
+        const authResponse: AuthResponse = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            ...response.user,
+            role: UserRole.USER, // Default role for social login users
+          },
+        };
+        this.handleAuthSuccess(authResponse);
+      }),
+      map((response: any) => ({
+        ...response.user,
+        role: UserRole.USER,
+      })),
+      catchError(this.handleAuthError.bind(this)),
+    );
+  }
+
+  /**
+   * Sign in with GitHub
+   */
+  public signInWithGitHub(): Observable<User> {
+    return this.socialAuthService.signInWithGitHub().pipe(
+      tap((response: any) => {
+        // Convert SocialAuthResponse to AuthResponse
+        const authResponse: AuthResponse = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            ...response.user,
+            role: UserRole.USER, // Default role for social login users
+          },
+        };
+        this.handleAuthSuccess(authResponse);
+      }),
+      map((response: any) => ({
+        ...response.user,
+        role: UserRole.USER,
+      })),
+      catchError(this.handleAuthError.bind(this)),
+    );
+  }
+
+  /**
+   * Initialize Google One-Tap sign-in
+   */
+  public async initializeGoogleOneTap(): Promise<void> {
+    const callback = (response: any): void => {
+      this.signInWithGoogle(response.credential).subscribe({
+        next: () => {
+          console.log('Google One-Tap sign-in successful');
+        },
+        error: (error) => {
+          console.error('Google One-Tap sign-in failed:', error);
+        },
+      });
+    };
+
+    await this.socialAuthService.initializeGoogleOneTap(callback);
+  }
+
+  /**
+   * Show Google One-Tap prompt
+   */
+  public showGoogleOneTap(): void {
+    this.socialAuthService.showGoogleOneTap();
+  }
+
+  /**
+   * Render Google Sign-In button
+   */
+  public async renderGoogleButton(element: HTMLElement): Promise<void> {
+    const callback = (response: any): void => {
+      this.signInWithGoogle(response.credential).subscribe({
+        next: () => {
+          console.log('Google sign-in successful');
+        },
+        error: (error) => {
+          console.error('Google sign-in failed:', error);
+        },
+      });
+    };
+
+    await this.socialAuthService.renderGoogleButton(element, callback);
+  }
+
+  /**
+   * Check if social login is available
+   */
+  public isSocialLoginAvailable(): boolean {
+    return this.socialAuthService.isSocialLoginAvailable();
+  }
+
+  /**
+   * Get available social providers
+   */
+  public getAvailableProviders(): string[] {
+    return this.socialAuthService.getAvailableProviders();
+  }
+
+  /**
+   * Handle successful authentication from any source
+   */
+  private async handleAuthSuccess(response: AuthResponse): Promise<void> {
+    // Store tokens
+    this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+
+    // Set current user
+    this.currentUserSubject.next(response.user);
+
+    // Token refresh is automatically started in the constructor
+    await this.router.navigate(['/dashboard']);
   }
 
   private getRolePermissions(role: UserRole): Record<string, boolean> {
