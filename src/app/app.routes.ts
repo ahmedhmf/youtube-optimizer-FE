@@ -24,6 +24,16 @@ export const routes: Routes = [
       import('./pages/auth/github-callback/github-callback').then((m) => m.GitHubCallbackComponent),
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
+    canActivate: [publicGuard],
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./pages/auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+    canActivate: [publicGuard],
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./pages/dashboard/layout/layout').then((m) => m.Layout),
     canActivate: [jwtAuthGuard],
