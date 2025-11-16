@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { inject } from '@angular/core';
 import type {
   HttpEvent,
@@ -12,6 +13,7 @@ import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { JwtTokenService } from '../services/jwt-token.service';
 import { JwtTokenRefreshService } from '../services/jwt-token-refresh.service';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 export const jwtInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -19,6 +21,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const jwtTokenService = inject(JwtTokenService);
   const tokenRefreshService = inject(JwtTokenRefreshService);
+  const router = inject(Router);
 
   // Skip interceptor for non-API requests
   if (!req.url.startsWith(environment.backendURL)) {
@@ -55,6 +58,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       const UNAUTHORIZED_STATUS = 401;
+      const FORBIDDEN_STATUS = 403;
       // Handle 401 Unauthorized errors
       if (error.status === UNAUTHORIZED_STATUS) {
         return handle401Error({
@@ -63,8 +67,10 @@ export const jwtInterceptor: HttpInterceptorFn = (
           jwtTokenService,
           tokenRefreshService,
         });
+      } else if (error.status === FORBIDDEN_STATUS) {
+        // Role/permission denied
+        router.navigate(['/unauthorized']);
       }
-
       return throwError(() => error);
     }),
   );

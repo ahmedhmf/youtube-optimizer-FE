@@ -24,19 +24,23 @@ export type RegisterRequest = {
 export type AuthResponse = {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name?: string;
-    role?: string;
-  };
+  user: User;
 };
+
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
+  PREMIUM = 'premium',
+}
 
 export type User = {
   id: string;
   email: string;
   name?: string;
-  role?: string;
+  role: UserRole; // Add this field
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -78,9 +82,9 @@ export class JwtAuthService {
   /**
    * Check if current user has specific role
    */
-  public hasRole(role: string): boolean {
-    const currentUser = this.getCurrentUser();
-    return currentUser?.role === role;
+  public hasRole(...roles: UserRole[]): boolean {
+    const userRole = this.getCurrentUser()?.role;
+    return userRole ? roles.includes(userRole) : false;
   }
 
   /**
@@ -198,6 +202,51 @@ export class JwtAuthService {
     );
   }
 
+  public hasPermission(permission: string): boolean {
+    const role = this.getCurrentUser()?.role;
+    if (!role) {
+      return false;
+    }
+
+    // Define permissions based on role
+    const permissions = this.getRolePermissions(role);
+    return permissions[permission] || false;
+  }
+
+  private getRolePermissions(role: UserRole): Record<string, boolean> {
+    const permissionMap = {
+      [UserRole.USER]: {
+        canAccessAdminPanel: false,
+        canManageUsers: false,
+        canDeleteAnyContent: false,
+        canViewAllJobs: false,
+        canUsePremiumFeatures: false,
+      },
+      [UserRole.PREMIUM]: {
+        canAccessAdminPanel: false,
+        canManageUsers: false,
+        canDeleteAnyContent: false,
+        canViewAllJobs: false,
+        canUsePremiumFeatures: true,
+      },
+      [UserRole.MODERATOR]: {
+        canAccessAdminPanel: true,
+        canManageUsers: false,
+        canDeleteAnyContent: true,
+        canViewAllJobs: true,
+        canUsePremiumFeatures: true,
+      },
+      [UserRole.ADMIN]: {
+        canAccessAdminPanel: true,
+        canManageUsers: true,
+        canDeleteAnyContent: true,
+        canViewAllJobs: true,
+        canUsePremiumFeatures: true,
+      },
+    };
+    return permissionMap[role];
+  }
+
   /**
    * Perform local logout operations
    */
@@ -219,7 +268,7 @@ export class JwtAuthService {
           id: tokenInfo.sub,
           email: tokenInfo.email ?? '',
           name: this.extractStringFromToken(tokenInfo, 'name'),
-          role: this.extractStringFromToken(tokenInfo, 'role'),
+          role: tokenInfo.role as UserRole,
         };
         this.currentUserSubject.next(user);
       }
