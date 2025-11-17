@@ -21,7 +21,7 @@ export class JobStatusService {
    */
   public getUserJobs(): Observable<UserJob[]> {
     const operation = (): Observable<UserJob[]> =>
-      this.http.get<UserJob[]>(`${this.API_BASE}/jobs`);
+      this.http.get<UserJob[]>(`${this.API_BASE}/jobs`, { withCredentials: true });
 
     return this.retryService.retryWithCategory(operation, 'listing', {
       operation: 'getUserJobs',
@@ -34,7 +34,11 @@ export class JobStatusService {
    */
   public retryJob(jobId: string): Observable<RetryJobResponce> {
     const operation = (): Observable<RetryJobResponce> =>
-      this.http.post<RetryJobResponce>(`${this.API_BASE}/job/${jobId}/retry`, {});
+      this.http.post<RetryJobResponce>(
+        `${this.API_BASE}/job/${jobId}/retry`,
+        {},
+        { withCredentials: true },
+      );
 
     return this.retryService.retryWithCategory(operation, 'critical', {
       operation: 'retryJob',
@@ -47,7 +51,11 @@ export class JobStatusService {
    */
   public cancelJob(jobId: string): Observable<CanceledJobResponse> {
     const operation = (): Observable<CanceledJobResponse> =>
-      this.http.post<CanceledJobResponse>(`${this.API_BASE}/job/${jobId}/cancel`, {});
+      this.http.post<CanceledJobResponse>(
+        `${this.API_BASE}/job/${jobId}/cancel`,
+        {},
+        { withCredentials: true },
+      );
 
     return this.retryService.retryWithCategory(operation, 'critical', {
       operation: 'cancelJob',
@@ -60,7 +68,7 @@ export class JobStatusService {
    */
   public getJobStatus(jobId: string): Observable<UserJob> {
     const operation = (): Observable<UserJob> =>
-      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}`);
+      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}`, { withCredentials: true });
 
     return this.retryService.retryWithCategory(operation, 'listing', {
       operation: 'getJobStatus',
@@ -73,7 +81,7 @@ export class JobStatusService {
    */
   public pollJobStatus(jobId: string): Observable<UserJob> {
     const operation = (): Observable<UserJob> =>
-      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}/status`);
+      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}/status`, { withCredentials: true });
 
     // Use background category with more aggressive retry for polling
     return this.retryService.retryWithOverrides(

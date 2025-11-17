@@ -26,7 +26,11 @@ export class ApiService implements OnDestroy {
 
   public analyzeVideoUrl(configuration: AiMessageConfiguration): Observable<Audits> {
     const operation = (): Observable<Audits> =>
-      this.http.post<Audits>(`${this.baseUrl}/analyze/video`, { configuration });
+      this.http.post<Audits>(
+        `${this.baseUrl}/analyze/video`,
+        { configuration },
+        { withCredentials: true },
+      );
     return this.retryService.retryWithCategory(operation, 'analysis', {
       operation: 'analyzeVideoUrl',
       metadata: { videoUrl: configuration.url },
@@ -38,7 +42,9 @@ export class ApiService implements OnDestroy {
       const formData = new FormData();
       formData.append('video', file);
       formData.append('configuration', JSON.stringify(configuration));
-      return this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData);
+      return this.http.post<Audits>(`${this.baseUrl}/analyze/upload`, formData, {
+        withCredentials: true,
+      });
     };
 
     return this.retryService.retryWithCategory(operation, 'upload', {
@@ -53,7 +59,9 @@ export class ApiService implements OnDestroy {
         transcript: text,
         configuration: configuration,
       };
-      return this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload);
+      return this.http.post<Audits>(`${this.baseUrl}/analyze/transcript`, payload, {
+        withCredentials: true,
+      });
     };
 
     return this.retryService.retryWithCategory(operation, 'analysis', {
@@ -71,7 +79,10 @@ export class ApiService implements OnDestroy {
 
     const operation = (): Observable<HistoryResponse> => {
       const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
-      return this.http.get<HistoryResponse>(`${this.baseUrl}/analyze/history`, { params });
+      return this.http.get<HistoryResponse>(`${this.baseUrl}/analyze/history`, {
+        params,
+        withCredentials: true,
+      });
     };
 
     this.retryService
@@ -105,7 +116,7 @@ export class ApiService implements OnDestroy {
     this.store.setLoading(true);
 
     const operation = (): Observable<object> =>
-      this.http.delete(`${this.baseUrl}/analyze/delete/${id}`);
+      this.http.delete(`${this.baseUrl}/analyze/delete/${id}`, { withCredentials: true });
 
     this.retryService
       .retryWithCategory(operation, 'crud', {

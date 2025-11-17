@@ -163,6 +163,7 @@ export class SocialAuthService {
         return this.http.post<SocialAuthResponse>(
           `${environment.backendURL}/auth/social/github`,
           payload,
+          { withCredentials: true }, // Enable session cookies
         );
       }),
       catchError((error) => {

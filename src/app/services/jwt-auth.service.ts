@@ -102,24 +102,28 @@ export class JwtAuthService {
    * Get user profile from server
    */
   public getUserProfile(): Observable<User> {
-    return this.httpClient.get<User>(`${environment.backendURL}/auth/profile`).pipe(
-      tap((user) => {
-        this.currentUserSubject.next(user);
-      }),
-      catchError(this.handleAuthError.bind(this)),
-    );
+    return this.httpClient
+      .get<User>(`${environment.backendURL}/auth/profile`, { withCredentials: true })
+      .pipe(
+        tap((user) => {
+          this.currentUserSubject.next(user);
+        }),
+        catchError(this.handleAuthError.bind(this)),
+      );
   }
 
   /**
    * Update user profile
    */
   public updateProfile(profileData: Partial<User>): Observable<User> {
-    return this.httpClient.put<User>(`${environment.backendURL}/auth/profile`, profileData).pipe(
-      tap((updatedUser) => {
-        this.currentUserSubject.next(updatedUser);
-      }),
-      catchError(this.handleAuthError.bind(this)),
-    );
+    return this.httpClient
+      .put<User>(`${environment.backendURL}/auth/profile`, profileData, { withCredentials: true })
+      .pipe(
+        tap((updatedUser) => {
+          this.currentUserSubject.next(updatedUser);
+        }),
+        catchError(this.handleAuthError.bind(this)),
+      );
   }
 
   /**
@@ -127,10 +131,14 @@ export class JwtAuthService {
    */
   public changePassword(oldPassword: string, newPassword: string): Observable<any> {
     return this.httpClient
-      .post<any>(`${environment.backendURL}/auth/change-password`, {
-        oldPassword,
-        newPassword,
-      })
+      .post<any>(
+        `${environment.backendURL}/auth/change-password`,
+        {
+          oldPassword,
+          newPassword,
+        },
+        { withCredentials: true },
+      )
       .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
@@ -139,7 +147,11 @@ export class JwtAuthService {
    */
   public requestPasswordReset(email: string): Observable<any> {
     return this.httpClient
-      .post<any>(`${environment.backendURL}/auth/forgot-password`, { email })
+      .post<any>(
+        `${environment.backendURL}/auth/forgot-password`,
+        { email },
+        { withCredentials: true },
+      )
       .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
@@ -148,10 +160,14 @@ export class JwtAuthService {
    */
   public resetPassword(token: string, newPassword: string): Observable<any> {
     return this.httpClient
-      .post(`${environment.backendURL}/auth/reset-password`, {
-        token,
-        newPassword,
-      })
+      .post(
+        `${environment.backendURL}/auth/reset-password`,
+        {
+          token,
+          newPassword,
+        },
+        { withCredentials: true },
+      )
       .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
@@ -160,11 +176,15 @@ export class JwtAuthService {
    */
   public login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.httpClient
-      .post<AuthResponse>(`${environment.backendURL}/auth/login`, credentials)
+      .post<AuthResponse>(
+        `${environment.backendURL}/auth/login`,
+        credentials,
+        { withCredentials: true }, // Enable session cookies
+      )
       .pipe(
         tap((response) => {
-          // Store tokens
-          this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+          // Store access token in memory only
+          this.jwtTokenService.setAccessToken(response.accessToken);
           // Update current user
           this.currentUserSubject.next(response.user);
         }),
@@ -177,11 +197,15 @@ export class JwtAuthService {
    */
   public register(userData: RegisterRequest): Observable<AuthResponse> {
     return this.httpClient
-      .post<AuthResponse>(`${environment.backendURL}/auth/register`, userData)
+      .post<AuthResponse>(
+        `${environment.backendURL}/auth/register`,
+        userData,
+        { withCredentials: true }, // Enable session cookies
+      )
       .pipe(
         tap((response) => {
-          // Store tokens
-          this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+          // Store access token in memory only
+          this.jwtTokenService.setAccessToken(response.accessToken);
           // Update current user
           this.currentUserSubject.next(response.user);
         }),
@@ -193,16 +217,22 @@ export class JwtAuthService {
    * Logout user
    */
   public logout(): Observable<any> {
-    return this.httpClient.post<any>(`${environment.backendURL}/auth/logout`, {}).pipe(
-      tap(() => {
-        this.performLogout();
-      }),
-      catchError(() => {
-        // Even if logout API fails, clear local tokens
-        this.performLogout();
-        return throwError(() => new Error('Logout failed'));
-      }),
-    );
+    return this.httpClient
+      .post<any>(
+        `${environment.backendURL}/auth/logout`,
+        {},
+        { withCredentials: true }, // Important: Send session cookies for cleanup
+      )
+      .pipe(
+        tap(() => {
+          this.performLogout();
+        }),
+        catchError(() => {
+          // Even if logout API fails, clear local tokens
+          this.performLogout();
+          return throwError(() => new Error('Logout failed'));
+        }),
+      );
   }
 
   public hasPermission(permission: string): boolean {
@@ -329,13 +359,13 @@ export class JwtAuthService {
    * Handle successful authentication from any source
    */
   private async handleAuthSuccess(response: AuthResponse): Promise<void> {
-    // Store tokens
-    this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+    // Store access token in memory only
+    this.jwtTokenService.setAccessToken(response.accessToken);
 
     // Set current user
     this.currentUserSubject.next(response.user);
 
-    // Token refresh is automatically started in the constructor
+    // Navigate to dashboard
     await this.router.navigate(['/dashboard']);
   }
 

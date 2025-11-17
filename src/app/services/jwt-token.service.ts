@@ -14,8 +14,7 @@ export type DecodedToken = {
 export class JwtTokenService {
   public token$;
 
-  private readonly ACCESS_TOKEN_KEY = 'access_token';
-  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
+  // Memory-only storage constants (no localStorage for security)
   private readonly SIXTY = 60;
   private readonly ONE_THOUSAND = 1000;
   private readonly FIVE = 5;
@@ -23,37 +22,45 @@ export class JwtTokenService {
   private readonly TOKEN_EXPIRY_BUFFER_MINUTES = this.FIVE;
   private readonly TOKEN_EXPIRY_BUFFER = this.TOKEN_EXPIRY_BUFFER_MINUTES * this.MINUTES_IN_MS;
 
-  private readonly tokenSubject = new BehaviorSubject<string | null>(this.getAccessToken());
+  // In-memory token storage (no localStorage)
+  private currentAccessToken: string | null = null;
+  private readonly tokenSubject = new BehaviorSubject<string | null>(null);
 
   constructor() {
     this.token$ = this.tokenSubject.asObservable();
-    // Check token validity on service initialization
-    this.validateStoredToken();
+    // No token validation needed since we use memory-only storage
   }
 
   /**
-   * Store access and refresh tokens
+   * Store access token in memory only (refresh token handled by HTTP-only cookies)
    */
-  public setTokens(accessToken: string, refreshToken?: string): void {
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
-    if (refreshToken) {
-      localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
-    }
+  public setAccessToken(accessToken: string): void {
+    this.currentAccessToken = accessToken;
     this.tokenSubject.next(accessToken);
   }
 
   /**
-   * Get access token from storage
+   * Legacy method for backward compatibility - use setAccessToken instead
    */
-  public getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  public setTokens(accessToken: string, refreshToken?: string): void {
+    this.setAccessToken(accessToken);
+    // Refresh token parameter ignored - handled by HTTP-only cookies
   }
 
   /**
-   * Get refresh token from storage
+   * Get access token from memory
+   */
+  public getAccessToken(): string | null {
+    return this.currentAccessToken;
+  }
+
+  /**
+   * Refresh tokens are now handled by HTTP-only cookies
+   * No need to access them from frontend for security
    */
   public getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+    // Refresh tokens are HTTP-only cookies - not accessible from JS
+    return null;
   }
 
   /**
@@ -151,11 +158,10 @@ export class JwtTokenService {
   }
 
   /**
-   * Clear all tokens and logout
+   * Clear access token from memory (refresh token cookies cleared by backend)
    */
   public clearTokens(): void {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    this.currentAccessToken = null;
     this.tokenSubject.next(null);
   }
 
@@ -180,12 +186,10 @@ export class JwtTokenService {
   }
 
   /**
-   * Validate stored token and clear if invalid
+   * Check if token is valid and not expired
    */
-  private validateStoredToken(): void {
+  public isTokenValid(): boolean {
     const token = this.getAccessToken();
-    if (token && this.isTokenExpired(token)) {
-      this.clearTokens();
-    }
+    return token !== null && !this.isTokenExpired(token);
   }
 }

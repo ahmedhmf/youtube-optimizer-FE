@@ -27,25 +27,21 @@ export class JwtTokenRefreshService {
   }
 
   /**
-   * Refresh the access token using refresh token
+   * Refresh the access token using HTTP-only refresh cookie
    */
   public refreshToken(): Observable<TokenResponse> {
-    const refreshToken = this.jwtTokenService.getRefreshToken();
-
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
     this.refreshInProgress.next(true);
 
     return this.httpClient
-      .post<TokenResponse>(`${environment.backendURL}/auth/refresh`, {
-        refreshToken,
-      })
+      .post<TokenResponse>(
+        `${environment.backendURL}/auth/refresh`,
+        {}, // Empty body - refresh token is in HTTP-only cookie
+        { withCredentials: true }, // Important: Send cookies
+      )
       .pipe(
         tap((response) => {
-          // Store new tokens
-          this.jwtTokenService.setTokens(response.accessToken, response.refreshToken);
+          // Store new access token in memory only
+          this.jwtTokenService.setAccessToken(response.accessToken);
         }),
         catchError((error) => {
           // If refresh fails, clear tokens and logout

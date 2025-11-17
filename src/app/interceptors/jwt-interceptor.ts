@@ -34,26 +34,29 @@ export const jwtInterceptor: HttpInterceptorFn = (
   if (
     req.url.includes('/auth/login') ||
     req.url.includes('/auth/register') ||
-    req.url.includes('/auth/refresh')
+    req.url.includes('/auth/refresh') ||
+    req.url.includes('/auth/social/')
   ) {
-    return next(req);
+    // Still add withCredentials for auth endpoints to handle cookies
+    const authReq = req.clone({ withCredentials: true });
+    return next(authReq);
   }
 
   const token = jwtTokenService.getAccessToken();
 
-  // If no token, proceed without authorization header
-  if (!token) {
+  // Always add withCredentials for session cookies
+  let authReq = req.clone({ withCredentials: true });
+
+  // Add authorization header if token exists
+  if (token) {
+    // Debug: Check if token is expired
+    if (jwtTokenService.isTokenExpired(token)) {
+      console.warn('⚠️ JWT token is expired for request:', req.url);
+    }
+    authReq = addAuthHeader(authReq, token);
+  } else {
     console.warn('⚠️ No JWT token found for request:', req.url);
-    return next(req);
   }
-
-  // Debug: Check if token is expired
-  if (jwtTokenService.isTokenExpired(token)) {
-    console.warn('⚠️ JWT token is expired for request:', req.url);
-  }
-
-  // Add authorization header
-  const authReq = addAuthHeader(req, token);
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -77,7 +80,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
 };
 
 /**
- * Add authorization header to request
+ * Add authorization header to request while preserving other settings
  */
 function addAuthHeader(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   const authHeader = `Bearer ${token}`;
@@ -88,6 +91,7 @@ function addAuthHeader(req: HttpRequest<unknown>, token: string): HttpRequest<un
     setHeaders: {
       Authorization: authHeader,
     },
+    // Preserve existing withCredentials setting
   });
 }
 
@@ -107,6 +111,8 @@ function handle401Error({
   jwtTokenService,
   tokenRefreshService,
 }: Handle401ErrorParams): Observable<HttpEvent<unknown>> {
+  console.warn('🔄 Handling 401 error, attempting token refresh...');
+
   // If refresh is already in progress, wait for it to complete
   if (tokenRefreshService.isRefreshInProgress()) {
     return tokenRefreshService.refreshInProgress$.pipe(
@@ -119,6 +125,7 @@ function handle401Error({
           return next(newAuthReq);
         } else {
           // Token refresh failed, logout user
+          console.warn('❌ Token refresh failed, clearing tokens');
           jwtTokenService.clearTokens();
           return throwError(() => new Error('Authentication failed'));
         }
@@ -126,15 +133,19 @@ function handle401Error({
     );
   }
 
-  // Attempt to refresh token
-  return tokenRefreshService.forceRefreshToken().pipe(
+  // Attempt to refresh token using session cookies
+  return tokenRefreshService.refreshToken().pipe(
     switchMap((tokenResponse) => {
+      console.warn('✅ Token refreshed successfully');
+      // Store new access token in memory
+      jwtTokenService.setAccessToken(tokenResponse.accessToken);
       // Retry original request with new token
       const newAuthReq = addAuthHeader(req, tokenResponse.accessToken);
       return next(newAuthReq);
     }),
     catchError((refreshError) => {
       // Refresh failed, clear tokens and logout
+      console.warn('❌ Token refresh failed:', refreshError);
       jwtTokenService.clearTokens();
       return throwError(() => refreshError);
     }),
