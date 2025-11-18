@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
 import { ErrorMessage } from '../../../ui-components/error-message/error-message';
+import { errorCodes } from '../../../error-handling/error-codes.constants';
 
 @Component({
   selector: 'app-login',
@@ -14,14 +15,14 @@ import { ErrorMessage } from '../../../ui-components/error-message/error-message
   styleUrl: './login.scss',
 })
 export class Login implements AfterViewInit {
+  @ViewChild('googleButtonContainer', { static: false })
+  protected googleButtonContainer?: ElementRef<HTMLElement>;
+
   protected form: FormGroup;
   protected hide = signal<boolean>(true);
   protected loading = signal<boolean>(false);
   protected socialLoginLoading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
-
-  @ViewChild('googleButtonContainer', { static: false })
-  googleButtonContainer?: ElementRef<HTMLElement>;
 
   private readonly jwtAuthService = inject(JwtAuthService);
   private readonly fb = inject(FormBuilder);
@@ -32,6 +33,49 @@ export class Login implements AfterViewInit {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(this.MIN_PASSWORD_LENGTH)]],
+    });
+  }
+
+  public ngAfterViewInit(): void {
+    if (
+      this.socialLoginAvailable() &&
+      this.availableProviders().includes('google') &&
+      this.googleButtonContainer
+    ) {
+      void this.jwtAuthService.renderGoogleButton(this.googleButtonContainer.nativeElement);
+    }
+  }
+
+  protected socialLoginAvailable(): boolean {
+    return this.jwtAuthService.isSocialLoginAvailable();
+  }
+
+  protected availableProviders(): string[] {
+    return this.jwtAuthService.getAvailableProviders();
+  }
+
+  protected signInWithGoogle(): void {
+    // Google sign-in is handled by the rendered button
+    // This method can be used for manual Google sign-in if needed
+  }
+
+  protected signInWithGitHub(): void {
+    this.socialLoginLoading.set(true);
+    this.error.set(null);
+
+    this.jwtAuthService.signInWithGitHub().subscribe({
+      next: (user) => {
+        this.socialLoginLoading.set(false);
+        console.log('GitHub sign-in successful:', user);
+        void this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        this.socialLoginLoading.set(false);
+        this.error.set({
+          message: error.error?.message ?? 'GitHub sign-in failed. Please try again.',
+          code: error.status ?? errorCodes.internalServerError,
+        });
+      },
     });
   }
 
@@ -72,17 +116,34 @@ export class Login implements AfterViewInit {
       password: this.form.value.password,
     };
 
+    // 🔍 Debug what we're sending
+    console.log('🔍 Sending login request:', {
+      email: credentials.email,
+      password: credentials.password ? '[PROVIDED]' : '[MISSING]',
+      formValid: this.form.valid,
+    });
+
     this.jwtAuthService.login(credentials).subscribe({
       next: (response) => {
         this.loading.set(false);
-        console.log('Login successful:', response.user);
+        console.log('✅ Login successful:', response.user);
         void this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         this.loading.set(false);
+
+        // 🔍 Debug the actual error
+        console.error('❌ Login failed details:', {
+          status: error.status,
+          statusText: error.statusText,
+          errorBody: error.error,
+          message: error.error?.message,
+          headers: error.headers,
+        });
+
         this.error.set({
-          message: error.error?.message || 'Login failed. Please check your credentials.',
-          code: error.status || 500,
+          message: error.error?.message ?? 'Login failed. Please check your credentials.',
+          code: error.status ?? errorCodes.internalServerError,
         });
       },
     });
@@ -94,51 +155,5 @@ export class Login implements AfterViewInit {
       password: 'Password',
     };
     return names[fieldName] || fieldName;
-  }
-
-  // Social login methods
-
-  public ngAfterViewInit(): void {
-    // Initialize Google button if available
-    if (
-      this.socialLoginAvailable() &&
-      this.availableProviders().includes('google') &&
-      this.googleButtonContainer
-    ) {
-      void this.jwtAuthService.renderGoogleButton(this.googleButtonContainer.nativeElement);
-    }
-  }
-
-  protected socialLoginAvailable(): boolean {
-    return this.jwtAuthService.isSocialLoginAvailable();
-  }
-
-  protected availableProviders(): string[] {
-    return this.jwtAuthService.getAvailableProviders();
-  }
-
-  protected signInWithGoogle(): void {
-    // Google sign-in is handled by the rendered button
-    // This method can be used for manual Google sign-in if needed
-  }
-
-  protected signInWithGitHub(): void {
-    this.socialLoginLoading.set(true);
-    this.error.set(null);
-
-    this.jwtAuthService.signInWithGitHub().subscribe({
-      next: (user) => {
-        this.socialLoginLoading.set(false);
-        console.log('GitHub sign-in successful:', user);
-        void this.router.navigate(['/dashboard']);
-      },
-      error: (error) => {
-        this.socialLoginLoading.set(false);
-        this.error.set({
-          message: error.error?.message || 'GitHub sign-in failed. Please try again.',
-          code: error.status || 500,
-        });
-      },
-    });
   }
 }

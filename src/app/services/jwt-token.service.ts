@@ -42,7 +42,7 @@ export class JwtTokenService {
   /**
    * Legacy method for backward compatibility - use setAccessToken instead
    */
-  public setTokens(accessToken: string, refreshToken?: string): void {
+  public setTokens(accessToken: string): void {
     this.setAccessToken(accessToken);
     // Refresh token parameter ignored - handled by HTTP-only cookies
   }

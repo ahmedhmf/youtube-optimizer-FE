@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from './interceptors/jwt-interceptor';
+import { csrfInterceptor } from './interceptors/csrf-interceptor';
 import { globalErrorHandlingInterceptor } from './error-handling/global-error-handling.interceptors';
 import { GlobalErrorHandler } from './error-handling/global-error-handling.service';
 
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
       withInterceptors([
+        csrfInterceptor, // CSRF protection first
         jwtInterceptor, // Use JWT interceptor for authentication
         globalErrorHandlingInterceptor,
       ]),

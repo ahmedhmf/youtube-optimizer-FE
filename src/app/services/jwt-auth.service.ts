@@ -9,6 +9,7 @@ import { tap, catchError, map } from 'rxjs/operators';
 import { JwtTokenService } from './jwt-token.service';
 import { JwtTokenRefreshService } from './jwt-token-refresh.service';
 import { SocialAuthService } from './social-auth.service';
+import { CsrfTokenService } from './csrf-token.service';
 import { environment } from '../../environments/environment';
 
 export type LoginRequest = {
@@ -54,6 +55,7 @@ export class JwtAuthService {
   private readonly jwtTokenService = inject(JwtTokenService);
   private readonly tokenRefreshService = inject(JwtTokenRefreshService);
   private readonly socialAuthService = inject(SocialAuthService);
+  private readonly csrfTokenService = inject(CsrfTokenService);
   private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
 
   constructor() {
@@ -176,16 +178,12 @@ export class JwtAuthService {
    */
   public login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.httpClient
-      .post<AuthResponse>(
-        `${environment.backendURL}/auth/login`,
-        credentials,
-        { withCredentials: true }, // Enable session cookies
-      )
+      .post<AuthResponse>(`${environment.backendURL}/auth/login`, credentials, {
+        withCredentials: true,
+      })
       .pipe(
         tap((response) => {
-          // Store access token in memory only
           this.jwtTokenService.setAccessToken(response.accessToken);
-          // Update current user
           this.currentUserSubject.next(response.user);
         }),
         catchError(this.handleAuthError.bind(this)),
@@ -408,6 +406,7 @@ export class JwtAuthService {
    */
   private performLogout(): void {
     this.jwtTokenService.clearTokens();
+    this.csrfTokenService.clearCsrfToken();
     this.tokenRefreshService.stopRefreshTimer();
     this.currentUserSubject.next(null);
     void this.router.navigate(['/login']);

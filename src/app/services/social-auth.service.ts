@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { type Observable, from, throwError } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { CsrfTokenService } from './csrf-token.service';
 
 type GoogleIdConfiguration = {
   client_id: string;
@@ -60,6 +61,7 @@ declare global {
 })
 export class SocialAuthService {
   private readonly http = inject(HttpClient);
+  private readonly csrfTokenService = inject(CsrfTokenService);
   private googleLoaded = false;
 
   /**
