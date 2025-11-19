@@ -35,7 +35,6 @@ export const jwtInterceptor: HttpInterceptorFn = (
     req.url.includes('/auth/login') ||
     req.url.includes('/auth/register') ||
     req.url.includes('/auth/refresh') ||
-    req.url.includes('/auth/logout') ||
     req.url.includes('/auth/social/') ||
     req.url.includes('/auth/csrf-token')
   ) {
