@@ -1,0 +1,21 @@
+<div class="flex flex-wrap justify-between gap-3 px-4">
+  <p
+    class="text-[#131018] dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em] min-w-72"
+  >
+    AI Content Analyzer
+  </p>
+</div>
+
+  <p-tabs value="0">
+    <p-tablist>
+      @for (tab of tabs; track tab.id) {
+        <p-tab [value]="tab.id">{{ tab.label }}</p-tab>
+      }
+    </p-tablist>
+    <p-tabpanels>
+      @for (tab of tabs; track tab.id) {
+        <p-tabpanel [value]="tab.id">
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
