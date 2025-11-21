@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import type { CanActivateFn } from '@angular/router';
-import { JwtAuthService } from '../services/jwt-auth.service';
+import { AuthService } from '../services/auth/auth.service';
 
 export const publicGuard: CanActivateFn = () => {
-  const jwtAuthService = inject(JwtAuthService);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
   // If user is already authenticated, redirect to dashboard
-  if (jwtAuthService.isAuthenticated()) {
+  if (authService.isAuthenticated()) {
     void router.navigate(['/dashboard']);
     return false;
   }

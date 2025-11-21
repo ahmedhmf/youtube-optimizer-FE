@@ -2,42 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { type Observable, from, throwError } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
-import { CsrfTokenService } from './csrf-token.service';
-
-type GoogleIdConfiguration = {
-  client_id: string;
-  callback: (response: GoogleCredentialResponse) => void;
-  auto_select?: boolean;
-  cancel_on_tap_outside?: boolean;
-};
-
-type GoogleCredentialResponse = {
-  credential: string;
-  select_by?: string;
-};
-
-type GoogleButtonConfiguration = {
-  theme?: 'outline' | 'filled_blue' | 'filled_black';
-  size?: 'large' | 'medium' | 'small';
-  text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
-  shape?: 'rectangular' | 'pill' | 'circle' | 'square';
-  logo_alignment?: 'left' | 'center';
-  width?: string;
-  locale?: string;
-};
-
-type SocialAuthResponse = {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    picture?: string;
-    provider: 'google' | 'github';
-  };
-};
+import { environment } from '../../../environments/environment';
+import { CsrfService } from './csrf.service';
+import type { GoogleButtonConfiguration } from '../../models/auth/google-button-configuration.type';
+import type { GoogleCredentialResponse } from '../../models/auth/google-credential-response.type';
+import type { GoogleIdConfiguration } from '../../models/auth/google-id-configuration.type';
+import type { SocialAuthResponse } from '../../models/auth/social-auth-response.type';
 
 // Google Identity Services types
 declare global {
@@ -61,7 +31,7 @@ declare global {
 })
 export class SocialAuthService {
   private readonly http = inject(HttpClient);
-  private readonly csrfTokenService = inject(CsrfTokenService);
+  private readonly csrfTokenService = inject(CsrfService);
   private googleLoaded = false;
 
   /**

@@ -3,10 +3,11 @@ import { Component, inject, signal, ViewChild } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { JwtAuthService } from '../../../services/jwt-auth.service';
+import { take, filter } from 'rxjs/operators';
 import type { ApiError } from '../../../models/api-error.model';
 import { ErrorMessage } from '../../../ui-components/error-message/error-message';
 import { errorCodes } from '../../../error-handling/error-codes.constants';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,7 @@ export class Login implements AfterViewInit {
   protected socialLoginLoading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
 
-  private readonly jwtAuthService = inject(JwtAuthService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly MIN_PASSWORD_LENGTH = 6;
@@ -37,46 +38,41 @@ export class Login implements AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    if (
-      this.socialLoginAvailable() &&
-      this.availableProviders().includes('google') &&
-      this.googleButtonContainer
-    ) {
-      void this.jwtAuthService.renderGoogleButton(this.googleButtonContainer.nativeElement);
-    }
+    // Social login functionality would be implemented here
+    // Currently using email/password authentication only
   }
 
   protected socialLoginAvailable(): boolean {
-    return this.jwtAuthService.isSocialLoginAvailable();
+    return false; // Disabled for now
   }
 
   protected availableProviders(): string[] {
-    return this.jwtAuthService.getAvailableProviders();
+    return []; // No social providers available yet
   }
 
   protected signInWithGoogle(): void {
-    // Google sign-in is handled by the rendered button
-    // This method can be used for manual Google sign-in if needed
+    // Social login would be implemented here
+    console.warn('Social login not implemented yet');
   }
 
   protected signInWithGitHub(): void {
     this.socialLoginLoading.set(true);
     this.error.set(null);
 
-    this.jwtAuthService.signInWithGitHub().subscribe({
-      next: (user) => {
-        this.socialLoginLoading.set(false);
-        console.log('GitHub sign-in successful:', user);
-        void this.router.navigate(['/dashboard']);
-      },
-      error: (error) => {
-        this.socialLoginLoading.set(false);
-        this.error.set({
-          message: error.error?.message ?? 'GitHub sign-in failed. Please try again.',
-          code: error.status ?? errorCodes.internalServerError,
-        });
-      },
-    });
+    // this.authService.signInWithGitHub().subscribe({
+    //   next: (user) => {
+    //     this.socialLoginLoading.set(false);
+    //     console.log('GitHub sign-in successful:', user);
+    //     void this.router.navigate(['/dashboard']);
+    //   },
+    //   error: (error) => {
+    //     this.socialLoginLoading.set(false);
+    //     this.error.set({
+    //       message: error.error?.message ?? 'GitHub sign-in failed. Please try again.',
+    //       code: error.status ?? errorCodes.internalServerError,
+    //     });
+    //   },
+    // });
   }
 
   protected getFieldError(fieldName: string): string {
@@ -123,11 +119,23 @@ export class Login implements AfterViewInit {
       formValid: this.form.valid,
     });
 
-    this.jwtAuthService.login(credentials).subscribe({
+    this.authService.login(credentials).subscribe({
       next: (response) => {
         this.loading.set(false);
         console.log('✅ Login successful:', response.user);
-        void this.router.navigate(['/dashboard']);
+        console.log('🔍 Auth state after login:', this.authService.isAuthenticated());
+
+        // Wait for auth state to be true, then navigate
+        this.authService
+          .getAuthenticationStatus()
+          .pipe(
+            filter((isAuthenticated) => isAuthenticated),
+            take(1),
+          )
+          .subscribe(() => {
+            console.log('✅ Authentication state confirmed, navigating to dashboard');
+            void this.router.navigate(['/dashboard']);
+          });
       },
       error: (error) => {
         this.loading.set(false);

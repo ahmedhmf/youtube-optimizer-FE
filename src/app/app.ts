@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ErrorHandling } from './error-handling/error-handling/error-handling';
 

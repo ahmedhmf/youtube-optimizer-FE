@@ -2,8 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
+import { AuthService } from '../../../services/auth/auth.service';
+import type { RegisterRequest } from '../../../models/auth/register-request.type';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +19,7 @@ export class Register {
   protected loading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
 
-  private readonly jwtAuthService = inject(JwtAuthService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly MIN_PASSWORD_LENGTH = 6;
@@ -52,24 +53,26 @@ export class Register {
 
     this.loading.set(true);
 
-    const userData = {
+    const userData: RegisterRequest = {
       email: this.form.value.email,
       password: this.form.value.password,
-      name: this.form.value.name,
+      firstName: this.form.value.name,
+      lastName: this.form.value.name,
     };
 
-    this.jwtAuthService.register(userData).subscribe({
-      next: (response) => {
+    this.authService.register(userData).subscribe({
+      next: () => {
         this.loading.set(false);
-        console.log('Registration successful:', response.user);
         this.form.reset();
         void this.router.navigate(['/dashboard']); // Login automatically after registration
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.loading.set(false);
+        const errorResponse = error as { error?: { message?: string }; status?: number };
+        const DEFAULT_ERROR_CODE = 500;
         this.error.set({
-          message: error.error?.message || 'Registration failed. Please try again.',
-          code: error.status || 500,
+          message: errorResponse.error?.message ?? 'Registration failed. Please try again.',
+          code: (errorResponse.status ?? DEFAULT_ERROR_CODE).toString(),
         });
       },
     });

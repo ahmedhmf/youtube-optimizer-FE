@@ -241,6 +241,11 @@ export class GlobalErrorHandler implements ErrorHandler {
   }
 
   private reportToBackend(error: any): void {
+    // Skip backend reporting in development or if backend is not available
+    if (!environment.production) {
+      return;
+    }
+
     const errorReport = {
       message: error.message,
       stack: error.stack,
@@ -252,7 +257,7 @@ export class GlobalErrorHandler implements ErrorHandler {
     };
 
     // Fire and forget - don't handle errors from error reporting
-    fetch('/api/errors/report', {
+    fetch(`${environment.backendURL}/errors/report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(errorReport),

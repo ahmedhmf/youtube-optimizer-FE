@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { JwtAuthService } from '../../../services/jwt-auth.service';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -9,10 +9,9 @@ import { JwtAuthService } from '../../../services/jwt-auth.service';
   styleUrl: './layout.scss',
 })
 export class Layout {
-  private readonly jwtAuthService = inject(JwtAuthService);
-
+  private readonly authService = inject(AuthService);
   protected logout(): void {
-    this.jwtAuthService.logout().subscribe({
+    this.authService.logout().subscribe({
       next: () => {
         console.log('Logout successful');
         // Navigation is handled automatically in the service

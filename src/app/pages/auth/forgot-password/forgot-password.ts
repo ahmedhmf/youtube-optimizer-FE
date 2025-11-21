@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { type FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
 import { ErrorMessage } from '../../../ui-components/error-message/error-message';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -18,7 +18,7 @@ export class ForgotPasswordComponent {
   protected error = signal<ApiError | null>(null);
   protected success = signal<boolean>(false);
 
-  private readonly jwtAuthService = inject(JwtAuthService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
@@ -59,20 +59,20 @@ export class ForgotPasswordComponent {
 
     const email = this.form.value.email;
 
-    this.jwtAuthService.requestPasswordReset(email).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.success.set(true);
-        // Success - no console logging needed
-      },
-      error: (error) => {
-        this.loading.set(false);
-        this.error.set({
-          message: error.error?.message ?? 'Failed to send password reset email. Please try again.',
-          code: error.status ?? 500,
-        });
-      },
-    });
+    // this.authService.requestPasswordReset(email).subscribe({
+    //   next: () => {
+    //     this.loading.set(false);
+    //     this.success.set(true);
+    //     // Success - no console logging needed
+    //   },
+    //   error: (error) => {
+    //     this.loading.set(false);
+    //     this.error.set({
+    //       message: error.error?.message ?? 'Failed to send password reset email. Please try again.',
+    //       code: error.status ?? 500,
+    //     });
+    //   },
+    // });
   }
 
   protected backToLogin(): void {

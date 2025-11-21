@@ -1,5 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
 
 import { Login } from './login';
 
@@ -9,7 +11,13 @@ describe('Login', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Login],
+      imports: [Login, HttpClientTestingModule],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParams: {} } },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Login);
