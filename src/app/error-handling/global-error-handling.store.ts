@@ -1,5 +1,5 @@
+import { errorCodes } from './error-codes.constants';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { HTTP_401_ERROR_MESSAGES } from '../constants/http-errors.constants';
 
 export type ErrorType =
   | 'JavaScript Error' // Uncaught JS errors
@@ -102,7 +102,7 @@ export const errorStore = signalStore(
         timestamp: new Date().toISOString(),
         url: window.location.href,
         errorType: 'Business Logic Error',
-        severity: context?.statusCode === HTTP_401_ERROR_MESSAGES ? 'high' : 'medium',
+        severity: context?.statusCode === errorCodes.unauthorized ? 'high' : 'medium',
         category: 'business',
         dismissed: false,
         retryCount: 0,

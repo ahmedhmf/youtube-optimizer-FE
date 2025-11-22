@@ -1,0 +1,8 @@
+<div class="p-6 bg-white rounded-xl shadow hover:shadow-md transition">
+  <div class="flex items-center justify-between">
+    <h2 class="text-gray-500 text-sm">{{ title() }}</h2>
+    <span class="material-symbols-outlined {{ iconColorClass() }}">{{ iconName() }}</span>
+  </div>
+  <p class="text-3xl font-bold mt-2">{{ mainValue() || 0 }}</p>
+  <p class="{{ subValueColorClass() }} text-sm mt-1">+{{ subValue() || 0 }} today</p>
+</div>

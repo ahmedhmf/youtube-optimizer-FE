@@ -25,12 +25,14 @@ export const routes: Routes = [
   },
   {
     path: 'forgot-password',
-    loadComponent: () => import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
+    loadComponent: () =>
+      import('./pages/auth/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
     canActivate: [publicGuard],
   },
   {
     path: 'reset-password',
-    loadComponent: () => import('./pages/auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+    loadComponent: () =>
+      import('./pages/auth/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
     canActivate: [publicGuard],
   },
   {
@@ -54,56 +56,55 @@ export const routes: Routes = [
       },
     ],
   },
-  // Auth routes (no layout)
-  // {
-  //     path: 'login',
-  //     loadComponent: () => import('./pages/login/login').then(m => m.LoginPageComponent),
-  //     canActivate: [publicGuard]
-  // },
-  // {
-  //     path: 'register',
-  //     loadComponent: () => import('./pages/register/register').then(m => m.Register),
-  //     canActivate: [publicGuard]
-  // },
-
-  // {
-  //     path: '',
-  //     loadComponent: () => import('./layout/layout').then(m => m.Layout),
-  //     children: [
-  //         {
-  //             path: '',
-  //             pathMatch: 'full',
-  //             loadComponent: () => import('./pages/home/home').then(m => m.Home),
-  //             canActivate: [publicGuard],
-  //         },
-  //         {
-  //             path: 'dashboard',
-  //             loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard),
-  //             canActivate: [authGuard],
-  //             children: [
-  //                 {
-  //                     path: 'analyze-video',
-  //                     loadComponent: () => import('./pages/dashboard/pages/analyze-video/analyze-video').then(m => m.AnalyzeVideo),
-  //                     canActivate: [authGuard]
-  //                 }
-  //             ]
-  //         },
-  //         {
-  //             path: 'home',
-  //             loadComponent: () => import('./pages/home/home').then(m => m.Home),
-  //             canActivate: [authGuard]
-  //         },
-  //         {
-  //             path: 'profile',
-  //             loadComponent: () => import('./pages/profile/profile').then(m => m.Profile),
-  //             canActivate: [authGuard]
-  //         }
-  //     ]
-  // },
-
-  // // Wildcard route - redirect to login if not authenticated
-  // {
-  //     path: '**',
-  //     redirectTo: '/'
-  // }
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/layout/layout').then((m) => m.Layout),
+    canActivate: [jwtAuthGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./pages/admin/user-managment/user-managment').then((m) => m.UserManagment),
+      },
+      {
+        path: 'users/:id',
+        loadComponent: () =>
+          import('./pages/admin/user-managment/user-edit/user-edit').then((m) => m.UserEdit),
+      },
+      {
+        path: 'video',
+        loadComponent: () =>
+          import('./pages/admin/video-analysis/video-analysis').then((m) => m.VideoAnalysis),
+      },
+      {
+        path: 'billing',
+        loadComponent: () => import('./pages/admin/billing/billing').then((m) => m.Billing),
+      },
+      {
+        path: 'usage',
+        loadComponent: () => import('./pages/admin/api/api').then((m) => m.Api),
+      },
+      {
+        path: 'analytics',
+        loadComponent: () => import('./pages/admin/reports/reports').then((m) => m.Reports),
+      },
+      {
+        path: 'logs',
+        loadComponent: () => import('./pages/admin/logs/logs').then((m) => m.Logs),
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./pages/admin/settings/settings').then((m) => m.Settings),
+      },
+    ],
+  },
 ];
