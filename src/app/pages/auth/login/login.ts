@@ -1,19 +1,19 @@
-import type { ElementRef, AfterViewInit } from '@angular/core';
+import type { ElementRef } from '@angular/core';
 import { Component, inject, signal, ViewChild } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { JwtAuthService } from '../../../services/jwt-auth.service';
 import type { ApiError } from '../../../models/api-error.model';
-import { ErrorMessage } from '../../../ui-components/error-message/error-message';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, ErrorMessage, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  standalone: true,
 })
-export class Login implements AfterViewInit {
+export class Login {
   protected form: FormGroup;
   protected hide = signal<boolean>(true);
   protected loading = signal<boolean>(false);
