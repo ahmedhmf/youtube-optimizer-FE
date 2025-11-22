@@ -11,13 +11,13 @@ import type { RegisterRequest } from '../../../models/auth/register-request.type
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  standalone: true,
 })
 export class Register {
   protected form: FormGroup;
-  protected hidePassword = signal<boolean>(true);
-  protected hideConfirm = signal<boolean>(true);
   protected loading = signal<boolean>(false);
   protected error = signal<ApiError | null>(null);
+  protected socialLoginLoading = signal<boolean>(false);
 
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
@@ -101,6 +101,41 @@ export class Register {
     return '';
   }
 
+  protected socialLoginAvailable(): boolean {
+    // return this.authService.isSocialLoginAvailable();
+    return false;
+  }
+
+  protected availableProviders(): string[] {
+    // return this.authService.getAvailableProviders();
+    return [];
+  }
+
+  protected signInWithGoogle(): void {
+    // Google sign-in is handled by the rendered button
+    // This method can be used for manual Google sign-in if needed
+  }
+
+  protected signInWithGitHub(): void {
+    this.socialLoginLoading.set(true);
+    this.error.set(null);
+
+    // this.jwtAuthService.signInWithGitHub().subscribe({
+    //   next: (user) => {
+    //     this.socialLoginLoading.set(false);
+    //     console.log('GitHub sign-in successful:', user);
+    //     void this.router.navigate(['/dashboard']);
+    //   },
+    //   error: (error) => {
+    //     this.socialLoginLoading.set(false);
+    //     this.error.set({
+    //       message: error.error?.message || 'GitHub sign-in failed. Please try again.',
+    //       code: error.status || 500,
+    //     });
+    //   },
+    // });
+  }
+
   private getFieldDisplayName(fieldName: string): string {
     const names: Record<string, string> = {
       name: 'Name',
@@ -131,4 +166,6 @@ export class Register {
     }
     return null;
   }
+
+  // Social login methods
 }

@@ -1,21 +1,21 @@
-import type { ElementRef, AfterViewInit } from '@angular/core';
+import type { ElementRef } from '@angular/core';
 import { Component, inject, signal, ViewChild } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
 import type { ApiError } from '../../../models/api-error.model';
-import { ErrorMessage } from '../../../ui-components/error-message/error-message';
 import { errorCodes } from '../../../error-handling/error-codes.constants';
 import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, ErrorMessage, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  standalone: true,
 })
-export class Login implements AfterViewInit {
+export class Login {
   @ViewChild('googleButtonContainer', { static: false })
   protected googleButtonContainer?: ElementRef<HTMLElement>;
 

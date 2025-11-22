@@ -27,8 +27,6 @@
 
     <!-- Tab Content -->
     <div
-      class="rounded-xl p-6 sm:p-8 relative"
-      style="background-image: linear-gradient(to bottom right, #c4a6ff, #e8d8ff)"
       [class.opacity-50]="loading()"
       [class.pointer-events-none]="loading()"
     >
@@ -87,25 +85,42 @@
       <div class="flex flex-col gap-4">
         <!-- URL Tab Content -->
         @if (activeTab() === 'url') {
-          <div class="flex flex-col sm:flex-row items-stretch gap-4">
-            <div class="relative flex w-full flex-1 items-stretch rounded-lg shadow-sm">
-              <input
-                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#131018] dark:text-gray-800 focus:outline-0 focus:ring-2 focus:ring-[#8A2BE2] border-none bg-white h-14 placeholder:text-[#6d5e8d] p-4 text-base font-normal leading-normal disabled:cursor-not-allowed disabled:bg-gray-100"
-                placeholder="Paste YouTube URL here..."
-                [disabled]="loading()"
-                [value]="videoUrl()"
-                (input)="videoUrl.set($event.target.value)"
-              />
+          <div class="relative w-full">
+            <input
+              class="w-full p-4 pr-20 rounded-md border border-gray-200 bg-white shadow-xs placeholder-gray-400 focus:outline-none focus:shadow-sm transition-shadow duration-100"
+              placeholder="Paste a YouTube video URL to analyze"
+              [disabled]="loading()"
+              [value]="videoUrl()"
+              (input)="videoUrl.set($event.target.value)"
+            />
+            <div class="absolute inset-y-0 right-2 flex items-center gap-1 pr-1">
+              <button
+                class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                aria-label="Filter"
+                (click)="showSettings.set(!showSettings())"
+              >
+                <svg
+                  class="w-6 h-6 text-black"
+                  fill="currentColor"
+                  viewBox="-25.6 -25.6 307.20 307.20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"></path>
+                </svg>
+              </button>
+              <button
+                class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"
+                [disabled]="isAnalyzeDisabled"
+                (click)="analyzeVideo()"
+                aria-label="Analyze"
+              >
+      <span class="material-symbols-outlined text-lg">
+        arrow_upward_alt
+      </span>
+              </button>
             </div>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-[#8A2BE2] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#7e26cc] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#8A2BE2]"
-              type="button"
-              [disabled]="isAnalyzeDisabled"
-              (click)="analyzeVideo()"
-            >
-              <span class="truncate">{{ analyzeButtonText }}</span>
-            </button>
           </div>
+
         }
 
         <!-- Upload Tab Content -->
@@ -113,7 +128,13 @@
           <div class="flex flex-col gap-4">
             @if (!selectedFile()) {
               <div
-                class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center bg-white/50 hover:bg-white/70 transition-colors"
+                class="min-h-[250px] border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-8 text-center bg-white/50 hover:bg-white/70 transition-colors duration-200 bg-purple-50"
+                [ngClass]="{
+                'bg-purple-50 border-purple-300': isDragging,
+                'bg-white/50 border-gray-200': !isDragging}"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
               >
                 <input
                   accept="video/*"
@@ -123,173 +144,232 @@
                   [disabled]="loading()"
                   (change)="onFileSelected($event)"
                 />
-                <label class="cursor-pointer flex flex-col items-center gap-4" for="video-upload">
-                  <span class="material-symbols-outlined text-4xl text-gray-400">cloud_upload</span>
-                  <div>
+                <label class="flex flex-col items-center gap-4" for="video-upload">
+                  <div class="rounded-full p-5 shadow-sm bg-gray-50/50">
+                  <svg
+                    width="45px" height="45px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#c5a8ff" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C12.2189 1.25 12.427 1.34567 12.5694 1.51191L15.5694 5.01191C15.839 5.3264 15.8026 5.79988 15.4881 6.06944C15.1736 6.33901 14.7001 6.30259 14.4306 5.98809L12.75 4.02744L12.75 15C12.75 15.4142 12.4142 15.75 12 15.75C11.5858 15.75 11.25 15.4142 11.25 15L11.25 4.02744L9.56944 5.98809C9.29988 6.30259 8.8264 6.33901 8.51191 6.06944C8.19741 5.79988 8.16099 5.3264 8.43056 5.01191L11.4306 1.51191C11.573 1.34567 11.7811 1.25 12 1.25ZM6.99583 8.25196C7.41003 8.24966 7.74768 8.58357 7.74999 8.99778C7.7523 9.41198 7.41838 9.74963 7.00418 9.75194C5.91068 9.75803 5.1356 9.78642 4.54735 9.89448C3.98054 9.99859 3.65246 10.1658 3.40901 10.4092C3.13225 10.686 2.9518 11.0746 2.85315 11.8083C2.75159 12.5637 2.75 13.5648 2.75 15.0002V16.0002C2.75 17.4356 2.75159 18.4367 2.85315 19.1921C2.9518 19.9259 3.13225 20.3144 3.40901 20.5912C3.68577 20.868 4.07434 21.0484 4.80812 21.1471C5.56347 21.2486 6.56458 21.2502 8 21.2502H16C17.4354 21.2502 18.4365 21.2486 19.1919 21.1471C19.9257 21.0484 20.3142 20.868 20.591 20.5912C20.8678 20.3144 21.0482 19.9259 21.1469 19.1921C21.2484 18.4367 21.25 17.4356 21.25 16.0002V15.0002C21.25 13.5648 21.2484 12.5637 21.1469 11.8083C21.0482 11.0746 20.8678 10.686 20.591 10.4092C20.3475 10.1658 20.0195 9.99859 19.4527 9.89448C18.8644 9.78642 18.0893 9.75803 16.9958 9.75194C16.5816 9.74963 16.2477 9.41198 16.25 8.99778C16.2523 8.58357 16.59 8.24966 17.0042 8.25196C18.0857 8.25798 18.9871 8.28387 19.7236 8.41916C20.4816 8.55839 21.1267 8.82363 21.6517 9.34856C22.2536 9.95048 22.5125 10.7084 22.6335 11.6085C22.75 12.4754 22.75 13.5778 22.75 14.9453V16.0551C22.75 17.4227 22.75 18.525 22.6335 19.392C22.5125 20.2921 22.2536 21.0499 21.6517 21.6519C21.0497 22.2538 20.2919 22.5127 19.3918 22.6337C18.5248 22.7503 17.4225 22.7502 16.0549 22.7502H7.94513C6.57754 22.7502 5.47522 22.7503 4.60825 22.6337C3.70814 22.5127 2.95027 22.2538 2.34835 21.6519C1.74643 21.0499 1.48754 20.2921 1.36652 19.392C1.24996 18.525 1.24998 17.4227 1.25 16.0551V14.9453C1.24998 13.5777 1.24996 12.4754 1.36652 11.6085C1.48754 10.7084 1.74643 9.95048 2.34835 9.34856C2.87328 8.82363 3.51835 8.55839 4.27635 8.41916C5.01291 8.28386 5.9143 8.25798 6.99583 8.25196Z" fill="#c5a8ff"></path> </g></svg>
+                  </div>
+                    <div>
                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">
                       Drop your video here or click to browse
                     </p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-gray-400 dark:text-gray-400">
                       Supports MP4, AVI, MOV, MKV (max 100MB)
                     </p>
                   </div>
                 </label>
               </div>
             } @else {
+              <div
+                class="min-h-[250px] flex items-center justify-center border-2 relative border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-8 text-center bg-white/50 hover:bg-white/70 transition-colors duration-200 bg-purple-50"
+                [ngClass]="{
+                'bg-purple-50 border-purple-300': isDragging,
+                'bg-white/50 border-gray-200': !isDragging}">
+                <div class="flex items-start">
               <div class="bg-white/70 rounded-lg p-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-2xl text-green-600">video_file</span>
+                <div class="flex flex-col items-center justify-center gap-3">
+                  <span class="material-symbols-outlined text-xl">video_file</span>
                   <div>
-                    <p class="font-medium text-gray-800">{{ selectedFile()?.name }}</p>
+                    <p class="text-sm font-medium text-gray-800">{{ selectedFile()?.name }}</p>
                     <p class="text-sm text-gray-500">
                       {{ (selectedFile()?.size! / (1024 * 1024)).toFixed(2) }} MB
                     </p>
                   </div>
+                  <button
+                    class="px-4 py-1 cursor-pointer border border-black text-black rounded-md hover:border-red-500 hover:text-red-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="loading()"
+                    (click)="removeFile()"
+                  >
+                    Delete File
+                  </button>
                 </div>
-                <button
-                  class="text-red-500 hover:text-red-700 p-2 disabled:opacity-50"
-                  [disabled]="loading()"
-                  (click)="removeFile()"
-                >
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
               </div>
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-[#8A2BE2] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#7e26cc] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#8A2BE2] self-start"
-                [disabled]="isAnalyzeDisabled"
-                (click)="analyzeVideo()"
-              >
-                <span class="truncate">{{ analyzeButtonText }}</span>
-              </button>
+              </div>
+                <div class="absolute bottom-3 right-2 flex items-center gap-1">
+                  <button
+                    class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    aria-label="Filter"
+                    (click)="showSettings.set(!showSettings())"
+                  >
+                    <svg
+                      class="w-6 h-6 text-black"
+                      fill="currentColor"
+                      viewBox="-25.6 -25.6 307.20 307.20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"></path>
+                    </svg>
+                  </button>
+                  <button
+                    class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"
+                    [disabled]="isAnalyzeDisabled"
+                    (click)="analyzeVideo()"
+                    aria-label="Analyze"
+                  >
+      <span class="material-symbols-outlined text-lg">
+        arrow_upward_alt
+      </span>
+                  </button>
+                </div>
+
+              </div>
             }
           </div>
         }
 
         <!-- Text Tab Content -->
         @if (activeTab() === 'text') {
-          <div class="flex flex-col gap-4">
-            <div class="relative">
-              <textarea
-                class="form-textarea w-full min-h-[200px] resize-y rounded-lg text-[#131018] dark:text-gray-800 focus:outline-0 focus:ring-2 focus:ring-[#8A2BE2] border-none bg-white placeholder:text-[#6d5e8d] p-4 text-base font-normal leading-normal disabled:cursor-not-allowed disabled:bg-gray-100"
-                placeholder="Paste your text content here (e.g., video transcript, blog post, article...)&#10;&#10;Minimum 50 characters required for analysis."
-                [disabled]="loading()"
-                [value]="textContent()"
-                (input)="onTextAreaInput($event)"
-              ></textarea>
-              <div class="absolute bottom-2 right-2 text-xs text-gray-500">
-                {{ textContent().length }} characters
+          <div class="flex flex-col">
+            <div class="relative w-full">
+  <textarea
+    class="w-full min-h-[200px] resize-none p-3 pr-20 rounded-md border border-gray-200 bg-white shadow-xs placeholder-gray-400 focus:outline-none focus:shadow-sm transition-shadow duration-100"
+    placeholder="Write or summarize the video content here…"
+    [disabled]="loading()"
+    [value]="textContent()"
+    (input)="onTextAreaInput($event)"
+  ></textarea>
+              <div class="absolute bottom-3 right-2 flex items-center gap-1">
+                <button
+                  class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                  aria-label="Filter"
+                  (click)="showSettings.set(!showSettings())"
+                >
+                  <svg
+                    class="w-6 h-6 text-black"
+                    fill="currentColor"
+                    viewBox="-25.6 -25.6 307.20 307.20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"></path>
+                  </svg>
+                </button>
+                <button
+                  class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"
+                  [disabled]="isAnalyzeDisabled"
+                  (click)="analyzeVideo()"
+                  aria-label="Analyze"
+                >
+      <span class="material-symbols-outlined text-lg">
+        arrow_upward_alt
+      </span>
+                </button>
+              </div>
+              <div class="absolute bottom-4 left-2 text-xs text-gray-400 flex items-center gap-1">
                 @if (textContent().length > 0 && textContent().length < 50) {
-                  <span class="text-red-500 ml-1">(minimum 50)</span>
+                  <span>Minimum Characters 50 required</span>
                 }
               </div>
             </div>
-            <button
-              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-[#8A2BE2] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#7e26cc] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#8A2BE2] self-start"
-              [disabled]="isAnalyzeDisabled"
-              (click)="analyzeVideo()"
-            >
-              <span class="truncate">{{ analyzeButtonText }}</span>
-            </button>
           </div>
         }
 
         <!-- Advanced Settings (shown for all tabs) -->
-        <div class="group/settings">
-          <button
-            class="flex items-center gap-2 text-sm font-medium text-gray-800 hover:text-black"
-            [disabled]="loading()"
-          >
-            <span>Advanced Settings</span>
-            <span
-              class="material-symbols-outlined transition-transform duration-300 group-focus-within/settings:rotate-180"
-              >expand_more</span
-            >
-          </button>
-          <div
-            class="overflow-hidden max-h-0 opacity-0 group-focus-within/settings:max-h-[500px] group-focus-within/settings:opacity-100 transition-all duration-500 ease-in-out"
-          >
-            <div
-              class="mt-4 rounded-xl shadow-lg p-6 bg-white/70 dark:bg-background-dark/50 backdrop-blur-sm text-gray-800 dark:text-white"
-            >
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="space-y-3">
-                  <label class="block text-sm font-bold tracking-wide" for="language-dropdown"
-                    >Language</label
-                  >
-                  <div class="flex flex-col gap-2">
-                    @for (language of languages; track language) {
-                      <label
-                        class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"
-                        [class.cursor-not-allowed]="loading()"
-                        [class.opacity-50]="loading()"
-                      >
-                        <input
-                          class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"
-                          name="language-dropdown"
-                          type="radio"
-                          [checked]="settings().language === language.value"
-                          [disabled]="loading()"
-                          [value]="language.value"
-                          (change)="onLanguageChange(language.value)"
-                        />
-                        <span class="ml-3 text-sm font-medium">{{ language.name }}</span>
-                      </label>
-                    }
-                  </div>
-                </div>
-                <div class="space-y-3">
-                  <p class="block text-sm font-bold tracking-wide">AI Model</p>
-                  <div class="flex flex-col gap-2">
-                    @for (model of aiModels; track model) {
-                      <label
-                        class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"
-                        [class.cursor-not-allowed]="loading()"
-                        [class.opacity-50]="loading()"
-                      >
-                        <input
-                          class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"
-                          name="ai-model-dropdown"
-                          type="radio"
-                          [checked]="settings().aiModel === model.value"
-                          [disabled]="loading()"
-                          [value]="model.value"
-                          (change)="onModelChange(model.value)"
-                        />
-                        <span class="ml-3 text-sm font-medium">{{ model.name }}</span>
-                      </label>
-                    }
-                  </div>
-                </div>
-                <div class="space-y-3">
-                  <p class="block text-sm font-bold tracking-wide">Tone</p>
-                  <div class="flex flex-wrap gap-2">
-                    @for (tone of tones; track tone) {
-                      <label
-                        class="cursor-pointer"
-                        [class.cursor-not-allowed]="loading()"
-                        [class.opacity-50]="loading()"
-                      >
-                        <input
-                          class="sr-only peer disabled:cursor-not-allowed"
-                          name="tone-dropdown"
-                          type="radio"
-                          [checked]="settings().tone === tone.value"
-                          [disabled]="loading()"
-                          [value]="tone.value"
-                          (change)="onToneChange(tone.value)"
-                        />
-                        <span
-                          class="px-3 py-1.5 text-sm font-medium rounded-full bg-gray-200 dark:bg-gray-700 peer-checked:bg-primary peer-checked:text-black transition-colors peer-disabled:cursor-not-allowed"
-                        >
-                          {{ tone.name }}
-                        </span>
-                      </label>
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- Accordion content -->
+        <div
+          [style.max-height]="showSettings() ? '50vh' : '0'"
+          class="overflow-hidden transition-all duration-300 ease-in-out"
+        >
+          <div class="p-4 border border-gray-200 rounded-md bg-gray-50"></div>
+<!--          <div class="p-4 border border-gray-200 rounded-md bg-gray-50">-->
+<!--            <div class="group/settings">-->
+<!--              <button-->
+<!--                class="flex items-center gap-2 text-sm font-medium text-gray-800 hover:text-black"-->
+<!--                [disabled]="loading()"-->
+<!--              >-->
+<!--                <span>Advanced Settings</span>-->
+<!--                <span-->
+<!--                  class="material-symbols-outlined transition-transform duration-300 group-focus-within/settings:rotate-180"-->
+<!--                >expand_more</span-->
+<!--                >-->
+<!--              </button>-->
+<!--              <div-->
+<!--                class="overflow-hidden max-h-0 opacity-0 group-focus-within/settings:max-h-[500px] group-focus-within/settings:opacity-100 transition-all duration-500 ease-in-out"-->
+<!--              >-->
+<!--                <div-->
+<!--                  class="mt-4 rounded-xl shadow-lg p-6 bg-white/70 dark:bg-background-dark/50 backdrop-blur-sm text-gray-800 dark:text-white"-->
+<!--                >-->
+<!--                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">-->
+<!--                    <div class="space-y-3">-->
+<!--                      <label class="block text-sm font-bold tracking-wide" for="language-dropdown"-->
+<!--                      >Language</label-->
+<!--                      >-->
+<!--                      <div class="flex flex-col gap-2">-->
+<!--                        @for (language of languages; track language) {-->
+<!--                          <label-->
+<!--                            class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"-->
+<!--                            [class.cursor-not-allowed]="loading()"-->
+<!--                            [class.opacity-50]="loading()"-->
+<!--                          >-->
+<!--                            <input-->
+<!--                              class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"-->
+<!--                              name="language-dropdown"-->
+<!--                              type="radio"-->
+<!--                              [checked]="settings().language === language.value"-->
+<!--                              [disabled]="loading()"-->
+<!--                              [value]="language.value"-->
+<!--                              (change)="onLanguageChange(language.value)"-->
+<!--                            />-->
+<!--                            <span class="ml-3 text-sm font-medium">{{ language.name }}</span>-->
+<!--                          </label>-->
+<!--                        }-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                    <div class="space-y-3">-->
+<!--                      <p class="block text-sm font-bold tracking-wide">AI Model</p>-->
+<!--                      <div class="flex flex-col gap-2">-->
+<!--                        @for (model of aiModels; track model) {-->
+<!--                          <label-->
+<!--                            class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"-->
+<!--                            [class.cursor-not-allowed]="loading()"-->
+<!--                            [class.opacity-50]="loading()"-->
+<!--                          >-->
+<!--                            <input-->
+<!--                              class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"-->
+<!--                              name="ai-model-dropdown"-->
+<!--                              type="radio"-->
+<!--                              [checked]="settings().aiModel === model.value"-->
+<!--                              [disabled]="loading()"-->
+<!--                              [value]="model.value"-->
+<!--                              (change)="onModelChange(model.value)"-->
+<!--                            />-->
+<!--                            <span class="ml-3 text-sm font-medium">{{ model.name }}</span>-->
+<!--                          </label>-->
+<!--                        }-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                    <div class="space-y-3">-->
+<!--                      <p class="block text-sm font-bold tracking-wide">Tone</p>-->
+<!--                      <div class="flex flex-wrap gap-2">-->
+<!--                        @for (tone of tones; track tone) {-->
+<!--                          <label-->
+<!--                            class="cursor-pointer"-->
+<!--                            [class.cursor-not-allowed]="loading()"-->
+<!--                            [class.opacity-50]="loading()"-->
+<!--                          >-->
+<!--                            <input-->
+<!--                              class="sr-only peer disabled:cursor-not-allowed"-->
+<!--                              name="tone-dropdown"-->
+<!--                              type="radio"-->
+<!--                              [checked]="settings().tone === tone.value"-->
+<!--                              [disabled]="loading()"-->
+<!--                              [value]="tone.value"-->
+<!--                              (change)="onToneChange(tone.value)"-->
+<!--                            />-->
+<!--                            <span-->
+<!--                              class="px-3 py-1.5 text-sm font-medium rounded-full bg-gray-200 dark:bg-gray-700 peer-checked:bg-primary peer-checked:text-black transition-colors peer-disabled:cursor-not-allowed"-->
+<!--                            >-->
+<!--                          {{ tone.name }}-->
+<!--                        </span>-->
+<!--                          </label>-->
+<!--                        }-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            -->
+<!--          </div>-->
         </div>
       </div>
     </div>
