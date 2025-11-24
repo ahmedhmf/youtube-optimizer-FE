@@ -70,9 +70,16 @@ export const csrfInterceptor: HttpInterceptorFn = (
       );
     }),
     catchError((error) => {
-      console.error(`❌ CSRF: Failed to get token for ${req.method} ${req.url}:`, error);
+      // For auth/refresh, we must have a CSRF token - fail the request if we can't get one
+      const isAuthRefresh = req.url.includes('/auth/refresh');
 
-      // Continue without CSRF token as fallback
+      if (isAuthRefresh) {
+        console.warn('⚠️ CSRF: Cannot refresh without CSRF token, failing request');
+        return throwError(() => error);
+      }
+
+      // For other requests, log and continue without CSRF token
+      console.error(`❌ CSRF: Failed to get token for ${req.method} ${req.url}:`, error);
       console.warn(`⚠️ CSRF: Continuing without CSRF token for ${req.method} ${req.url}`);
       return next(req);
     }),

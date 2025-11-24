@@ -19,6 +19,11 @@ export const routes: Routes = [
     canActivate: [publicGuard],
   },
   {
+    path: 'auth/callback',
+    loadComponent: () =>
+      import('./pages/auth/oauth-callback/oauth-callback').then((m) => m.OAuthCallback),
+  },
+  {
     path: 'auth/github/callback',
     loadComponent: () =>
       import('./pages/auth/github-callback/github-callback').then((m) => m.GitHubCallbackComponent),

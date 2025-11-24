@@ -87,8 +87,11 @@ export class AuthService {
    */
   public initialize(): Observable<boolean> {
     return this.csrfService.initialize().pipe(
+      tap(() => {
+        console.warn('✅ Auth: CSRF token initialized successfully');
+      }),
       switchMap(() => {
-        // Try to restore JWT session
+        // Try to restore JWT session (requires CSRF token)
         return this.jwtService.initialize();
       }),
       tap((isAuthenticated) => {

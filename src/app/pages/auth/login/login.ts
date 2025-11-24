@@ -1,5 +1,4 @@
-import type { ElementRef } from '@angular/core';
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -7,6 +6,7 @@ import { take, filter } from 'rxjs/operators';
 import type { ApiError } from '../../../models/api-error.model';
 import { errorCodes } from '../../../error-handling/error-codes.constants';
 import { AuthService } from '../../../services/auth/auth.service';
+import { SocialAuthService } from '../../../services/auth/social-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,9 +16,6 @@ import { AuthService } from '../../../services/auth/auth.service';
   standalone: true,
 })
 export class Login {
-  @ViewChild('googleButtonContainer', { static: false })
-  protected googleButtonContainer?: ElementRef<HTMLElement>;
-
   protected form: FormGroup;
   protected hide = signal<boolean>(true);
   protected loading = signal<boolean>(false);
@@ -26,6 +23,7 @@ export class Login {
   protected error = signal<ApiError | null>(null);
 
   private readonly authService = inject(AuthService);
+  private readonly socialAuthService = inject(SocialAuthService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly MIN_PASSWORD_LENGTH = 6;
@@ -37,42 +35,32 @@ export class Login {
     });
   }
 
-  public ngAfterViewInit(): void {
-    // Social login functionality would be implemented here
-    // Currently using email/password authentication only
-  }
-
   protected socialLoginAvailable(): boolean {
-    return false; // Disabled for now
+    return this.socialAuthService.isSocialLoginAvailable();
   }
 
   protected availableProviders(): string[] {
-    return []; // No social providers available yet
+    return this.socialAuthService.getAvailableProviders();
   }
 
   protected signInWithGoogle(): void {
-    // Social login would be implemented here
-    console.warn('Social login not implemented yet');
+    // Initiate server-side OAuth redirect
+    this.socialLoginLoading.set(true);
+    this.error.set(null);
+
+    this.socialAuthService.initiateGoogleOAuth().catch((err) => {
+      this.socialLoginLoading.set(false);
+      this.error.set({
+        message: 'Failed to start Google authentication. Please try again.',
+        code: String(errorCodes.internalServerError),
+      });
+      console.error('Google OAuth initiation failed:', err);
+    });
   }
 
   protected signInWithGitHub(): void {
     this.socialLoginLoading.set(true);
     this.error.set(null);
-
-    // this.authService.signInWithGitHub().subscribe({
-    //   next: (user) => {
-    //     this.socialLoginLoading.set(false);
-    //     console.log('GitHub sign-in successful:', user);
-    //     void this.router.navigate(['/dashboard']);
-    //   },
-    //   error: (error) => {
-    //     this.socialLoginLoading.set(false);
-    //     this.error.set({
-    //       message: error.error?.message ?? 'GitHub sign-in failed. Please try again.',
-    //       code: error.status ?? errorCodes.internalServerError,
-    //     });
-    //   },
-    // });
   }
 
   protected getFieldError(fieldName: string): string {
@@ -112,18 +100,9 @@ export class Login {
       password: this.form.value.password,
     };
 
-    // 🔍 Debug what we're sending
-    console.log('🔍 Sending login request:', {
-      email: credentials.email,
-      password: credentials.password ? '[PROVIDED]' : '[MISSING]',
-      formValid: this.form.valid,
-    });
-
     this.authService.login(credentials).subscribe({
-      next: (response) => {
+      next: () => {
         this.loading.set(false);
-        console.log('✅ Login successful:', response.user);
-        console.log('🔍 Auth state after login:', this.authService.isAuthenticated());
 
         // Wait for auth state to be true, then navigate
         this.authService
@@ -133,25 +112,15 @@ export class Login {
             take(1),
           )
           .subscribe(() => {
-            console.log('✅ Authentication state confirmed, navigating to dashboard');
             void this.router.navigate(['/dashboard']);
           });
       },
       error: (error) => {
         this.loading.set(false);
 
-        // 🔍 Debug the actual error
-        console.error('❌ Login failed details:', {
-          status: error.status,
-          statusText: error.statusText,
-          errorBody: error.error,
-          message: error.error?.message,
-          headers: error.headers,
-        });
-
         this.error.set({
           message: error.error?.message ?? 'Login failed. Please check your credentials.',
-          code: error.status ?? errorCodes.internalServerError,
+          code: String(error.status ?? errorCodes.internalServerError),
         });
       },
     });

@@ -15,6 +15,8 @@ export class JwtService {
   private static readonly MILLISECONDS_TO_SECONDS = 1000;
   private static readonly JWT_PARTS_COUNT = 3;
   private static readonly TOKEN_BUFFER_TIME_SECONDS = 300; // 5 minutes
+  private static readonly HTTP_BAD_REQUEST = 400;
+  private static readonly HTTP_UNAUTHORIZED = 401;
 
   private readonly http = inject(HttpClient);
 
@@ -116,9 +118,6 @@ export class JwtService {
       return this.refreshRequest$;
     }
 
-    console.warn('🔍 JWT: Attempting refresh to:', `${environment.backendURL}/auth/refresh`);
-    console.warn('🔍 JWT: Document cookies:', document.cookie);
-
     this.refreshRequest$ = this.http
       .post<JwtRefreshResponse>(
         `${environment.backendURL}/auth/refresh`,
@@ -131,10 +130,22 @@ export class JwtService {
         }),
         map((response) => response.accessToken),
         catchError((error) => {
-          console.error('❌ JWT: Token refresh failed:', {
-            status: error.status ?? 'unknown',
-            statusText: error.statusText ?? 'unknown',
-          });
+          // Log details for debugging (can be helpful during development)
+          const isExpectedError =
+            error.status === JwtService.HTTP_BAD_REQUEST ||
+            error.status === JwtService.HTTP_UNAUTHORIZED;
+
+          if (!isExpectedError) {
+            console.error('❌ JWT: Token refresh failed:', {
+              status: error.status ?? 'unknown',
+              statusText: error.statusText ?? 'unknown',
+              message: error.error?.message ?? error.message,
+            });
+          } else {
+            // Silent expected error - no valid session/token exists
+            console.warn('ℹ️ JWT: No valid session to restore (this is normal on first visit)');
+          }
+
           this.clearTokens(); // Clear invalid tokens
           this.refreshRequest$ = null;
           return throwError(() => new Error(`Token refresh failed: ${error.message}`));

@@ -71,39 +71,55 @@ export class SocialAuthService {
   }
 
   /**
-   * Render Google Sign-In button
+   * Render Google Sign-In button (not used with server-side OAuth)
+   * Keeping for backwards compatibility
    */
   public async renderGoogleButton(
     element: HTMLElement,
     callback: (response: GoogleCredentialResponse) => void,
     config: GoogleButtonConfiguration = {},
   ): Promise<void> {
-    await this.loadGoogleScript();
+    // Not used with server-side OAuth flow
+    // Button click will call initiateGoogleOAuth() instead
+  }
 
-    // Initialize Google ID services first
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: environment.oauth.google.clientId,
-        callback,
-      });
+  /**
+   * Initiate Google OAuth flow via backend (server-side)
+   * This avoids COOP issues by letting the backend handle OAuth
+   */
+  public async initiateGoogleOAuth(): Promise<void> {
+    try {
+      // 1. Get Google OAuth URL from backend
+      // Backend generates the Google OAuth URL with proper state and redirect_uri
+      const response = await fetch(`${environment.backendURL}/auth/social/google/url`);
 
-      // Default button configuration
-      const buttonConfig: GoogleButtonConfiguration = {
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        shape: 'rectangular',
-        logo_alignment: 'left',
-        width: '300',
-        ...config,
-      };
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Backend OAuth URL error:', errorText);
+        throw new Error(`Failed to get OAuth URL: ${response.statusText}`);
+      }
 
-      window.google.accounts.id.renderButton(element, buttonConfig);
+      const { url, state } = await response.json();
+
+      // Debug: Log the OAuth URL to check parameters
+      console.log('🔍 Google OAuth URL:', url);
+      console.log('🔍 State token:', state);
+
+      // 2. Store state for validation when we return
+      sessionStorage.setItem('oauth_state', state);
+
+      // 3. Redirect to GOOGLE (not the backend!)
+      // Google will authenticate user, then redirect back to backend callback
+      // Backend will then redirect to frontend /auth/callback
+      window.location.href = url;
+    } catch (error) {
+      console.error('❌ Failed to initiate Google login:', error);
+      throw new Error('Failed to start Google authentication');
     }
   }
 
   /**
-   * Sign in with Google credential token
+   * Sign in with Google credential token (legacy method - not used with server-side OAuth)
    */
   public signInWithGoogle(credentialToken: string): Observable<SocialAuthResponse> {
     const payload = {
