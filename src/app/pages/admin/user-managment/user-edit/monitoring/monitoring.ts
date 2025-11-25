@@ -16,18 +16,15 @@ export class Monitoring implements OnInit {
   private readonly adminUserService = inject(AdminUserService);
 
   public ngOnInit(): void {
-    if (this.store.user()) {
-      this.adminUserService.getUserUsage(this.store.user().id).subscribe({
-        next: (usage) => {
-          console.log('User usage data:', usage.data);
-          this.store.setUserUsage(usage.data);
-          this.store.setSuccessMessage(usage.message);
-        },
-        error: (error) => {
-          this.store.setErrorMessage(error.error?.message ?? 'Failed to load user usage');
-        },
-      });
-    }
+    this.adminUserService.getUserUsage(this.store.user().id).subscribe({
+      next: (usage) => {
+        this.store.setUserUsage(usage.data);
+        this.store.setSuccessMessage(usage.message);
+      },
+      error: (error) => {
+        this.store.setErrorMessage(error.error?.message ?? 'Failed to load user usage');
+      },
+    });
   }
 
   public startEdit(field: string): void {

@@ -10,8 +10,8 @@ import type { SessionState } from '../../models/auth/session-state.type';
   providedIn: 'root',
 })
 export class SessionService {
-  private static readonly ACTIVITY_UPDATE_INTERVAL = 30000; // 30 seconds
-  private static readonly SESSION_WARNING_TIME = 300000; // 5 minutes before expiry
+  private static readonly ACTIVITY_UPDATE_INTERVAL = 30000;
+  private static readonly SESSION_WARNING_TIME = 300000;
   private static readonly MILLISECONDS_TO_SECONDS = 1000;
 
   private readonly authService = inject(AuthService);
@@ -40,7 +40,6 @@ export class SessionService {
    * Initialize session monitoring
    */
   public initialize(): void {
-    // Subscribe to auth status changes
     this.authService.getAuthenticationStatus().subscribe((isAuthenticated) => {
       if (isAuthenticated) {
         this.startSession();
@@ -49,12 +48,10 @@ export class SessionService {
       }
     });
 
-    // Subscribe to user info changes
     this.jwtService.getUserInfoObservable().subscribe((userInfo) => {
       this.updateSessionFromUserInfo(userInfo);
     });
 
-    // Start activity monitoring
     this.startActivityMonitoring();
   }
 
@@ -134,8 +131,6 @@ export class SessionService {
     if (userInfo) {
       this.updateSessionFromUserInfo(userInfo);
     }
-
-    this.setupExpirationWarning();
   }
 
   /**
@@ -146,7 +141,7 @@ export class SessionService {
       return;
     }
 
-    const expiresAt = userInfo.exp ? userInfo.exp * SessionService.MILLISECONDS_TO_SECONDS : null; // Convert to milliseconds
+    const expiresAt = userInfo.exp ? userInfo.exp * SessionService.MILLISECONDS_TO_SECONDS : null;
 
     this.sessionStateSubject.next({
       isActive: true,
@@ -156,18 +151,13 @@ export class SessionService {
       lastActivity: Date.now(),
       expiresAt,
     });
-
-    this.setupExpirationWarning();
   }
 
   /**
    * Start monitoring user activity
    */
   private startActivityMonitoring(): void {
-    // Listen for user activity events
     const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-
-    // Throttled activity update
     let lastUpdate = 0;
     const throttledUpdate = (): void => {
       const now = Date.now();
@@ -176,33 +166,9 @@ export class SessionService {
         lastUpdate = now;
       }
     };
-
-    // Add event listeners
     activityEvents.forEach((event) => {
       document.addEventListener(event, throttledUpdate, { passive: true });
     });
-  }
-
-  /**
-   * Setup session expiration warning
-   */
-  private setupExpirationWarning(): void {
-    this.clearTimers();
-
-    const state = this.getCurrentSessionState();
-
-    if (!state.expiresAt) {
-      return;
-    }
-
-    const timeUntilWarning = state.expiresAt - Date.now() - SessionService.SESSION_WARNING_TIME;
-
-    if (timeUntilWarning > 0) {
-      this.warningTimer = window.setTimeout(() => {
-        console.warn('⚠️ Session: Session will expire soon');
-        // You can emit an event here to show a warning dialog
-      }, timeUntilWarning);
-    }
   }
 
   /**

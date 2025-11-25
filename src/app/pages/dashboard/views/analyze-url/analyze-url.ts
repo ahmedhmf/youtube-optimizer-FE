@@ -17,10 +17,10 @@ type TabType = {
 
 @Component({
   selector: 'app-analyze-url',
-  imports: [FormsModule,NgClass],
+  imports: [FormsModule, NgClass],
   templateUrl: './analyze-url.html',
   styleUrl: './analyze-url.scss',
-  standalone:true
+  standalone: true,
 })
 export class AnalyzeUrl {
   protected readonly activeTab = signal<TabType['id']>('url');
@@ -61,6 +61,8 @@ export class AnalyzeUrl {
   protected result: Audits | null = null;
   protected readonly loading = signal<boolean>(false);
   protected readonly error = signal<ApiError | null>(null);
+  protected showSettings = signal(false);
+  protected isDragging = false;
   protected readonly settings = signal<AiSettings>({
     language: 'english',
     tone: 'Professional & Authoritative',
@@ -80,8 +82,6 @@ export class AnalyzeUrl {
   private readonly MIN_TEXT_LENGTH = 50;
   private readonly MAX_TEXT_LENGTH = 50000; // 50k characters limit
   private readonly PERCENTAGE_30_PERCENT = 0.3;
-  showSettings = signal(false);
-  isDragging = false;
   protected get isAnalyzeDisabled(): boolean {
     if (this.loading() || this.error()) {
       return true;
@@ -171,6 +171,26 @@ export class AnalyzeUrl {
   protected onTextAreaInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     this.textContent.set(textarea.value);
+  }
+
+  protected onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  protected onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  protected onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files.length) {
+      const file = event.dataTransfer.files[0];
+      this.onFileSelected({ target: { files: [file] } } as any);
+    }
   }
 
   private analyzeFromUrl(): void {
@@ -327,27 +347,4 @@ export class AnalyzeUrl {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput.value = '';
   }
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = true;
-    console.log('over')
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-
-    if (event.dataTransfer?.files?.length) {
-      const file = event.dataTransfer.files[0];
-      this.onFileSelected({ target: { files: [file] } } as any);
-    }
-  }
-
-
 }

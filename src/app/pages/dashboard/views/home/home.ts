@@ -87,8 +87,7 @@ export class Home implements OnInit, OnDestroy {
       .cancelJob(jobId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: CanceledJobResponse) => {
-          console.warn('Job cancelled:', response);
+        next: () => {
           this.cancellingJobs.delete(jobId);
           this.refreshJobs(); // Refresh to get updated status
         },
@@ -156,12 +155,9 @@ export class Home implements OnInit, OnDestroy {
       .retryJob(jobId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: RetryJobResponce) => {
+        next: () => {
           this.retryingJobs.delete(jobId);
-          this.refreshJobs(); // Refresh to show new job
-
-          // Todo: show success message
-          console.warn('Job retried successfully:', response);
+          this.refreshJobs();
         },
         error: (error) => {
           this.retryingJobs.delete(jobId);
@@ -170,10 +166,7 @@ export class Home implements OnInit, OnDestroy {
       });
   }
 
-  protected viewJobDetails(jobId: string): void {
-    // Navigate to results page
-    console.warn('Viewing results for job:', jobId);
-  }
+  protected viewJobDetails(jobId: string): void {}
 
   private isActiveJob(job: UserJob): boolean {
     return job.status === 'pending' || job.status === 'processing';

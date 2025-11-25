@@ -59,6 +59,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/dashboard/views/history/history').then((m) => m.History),
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/dashboard/views/profile/profile').then((m) => m.Profile),
+      },
     ],
   },
   {

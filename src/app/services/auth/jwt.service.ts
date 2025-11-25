@@ -11,10 +11,9 @@ import type { JwtRefreshResponse } from '../../models/auth/jwt-refresh-response.
   providedIn: 'root',
 })
 export class JwtService {
-  // Constants for magic numbers
   private static readonly MILLISECONDS_TO_SECONDS = 1000;
   private static readonly JWT_PARTS_COUNT = 3;
-  private static readonly TOKEN_BUFFER_TIME_SECONDS = 300; // 5 minutes
+  private static readonly TOKEN_BUFFER_TIME_SECONDS = 300;
   private static readonly HTTP_BAD_REQUEST = 400;
   private static readonly HTTP_UNAUTHORIZED = 401;
 
@@ -91,7 +90,6 @@ export class JwtService {
       return false;
     }
 
-    // Check if token expires within the buffer time
     const currentTime = Math.floor(Date.now() / JwtService.MILLISECONDS_TO_SECONDS);
     return this.tokenExpirationTime > currentTime + JwtService.TOKEN_BUFFER_TIME_SECONDS;
   }
@@ -100,12 +98,9 @@ export class JwtService {
    * Get valid access token - refresh if needed
    */
   public getValidAccessToken(): Observable<string> {
-    // Return current token if still valid
     if (this.isTokenValid() && this.accessToken) {
       return of(this.accessToken);
     }
-
-    // Refresh token if we have a refresh token or session
     return this.refreshAccessToken();
   }
 
@@ -113,7 +108,6 @@ export class JwtService {
    * Refresh access token using refresh token or session
    */
   public refreshAccessToken(): Observable<string> {
-    // Return ongoing refresh request if already in progress
     if (this.refreshRequest$) {
       return this.refreshRequest$;
     }
@@ -121,8 +115,8 @@ export class JwtService {
     this.refreshRequest$ = this.http
       .post<JwtRefreshResponse>(
         `${environment.backendURL}/auth/refresh`,
-        {}, // Empty request body
-        { withCredentials: true }, // Include session cookies
+        {},
+        { withCredentials: true },
       )
       .pipe(
         tap((response) => {
@@ -130,28 +124,12 @@ export class JwtService {
         }),
         map((response) => response.accessToken),
         catchError((error) => {
-          // Log details for debugging (can be helpful during development)
-          const isExpectedError =
-            error.status === JwtService.HTTP_BAD_REQUEST ||
-            error.status === JwtService.HTTP_UNAUTHORIZED;
-
-          if (!isExpectedError) {
-            console.error('❌ JWT: Token refresh failed:', {
-              status: error.status ?? 'unknown',
-              statusText: error.statusText ?? 'unknown',
-              message: error.error?.message ?? error.message,
-            });
-          } else {
-            // Silent expected error - no valid session/token exists
-            console.warn('ℹ️ JWT: No valid session to restore (this is normal on first visit)');
-          }
-
-          this.clearTokens(); // Clear invalid tokens
+          this.clearTokens();
           this.refreshRequest$ = null;
           return throwError(() => new Error(`Token refresh failed: ${error.message}`));
         }),
         tap(() => {
-          this.refreshRequest$ = null; // Clear request on success
+          this.refreshRequest$ = null;
         }),
       );
 
@@ -170,11 +148,9 @@ export class JwtService {
    * Initialize JWT service - attempt to restore session
    */
   public initialize(): Observable<boolean> {
-    // Try to refresh token to restore session
     return this.refreshAccessToken().pipe(
       map(() => true),
       catchError(() => {
-        // No valid session, clear everything
         this.clearTokens();
         return of(false);
       }),
@@ -189,13 +165,10 @@ export class JwtService {
     this.tokenExpirationTime =
       Math.floor(Date.now() / JwtService.MILLISECONDS_TO_SECONDS) + expiresIn;
     this.accessTokenSubject.next(token);
-
-    // Decode and store user info
     try {
       const decoded = this.decodeJwtToken(token);
       this.userInfoSubject.next(decoded);
-    } catch (error) {
-      console.error('❌ JWT: Failed to decode token:', error);
+    } catch {
       this.userInfoSubject.next(null);
     }
   }

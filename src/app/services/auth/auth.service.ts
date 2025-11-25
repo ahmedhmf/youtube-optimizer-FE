@@ -7,20 +7,25 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { CsrfService } from './csrf.service';
 import { JwtService } from './jwt.service';
+import { UserProfileService } from './user-profile.service';
 import type { AuthResponse } from '../../models/auth/auth-response.type';
 import type { DecodedJwtToken } from '../../models/auth/decoded-jwt-token.type';
 import type { LoginRequest } from '../../models/auth/login-request.type';
 import type { LogoutResponse } from '../../models/auth/logout-response.type';
 import type { RegisterRequest } from '../../models/auth/register-request.type';
+import type { UserProfile } from '../../models/user-profile.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private static readonly HTTP_UNAUTHORIZED = 401;
+
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly csrfService = inject(CsrfService);
   private readonly jwtService = inject(JwtService);
+  private readonly userProfileService = inject(UserProfileService);
 
   private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   private readonly isInitializedSubject = new BehaviorSubject<boolean>(false);
@@ -83,23 +88,35 @@ export class AuthService {
 
   /**
    * Initialize authentication service
-   * Phase 1: Initialize CSRF + Phase 4: Restore session if valid
    */
   public initialize(): Observable<boolean> {
     return this.csrfService.initialize().pipe(
-      tap(() => {
-        console.warn('✅ Auth: CSRF token initialized successfully');
-      }),
       switchMap(() => {
-        // Try to restore JWT session (requires CSRF token)
         return this.jwtService.initialize();
       }),
       tap((isAuthenticated) => {
         this.isAuthenticatedSubject.next(isAuthenticated);
+      }),
+      switchMap((isAuthenticated) => {
+        if (isAuthenticated) {
+          return this.userProfileService.fetchProfile().pipe(
+            map(() => isAuthenticated),
+            catchError((error) => {
+              if (error.status === AuthService.HTTP_UNAUTHORIZED) {
+                this.isAuthenticatedSubject.next(false);
+                this.clearAuthenticationState();
+                return of(false);
+              }
+              return of(isAuthenticated);
+            }),
+          );
+        }
+        return of(false);
+      }),
+      tap(() => {
         this.isInitializedSubject.next(true);
       }),
-      catchError((error) => {
-        console.error('❌ Auth: Initialization failed:', error);
+      catchError(() => {
         this.isAuthenticatedSubject.next(false);
         this.isInitializedSubject.next(true);
         return of(false);
@@ -109,7 +126,6 @@ export class AuthService {
 
   /**
    * Register new user account
-   * Phase 2: Registration with CSRF protection
    */
   public register(registerData: RegisterRequest): Observable<AuthResponse> {
     return this.csrfService.getToken().pipe(
@@ -137,8 +153,15 @@ export class AuthService {
           this.isAuthenticatedSubject.next(true);
         }
       }),
+      switchMap((response) => {
+        return this.userProfileService.fetchProfile().pipe(
+          map(() => response),
+          catchError(() => {
+            return of(response);
+          }),
+        );
+      }),
       catchError((error) => {
-        console.error('❌ Auth: Registration failed:', error);
         return throwError(() => new Error(`Registration failed: ${error.message}`));
       }),
     );
@@ -169,8 +192,15 @@ export class AuthService {
           this.isAuthenticatedSubject.next(true);
         }
       }),
+      switchMap((response) => {
+        return this.userProfileService.fetchProfile().pipe(
+          map(() => response),
+          catchError(() => {
+            return of(response);
+          }),
+        );
+      }),
       catchError((error) => {
-        console.error('❌ Auth: Login failed:', error);
         return throwError(() => new Error(`Login failed: ${error.message}`));
       }),
     );
@@ -197,13 +227,12 @@ export class AuthService {
       }),
       tap(() => {
         this.clearAuthenticationState();
+        void this.router.navigate(['/']);
       }),
       map((response) => response.success),
-      catchError((error) => {
-        console.error('❌ Auth: Logout request failed:', error);
-        // Clear local state even if server request fails
+      catchError(() => {
         this.clearAuthenticationState();
-        return of(true); // Return success to continue logout flow
+        return of(true);
       }),
     );
   }
@@ -211,10 +240,9 @@ export class AuthService {
   /**
    * Force logout (clear local state and redirect)
    */
-  public forceLogout(reason = 'Session expired'): void {
-    console.warn(`🚪 Auth: Force logout - ${reason}`);
+  public forceLogout(): void {
     this.clearAuthenticationState();
-    this.router.navigate(['/login']).catch(console.error);
+    void this.router.navigate(['/']);
   }
 
   /**
@@ -223,11 +251,17 @@ export class AuthService {
   public getValidAccessToken(): Observable<string> {
     return this.jwtService.getValidAccessToken().pipe(
       catchError((error) => {
-        console.error('❌ Auth: Token refresh failed, forcing logout:', error);
-        this.forceLogout('Token refresh failed');
+        this.forceLogout();
         return throwError(() => error);
       }),
     );
+  }
+
+  /**
+   * Refresh user profile manually
+   */
+  public refreshUserProfile(): Observable<UserProfile> {
+    return this.userProfileService.fetchProfile();
   }
 
   /**
@@ -236,6 +270,7 @@ export class AuthService {
   private clearAuthenticationState(): void {
     this.jwtService.clearTokens();
     this.csrfService.clearToken();
+    this.userProfileService.clearProfile();
     this.isAuthenticatedSubject.next(false);
   }
 }

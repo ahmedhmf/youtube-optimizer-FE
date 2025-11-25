@@ -87,11 +87,19 @@
             >notifications</span
           >
         </button>
-        <img
-          alt="User profile avatar"
-          class="h-10 w-10 rounded-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoJuT9v9PAmEOZ1QhbdNP-0WLXQfTb7CMClotA5LlBoyOW9R16rWAfW1FUHTm4FUkXH7f8lfEX9Z8_1OaxDVN5iQfGIhpYfSS4K-4Hv00v29Vv6I7QgS_UxZvCpLWnD5Eyz4o1ykhqFcKud-gglCz98ljpC-q6XlefDEGHxwbBOMe584JxI9KCMNdwppC5zlaFqhviywGrQ_BYUTC6NHS3M70fqU2GW0q09xQmnMHFq-LSctda2qhacGTnUoK17uXiO04Lh33_SB99"
-        />
+        @if (store.profile()?.picture) {
+          <img
+            [src]="store.profile()?.picture"
+            alt="Profile Picture"
+            class="h-10 w-10 rounded-full object-cover"
+          />
+        } @else {
+          <div
+            class="w-10 h-10 rounded-full border-4 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs"
+          >
+            {{ store.userInitials() }}
+          </div>
+        }
       </div>
     </header>
     <main class="flex-1 overflow-y-auto p-8">

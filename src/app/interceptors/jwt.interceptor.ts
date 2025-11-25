@@ -40,10 +40,8 @@ export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
       return next(authenticatedRequest);
     }),
     catchError((error) => {
-      // Handle authentication errors
       if (error.status === HTTP_UNAUTHORIZED || error.status === HTTP_FORBIDDEN) {
-        console.warn('🔐 JWT: Authentication failed, forcing logout...');
-        authService.forceLogout('Authentication failed');
+        authService.forceLogout();
       }
 
       return throwError(() => error);
@@ -58,11 +56,11 @@ function shouldSkipJwt(url: string): boolean {
   const skipEndpoints = [
     '/auth/login',
     '/auth/register',
-    '/auth/refresh', // Refresh uses session cookies, not JWT
+    '/auth/refresh',
     '/csrf/token',
     '/public/',
-    '/login', // Frontend login route
-    '/register', // Frontend register route
+    '/login',
+    '/register',
   ];
 
   return skipEndpoints.some((endpoint) => url.includes(endpoint));

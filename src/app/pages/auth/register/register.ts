@@ -119,21 +119,6 @@ export class Register {
   protected signInWithGitHub(): void {
     this.socialLoginLoading.set(true);
     this.error.set(null);
-
-    // this.jwtAuthService.signInWithGitHub().subscribe({
-    //   next: (user) => {
-    //     this.socialLoginLoading.set(false);
-    //     console.log('GitHub sign-in successful:', user);
-    //     void this.router.navigate(['/dashboard']);
-    //   },
-    //   error: (error) => {
-    //     this.socialLoginLoading.set(false);
-    //     this.error.set({
-    //       message: error.error?.message || 'GitHub sign-in failed. Please try again.',
-    //       code: error.status || 500,
-    //     });
-    //   },
-    // });
   }
 
   private getFieldDisplayName(fieldName: string): string {

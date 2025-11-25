@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
+import { userProfileStore } from '../../../stores/dashboard/user-profile.store';
 
 @Component({
   selector: 'app-layout',
@@ -9,16 +10,14 @@ import { AuthService } from '../../../services/auth/auth.service';
   styleUrl: './layout.scss',
 })
 export class Layout {
+  protected readonly store = inject(userProfileStore);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   protected logout(): void {
     this.authService.logout().subscribe({
       next: () => {
-        console.log('Logout successful');
-        // Navigation is handled automatically in the service
-      },
-      error: (error) => {
-        console.error('Logout error:', error);
-        // Even if logout API fails, tokens are cleared
+        void this.router.navigate(['/']);
       },
     });
   }

@@ -105,11 +105,7 @@ export class ApiService implements OnDestroy {
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe({
-        error: (error) => {
-          console.error('getUserHistory final error:', error);
-        },
-      });
+      .subscribe();
   }
 
   public deleteAudit(id: string): void {
@@ -134,11 +130,7 @@ export class ApiService implements OnDestroy {
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe({
-        error: (error) => {
-          console.error('deleteAudit final error:', error);
-        },
-      });
+      .subscribe();
   }
 
   public ngOnDestroy(): void {

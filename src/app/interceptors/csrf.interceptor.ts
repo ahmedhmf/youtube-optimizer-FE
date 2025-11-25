@@ -21,37 +21,21 @@ export const csrfInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 ): Observable<any> => {
   const csrfService = inject(CsrfService);
-
-  // Check if this request needs CSRF protection
   if (!csrfService.needsCsrfProtection(req.method, req.url)) {
-    console.log(`⏭️ CSRF: Skipping ${req.method} ${req.url}`);
     return next(req);
   }
-
-  console.log(`🛡️ CSRF: Processing ${req.method} ${req.url}`);
-
-  // Get CSRF token and add to request
   return csrfService.getToken().pipe(
     switchMap((csrfToken) => {
-      console.log(`🛡️ CSRF: Adding token to ${req.method} ${req.url}`);
-
-      // Add CSRF token to request headers
       const csrfReq = req.clone({
         setHeaders: {
           'X-CSRF-Token': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest', // Additional CSRF protection
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
       return next(csrfReq).pipe(
         catchError((error: HttpErrorResponse) => {
-          // Handle CSRF-specific errors
           if (isCsrfError(error)) {
-            console.warn(
-              `🔄 CSRF: Token invalid, refreshing and retrying ${req.method} ${req.url}`,
-            );
-
-            // Refresh CSRF token and retry
             return csrfService.refreshToken().pipe(
               switchMap((newToken) => {
                 const retryReq = req.clone({
@@ -70,17 +54,11 @@ export const csrfInterceptor: HttpInterceptorFn = (
       );
     }),
     catchError((error) => {
-      // For auth/refresh, we must have a CSRF token - fail the request if we can't get one
       const isAuthRefresh = req.url.includes('/auth/refresh');
 
       if (isAuthRefresh) {
-        console.warn('⚠️ CSRF: Cannot refresh without CSRF token, failing request');
         return throwError(() => error);
       }
-
-      // For other requests, log and continue without CSRF token
-      console.error(`❌ CSRF: Failed to get token for ${req.method} ${req.url}:`, error);
-      console.warn(`⚠️ CSRF: Continuing without CSRF token for ${req.method} ${req.url}`);
       return next(req);
     }),
   );
@@ -91,7 +69,7 @@ export const csrfInterceptor: HttpInterceptorFn = (
  */
 function isCsrfError(error: HttpErrorResponse): boolean {
   // Common CSRF error indicators
-  const csrfErrorCodes = [403, 419]; // 403 Forbidden, 419 Page Expired
+  const csrfErrorCodes = [403, 419];
   const csrfErrorMessages = [
     'csrf',
     'token',

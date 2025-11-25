@@ -35,23 +35,18 @@ export class GlobalErrorHandler implements ErrorHandler {
    * Main error handler - processes all uncaught errors
    */
   public handleError(error: any): void {
-    try {
-      const errorDetails = this.extractErrorDetails(error);
+    const errorDetails = this.extractErrorDetails(error);
 
-      // Add to store
-      this.errorStore.addError(errorDetails);
+    // Add to store
+    this.errorStore.addError(errorDetails);
 
-      // Handle based on error type
-      this.processError(errorDetails);
+    // Handle based on error type
+    this.processError(errorDetails);
 
-      // Schedule batch reporting for non-critical errors
-      this.scheduleBatchReport();
+    // Schedule batch reporting for non-critical errors
+    this.scheduleBatchReport();
 
-      this.reportToBackend(error);
-    } catch (handlingError) {
-      console.error('Error in GlobalErrorHandler:', handlingError);
-      console.error('Original error:', error);
-    }
+    this.reportToBackend(error);
   }
 
   /**
@@ -146,9 +141,7 @@ export class GlobalErrorHandler implements ErrorHandler {
    * Handle permission errors
    */
   private handlePermissionError(): void {
-    this.router.navigate(['/login']).catch((navError) => {
-      console.error('Navigation error:', navError);
-    });
+    void this.router.navigate(['/login']);
   }
 
   /**
@@ -188,11 +181,7 @@ export class GlobalErrorHandler implements ErrorHandler {
       errors.forEach((error) => {
         console.error(error);
       });
-      return;
     }
-
-    // Send to logging service (Sentry, LogRocket, etc.)
-    console.error(`Logging ${errors.length} errors to external service`);
   }
 
   /**

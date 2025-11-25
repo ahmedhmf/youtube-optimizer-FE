@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { userStore } from '../../stores/admin/users.store';
 import type { UserListResponse } from '../../models/admin/user.type';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +10,9 @@ import type { UserListResponse } from '../../models/admin/user.type';
 export class AdminApi {
   private readonly httpClient = inject(HttpClient);
   private readonly userStore = inject(userStore);
+  private readonly baseUrl = environment.backendURL;
 
   public loadAllUsers(): void {
-    // this.isLoading = true;
     this.userStore.setLoading(true);
 
     const requestParams: Record<string, string> = {
@@ -26,7 +27,7 @@ export class AdminApi {
     }
 
     this.httpClient
-      .get<UserListResponse>('http://localhost:3000/admin/users', {
+      .get<UserListResponse>(`${this.baseUrl}/admin/users`, {
         params: requestParams,
         withCredentials: true,
       })
@@ -38,8 +39,7 @@ export class AdminApi {
           this.userStore.setTotalPages(response.totalPages);
           this.userStore.setLoading(false);
         },
-        error: (error) => {
-          console.error('Failed to load users:', error);
+        error: () => {
           this.userStore.setLoading(false);
         },
       });

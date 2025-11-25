@@ -29,30 +29,23 @@ export class CsrfService {
    * Refresh CSRF token (get new one from server)
    */
   public refreshToken(): Observable<string> {
-    // Clear current token first
     this.clearToken();
 
-    // Use csrf-token endpoint for refreshing existing tokens
     this.tokenRequest$ = this.http
       .get<CsrfResponse>(`${environment.backendURL}/auth/csrf-token`, {
-        withCredentials: true, // Include session cookies
+        withCredentials: true,
       })
       .pipe(
         tap((response) => {
           this.setToken(response.csrfToken);
-          this.tokenRequest$ = null; // Clear ongoing request
+          this.tokenRequest$ = null;
         }),
         switchMap((response) => of(response.csrfToken)),
         catchError((error) => {
-          console.error('❌ CSRF: Token refresh failed:', {
-            status: error.status ?? 'unknown',
-            statusText: error.statusText ?? 'unknown',
-            url: error.url ?? 'unknown',
-          });
-          this.tokenRequest$ = null; // Clear failed request
+          this.tokenRequest$ = null;
           return throwError(() => error);
         }),
-        shareReplay(1), // Share result with multiple subscribers
+        shareReplay(1),
       );
 
     return this.tokenRequest$;
@@ -65,7 +58,6 @@ export class CsrfService {
     const protectedMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
     const isProtectedMethod = protectedMethods.includes(method.toUpperCase());
 
-    // Skip CSRF for these endpoints
     const skipEndpoints = ['/csrf/token', '/auth/csrf-token', '/auth/csrf', '/api/csrf/token'];
 
     const shouldSkip = skipEndpoints.some((endpoint) => url.includes(endpoint));
@@ -84,37 +76,28 @@ export class CsrfService {
    * Get CSRF token - fetch new one if not available
    */
   public getToken(): Observable<string> {
-    // Return cached token if available
     if (this.csrfToken) {
       return of(this.csrfToken);
     }
 
-    // Return ongoing request if already fetching
     if (this.tokenRequest$) {
       return this.tokenRequest$;
     }
-
-    // Fetch new token from backend - use csrf-token endpoint
     this.tokenRequest$ = this.http
       .get<CsrfResponse>(`${environment.backendURL}/auth/csrf-token`, {
-        withCredentials: true, // Include session cookies
+        withCredentials: true,
       })
       .pipe(
         tap((response) => {
           this.setToken(response.csrfToken);
-          this.tokenRequest$ = null; // Clear ongoing request
+          this.tokenRequest$ = null;
         }),
         switchMap((response) => of(response.csrfToken)),
         catchError((error) => {
-          console.error('❌ CSRF: Token fetch failed:', {
-            status: error.status ?? 'unknown',
-            statusText: error.statusText ?? 'unknown',
-            url: error.url ?? 'unknown',
-          });
-          this.tokenRequest$ = null; // Clear failed request
+          this.tokenRequest$ = null;
           return throwError(() => error);
         }),
-        shareReplay(1), // Share result with multiple subscribers
+        shareReplay(1),
       );
 
     return this.tokenRequest$;

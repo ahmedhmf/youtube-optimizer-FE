@@ -54,7 +54,6 @@ export class Login {
         message: 'Failed to start Google authentication. Please try again.',
         code: String(errorCodes.internalServerError),
       });
-      console.error('Google OAuth initiation failed:', err);
     });
   }
 
