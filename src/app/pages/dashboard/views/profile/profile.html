@@ -3,60 +3,73 @@
     <h1 class="text-2xl font-semibold mb-10">Profile</h1>
 
     <!-- PROFILE HEADER -->
-    <div class="flex items-center gap-6 mb-10">
-      <div class="relative">
-        @if (!store.profile()?.picture) {
-          <img
-            [src]="store.profile()?.picture"
-            class="w-20 h-20 rounded-full object-cover"
-            alt="User Profile Picture"
-          />
-        } @else {
-          <div
-            class="w-20 h-20 rounded-full object-cover bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold"
-          >
-            {{ store.userInitials() }}
-          </div>
-        }
+    <div class="flex items-center justify-between mb-10">
+      <div class="flex items-center gap-6">
+        <div class="relative">
+          @if (!store.profile()?.picture) {
+            <img
+              [src]="store.profile()?.picture"
+              class="w-20 h-20 rounded-full object-cover"
+              alt="User Profile Picture"
+            />
+          } @else {
+            <div
+              class="w-20 h-20 rounded-full object-cover bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold"
+            >
+              {{ store.userInitials() }}
+            </div>
+          }
+        </div>
+
+        <div>
+          <p class="text-lg font-medium">{{ store.profile()?.name }}</p>
+          <p class="text-sm text-gray-400 mt-1">{{ store.profile()?.email }}</p>
+          @switch (store.profile()?.subscription?.tier) {
+            @case ('free') {
+              <span
+                class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
+                >Free</span
+              >
+            }
+            @case ('pro') {
+              <span
+                class="inline-flex items-start rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 inset-ring inset-ring-green-500/10 mt-2"
+                >Pro</span
+              >
+            }
+            @case ('premium') {
+              <span
+                class="inline-flex items-start rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 inset-ring inset-ring-blue-500/10 mt-2"
+                >Premium</span
+              >
+            }
+            @case ('enterprise') {
+              <span
+                class="inline-flex items-start rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 inset-ring inset-ring-indigo-500/10 mt-2"
+                >Enterprise</span
+              >
+            }
+            @default {
+              <span
+                class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
+                >Free</span
+              >
+            }
+          }
+        </div>
       </div>
 
-      <div>
-        <p class="text-lg font-medium">{{ store.profile()?.name }}</p>
-        <p class="text-sm text-gray-400 mt-1">{{ store.profile()?.email }}</p>
-        @switch (store.profile()?.subscription?.tier) {
-          @case ('free') {
-            <span
-              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
-              >Free</span
-            >
-          }
-          @case ('pro') {
-            <span
-              class="inline-flex items-start rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 inset-ring inset-ring-green-500/10 mt-2"
-              >Pro</span
-            >
-          }
-          @case ('premium') {
-            <span
-              class="inline-flex items-start rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 inset-ring inset-ring-blue-500/10 mt-2"
-              >Premium</span
-            >
-          }
-          @case ('enterprise') {
-            <span
-              class="inline-flex items-start rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 inset-ring inset-ring-indigo-500/10 mt-2"
-              >Enterprise</span
-            >
-          }
-          @default {
-            <span
-              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
-              >Free</span
-            >
-          }
-        }
-      </div>
+      <!-- Reset Password Button -->
+      <button
+        type="button"
+        (click)="openResetPasswordModal()"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+      >
+        <span class="material-symbols-outlined">lock_reset</span>
+        <span>Reset Password</span>
+      </button>
     </div>
+
     <div class="grid grid-cols-4 gap-10">
       <div class="bg-[#1E1F25] colspan-1 text-gray-200 p-6 w-full flex">
         <div class="bg-[#1E1F25] text-gray-200 p-6 flex: 1 w-1/2">
@@ -186,5 +199,10 @@
         </div>
       </div>
     </div>
+
+    <!-- Reset Password Modal -->
+    @if (showResetPasswordModal()) {
+      <app-reset-password-modal (closeModal)="closeResetPasswordModal()" />
+    }
   </section>
 }

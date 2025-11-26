@@ -56,8 +56,7 @@ export class Register {
     const userData: RegisterRequest = {
       email: this.form.value.email,
       password: this.form.value.password,
-      firstName: this.form.value.name,
-      lastName: this.form.value.name,
+      name: this.form.value.name,
     };
 
     this.authService.register(userData).subscribe({
