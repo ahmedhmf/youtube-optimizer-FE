@@ -1,8 +1,8 @@
 <div class="mx-auto max-w-7xl">
   <h2 class="text-3xl font-bold tracking-tight mb-8">Dashboard</h2>
-  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-    <div
-      class="relative overflow-hidden rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+  <div class="grid grid-cols-3 gap-4 mb-4">
+    <section
+      class="col-span-1 bg-[#0B0D11] border border-zinc-800 rounded-2xl p-4 flex flex-col gap-4"
     >
       <div class="absolute top-0 left-0 h-1.5 w-full gradient-highlight"></div>
       <div class="p-6">
@@ -11,9 +11,9 @@
         </p>
         <p class="mt-1 text-4xl font-bold">1,284</p>
       </div>
-    </div>
-    <div
-      class="relative overflow-hidden rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+    </section>
+    <section
+      class="col-span-1 bg-[#0B0D11] border border-zinc-800 rounded-2xl p-4 flex flex-col gap-4"
     >
       <div class="absolute top-0 left-0 h-1.5 w-full gradient-highlight"></div>
       <div class="p-6">
@@ -22,9 +22,9 @@
         </p>
         <p class="mt-1 text-4xl font-bold">42s</p>
       </div>
-    </div>
-    <div
-      class="relative overflow-hidden rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm"
+    </section>
+    <section
+      class="col-span-1 bg-[#0B0D11] border border-zinc-800 rounded-2xl p-4 flex flex-col gap-4"
     >
       <div class="absolute top-0 left-0 h-1.5 w-full gradient-highlight"></div>
       <div class="p-6">
@@ -33,99 +33,101 @@
         </p>
         <p class="mt-1 text-4xl font-bold">98.7%</p>
       </div>
-    </div>
+    </section>
   </div>
   <div class="mt-10">
     <h3 class="text-xl font-semibold">Recent History</h3>
     <div class="mt-4 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div
-            class="overflow-hidden rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark"
-          >
-            <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
-              <thead class="bg-background-light dark:bg-card-dark/50">
+          <div class="bg-[#0B0D11] border border-zinc-800 rounded-2xl overflow-hidden text-xs">
+            <table class="w-full border-collapse">
+              <thead class="bg-[#1F201D] text-[11px] text-[#969790] border-b border-zinc-800">
                 <tr>
-                  <th
-                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-text-light dark:text-text-dark sm:pl-6"
-                    scope="col"
-                  >
+                  <th class="text-left px-4 py-2 font-semibold text-[#969790]" scope="col">
                     Video Title
                   </th>
                   <th
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-text-light dark:text-text-dark"
+                    class="px-4 py-2 text-left text-[11px] font-semibold text-[#969790]"
                     scope="col"
                   >
                     Date Analyzed
                   </th>
                   <th
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-text-light dark:text-text-dark"
+                    class="px-4 py-2 text-left text-[11px] font-semibold text-[#969790]"
                     scope="col"
                   >
                     Status
                   </th>
-                  <th class="relative py-3.5 pl-3 pr-4 sm:pr-6" scope="col">
+                  <th
+                    class="px-4 py-2 text-left text-[11px] font-semibold text-[#969790]"
+                    scope="col"
+                  >
                     <span class="sr-only">View</span>
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-border-light dark:divide-border-dark">
+              <tbody class="divide-y divide-zinc-800">
                 @for (job of jobs; track job.id) {
                   <tr>
-                    <td
-                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-text-light dark:text-text-dark sm:pl-6"
-                    >
-                    {{job.data.video_title}}
+                    <td class="px-4 py-3 text-md text-[#D6D6D6]">
+                      {{ job.data.video_title }}
                     </td>
-                    <td
-                      class="whitespace-nowrap px-3 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark"
-                    >
-                      {{getTimeDifference(job.createdAt)}}
+                    <td class="whitespace-nowrap px-4 py-3 text-md text-[#969790]">
+                      {{ getTimeDifference(job.createdAt) }}
                     </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm">
-                      <span
-                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                        [class.bg-green-100]="job.status === 'completed'"
-                        [class.bg-red-100]="job.status === 'failed'"
-                        [class.bg-yellow-100]="job.status === 'processing'"
-                        [class.dark:bg-green-900/50]="job.status === 'completed'"
-                        [class.dark:bg-red-900/50]="job.status === 'failed'"
-                        [class.dark:bg-yellow-900/50]="job.status === 'processing'"
-                        [class.dark:text-green-300]="job.status === 'completed'"
-                        [class.dark:text-red-300]="job.status === 'failed'"
-                        [class.dark:text-yellow-300]="job.status === 'processing'"
-                        [class.text-green-800]="job.status === 'completed'"
-                        [class.text-red-800]="job.status === 'failed'"
-                        [class.text-yellow-800]="job.status === 'processing'"
-                        >{{job.status | titlecase }}</span
-                      >
+                    <td class="whitespace-nowrap px-4 py-3 text-md text-[#969790]">
+                      @if (job.status === 'completed') {
+                        <span
+                          class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/15 text-[11px] text-emerald-400 border border-emerald-500/40"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          Completed
+                        </span>
+                      } @else if (job.status === 'failed') {
+                        <span
+                          class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-600/20 text-[11px] text-red-300 border border-red-500/40"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+                          Failed
+                        </span>
+                      } @else if (job.status === 'processing') {
+                        <span
+                          class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-zinc-600/20 text-[11px] text-zinc-300 border border-zinc-500/40"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                          Pending
+                        </span>
+                      }
                     </td>
                     <td
                       class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
                     >
-                    @if (job.status === 'completed') {
-                      <button class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-light bg-primary/10 hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30 rounded-md border border-primary/30 dark:border-primary/40 transition-colors"
-                        type="button" (click)="viewJobDetails(job.id)">
-                        <span class="material-symbols-outlined text-sm">visibility</span>
-                        View
-                        <span class="sr-only">, {{ job.data.video_title }}</span>
-                    </button>
-                    } @else if (job.status === 'failed') {
-                      <button class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/40 rounded-md border border-blue-200 dark:border-blue-800 transition-colors"
-                          type="button" (click)="retryJob(job.id)">
-                          <span class="material-symbols-outlined text-sm">refresh</span>
+                      @if (job.status === 'completed') {
+                        <button
+                          class="px-4 py-2 rounded-xl bg-[#111318] border border-zinc-700 text-zinc-300 text-sm hover:bg-[#151821] hover:border-zinc-600 transition-all duration-200"
+                          type="button"
+                          (click)="viewJobDetails(job.id)"
+                        >
+                          View
+                        </button>
+                      } @else if (job.status === 'failed') {
+                        <button
+                          class="px-4 py-2 rounded-xl bg-[#111318] border border-green-700 text-green-300 text-sm hover:bg-[#151821] hover:border-green-600 transition-all duration-200"
+                          type="button"
+                          (click)="retryJob(job.id)"
+                        >
                           Retry
-                          <span class="sr-only">, {{ job.data.video_title }}</span>
-                      </button>
-                    }
-                    @else {
-                      <button class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/40 rounded-md border border-red-200 dark:border-red-800 transition-colors"
-                        type = "button" (click)="cancelJob(job.id)">
-                        <span class="material-symbols-outlined text-sm">cancel</span>
-                        Cancel
-                        <span class="sr-only">, {{ job.data.video_title }}</span>
-                    </button>
-                    }
+                        </button>
+                      } @else {
+                        <button
+                          class="px-4 py-2 rounded-xl bg-[#111318] border border-red-700 text-red-300 text-sm hover:bg-[#151821] hover:border-red-600 transition-all duration-200"
+                          type="button"
+                          (click)="cancelJob(job.id)"
+                        >
+                          Cancel
+                        </button>
+                      }
                     </td>
                   </tr>
                 }

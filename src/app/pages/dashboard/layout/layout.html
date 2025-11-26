@@ -1,109 +1,18 @@
-<div class="flex h-screen w-full bg-white">
-  <aside
-    class="flex w-64 flex-col border-r border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark"
-  >
-    <div
-      class="flex h-16 items-center gap-3 px-6 border-b border-border-light dark:border-border-dark"
-    >
-      <div class="h-8 w-8 text-primary">
-        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <path
-            clip-rule="evenodd"
-            d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z"
-            fill="currentColor"
-            fill-rule="evenodd"
-          ></path>
-        </svg>
-      </div>
-      <h1 class="text-xl font-bold tracking-tight">Descripta</h1>
-    </div>
-    <nav class="flex flex-1 flex-col justify-between p-4">
-      <div class="space-y-1">
-        <a
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          routerLink="/dashboard"
-          routerLinkActive="!bg-primary/20 !text-primary !font-semibold"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-symbols-outlined">dashboard</span>
-          Dashboard
-        </a>
-        <a
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          routerLink="/dashboard/analyze-url"
-          routerLinkActive="!bg-primary/20 !text-primary !font-semibold"
-        >
-          <span class="material-symbols-outlined">query_stats</span>
-          Tools
-        </a>
-        <a
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          routerLink="/dashboard/history"
-          routerLinkActive="!bg-primary/20 !text-primary !font-semibold"
-        >
-          <span class="material-symbols-outlined">history</span>
-          History
-        </a>
-        <a
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          routerLink="/dashboard/profile"
-          routerLinkActive="!bg-primary/20 !text-primary !font-semibold"
-        >
-          <span class="material-symbols-outlined">person</span>
-          Profile
-        </a>
-        <a
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-          routerLink="/dashboard/settings"
-          routerLinkActive="!bg-primary/20 !text-primary !font-semibold"
-        >
-          <span class="material-symbols-outlined">settings</span>
-          Settings
-        </a>
-      </div>
-      <div>
-        <button
-          type="button"
-          class="flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full text-left"
-          (click)="logout()"
-        >
-          <span class="material-symbols-outlined">logout</span>
-          Logout
-        </button>
-      </div>
-    </nav>
+<div class="flex h-screen w-full">
+  <aside class="w-64 bg-[#090A05] flex flex-col">
+    <app-nav></app-nav>
   </aside>
-  <div class="flex flex-1 flex-col">
-    <header
-      class="flex h-16 items-center justify-end border-b border-border-light dark:border-border-dark px-6"
-    >
-      <div class="flex items-center gap-4">
-        <button
-          class="relative rounded-full p-2 hover:bg-gray-100 dark:hover:bg-white/5"
-          (click)="logout()"
-        >
-          <span
-            class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark"
-            >notifications</span
-          >
-        </button>
-        @if (store.profile()?.picture) {
-          <img
-            [src]="store.profile()?.picture"
-            alt="Profile Picture"
-            class="h-10 w-10 rounded-full object-cover"
-          />
-        } @else {
-          <div
-            class="w-10 h-10 rounded-full border-4 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs"
-          >
-            {{ store.userInitials() }}
-          </div>
-        }
-      </div>
-    </header>
-    <main class="flex-1 overflow-y-auto p-8">
-      <router-outlet></router-outlet>
-    </main>
-  </div>
+
+  <!-- Content -->
+  <main class="flex-1 bg-black">
+    <div class="h-full flex flex-col">
+      <!-- Top bar -->
+      <!-- <app-top-bar></app-top-bar> -->
+      <section
+        class="col-span-2 bg-[#151515] border border-zinc-800 rounded-2xl p-1 flex flex-col gap-4 m-4 h-screen text-[#FCFBFC] h-full overflow-y-auto"
+      >
+        <router-outlet></router-outlet>
+      </section>
+    </div>
+  </main>
 </div>

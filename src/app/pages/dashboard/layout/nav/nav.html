@@ -1,0 +1,85 @@
+<div class="relative h-screen w-full overflow-hidden">
+  <!-- <div class="absolute inset-0 animate-border-glow"></div> -->
+
+  <div class="relative h-full w-full p-[1px]">
+    <div class="h-full w-full bg-black flex flex-col">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-5 pt-4 pb-3">
+        <div
+          class="w-8 h-8 rounded-xl bg-white-400 flex items-center justify-center text-black font-bold bg-white"
+        >
+          D
+        </div>
+        <div class="leading-tight">
+          <p class="text-sm font-semibold text-white">Descripta</p>
+        </div>
+      </div>
+
+      <div class="relative h-px w-full my-3 overflow-hidden">
+        <div class="absolute inset-0 bg-white/40 shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]"></div>
+        <div class="absolute inset-0 animate-divider-glow"></div>
+      </div>
+
+      <nav class="flex-1 px-2 space-y-1 text-sm overflow-y-auto text-white">
+        <a
+          href="#"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+          routerLink="/dashboard"
+          routerLinkActive="bg-[#1F201D]"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+          routerLink="/dashboard/history"
+          routerLinkActive="bg-[#1F201D]"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-symbols-outlined">history</span>
+          <span>History</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+          routerLink="/dashboard/analyze-url"
+          routerLinkActive="bg-[#1F201D]"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-symbols-outlined">credit_card</span>
+          <span>Tools</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+          routerLink="/dashboard/profile"
+          routerLinkActive="bg-[#1F201D]"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-symbols-outlined">person</span>
+          <span>Profile</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+        >
+          <span class="material-symbols-outlined">settings</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Bottom Menu Item -->
+      <div class="px-2 pb-4">
+        <button
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
+          (click)="logout()"
+        >
+          <span class="material-symbols-outlined">logout</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

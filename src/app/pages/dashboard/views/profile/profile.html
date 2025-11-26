@@ -1,222 +1,190 @@
 @if (store.profile()) {
-  <div class="bg-[#1E1F25] text-gray-200 p-6 r w-full flex gap-8">
-    <div class="bg-[#1E1F25] text-gray-200 p-6 r max-w-md w-1/2">
-      <div class="flex flex-col items-center -mt-16">
-        @if (store.profile()?.picture) {
+  <section class="flex-1 px-16 py-12">
+    <h1 class="text-2xl font-semibold mb-10">Profile</h1>
+
+    <!-- PROFILE HEADER -->
+    <div class="flex items-center gap-6 mb-10">
+      <div class="relative">
+        @if (!store.profile()?.picture) {
           <img
             [src]="store.profile()?.picture"
-            alt="Profile Picture"
-            class="w-24 h-24 rounded-full border-4 border-[#1E1F25]"
+            class="w-20 h-20 rounded-full object-cover"
+            alt="User Profile Picture"
           />
         } @else {
           <div
-            class="w-24 h-24 rounded-full border-4 border-[#1E1F25] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold"
+            class="w-20 h-20 rounded-full object-cover bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold"
           >
             {{ store.userInitials() }}
           </div>
         }
+      </div>
+
+      <div>
+        <p class="text-lg font-medium">{{ store.profile()?.name }}</p>
+        <p class="text-sm text-gray-400 mt-1">{{ store.profile()?.email }}</p>
         @switch (store.profile()?.subscription?.tier) {
           @case ('free') {
             <span
-              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-1"
+              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
               >Free</span
             >
           }
           @case ('pro') {
             <span
-              class="inline-flex items-start rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 inset-ring inset-ring-green-500/10 mt-1"
+              class="inline-flex items-start rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-600 inset-ring inset-ring-green-500/10 mt-2"
               >Pro</span
             >
           }
           @case ('premium') {
             <span
-              class="inline-flex items-start rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 inset-ring inset-ring-blue-500/10 mt-1"
+              class="inline-flex items-start rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 inset-ring inset-ring-blue-500/10 mt-2"
               >Premium</span
             >
           }
           @case ('enterprise') {
             <span
-              class="inline-flex items-start rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 inset-ring inset-ring-indigo-500/10 mt-1"
+              class="inline-flex items-start rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 inset-ring inset-ring-indigo-500/10 mt-2"
               >Enterprise</span
             >
           }
           @default {
             <span
-              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-1"
+              class="inline-flex items-start rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 inset-ring inset-ring-gray-500/10 mt-2"
               >Free</span
             >
           }
         }
-        <div class="flex gap-2 items-center">
-          <h2 class="text-sm font-semibold">Provider:</h2>
-          @switch (store.profile()?.provider) {
-            @case ('email') {
-              <span class="material-symbols-outlined mt-3">drafts</span>
-            }
-            @case ('google') {
-              <span class="material-symbols-outlined mt-3">android</span>
-            }
-            @default {
-              <span class="material-symbols-outlined mt-3">drafts</span>
-            }
-          }
-        </div>
-
-        <h3 class="text-lg font-semibold mt-3 w-full text-center">{{ store.profile()?.name }}</h3>
       </div>
     </div>
+    <div class="grid grid-cols-4 gap-10">
+      <div class="bg-[#1E1F25] colspan-1 text-gray-200 p-6 w-full flex">
+        <div class="bg-[#1E1F25] text-gray-200 p-6 flex: 1 w-1/2">
+          <h2 class="text-xl font-semibold mb-4">Subscription</h2>
 
-    <div class="bg-[#1E1F25] text-gray-200 p-6 r w-1/2">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold">Personal Information</h2>
-      </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-400">Tier</p>
+              <p class="text-base capitalize">{{ store.profile()?.subscription?.tier }}</p>
+            </div>
 
-      <div class="space-y-4">
-        <div>
-          <p class="text-sm text-gray-400">Full name</p>
-          <p class="text-base">{{ store.profile()?.name }}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-400">Email</p>
-          <p class="text-base">{{ store.profile()?.email }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div>
+              <p class="text-sm text-gray-400">Status</p>
+              <p class="text-base capitalize text-green-400">
+                {{ store.profile()?.subscription?.status }}
+              </p>
+            </div>
 
-  <div class="bg-[#1E1F25] text-gray-200 p-6 w-full flex">
-    <div class="bg-[#1E1F25] text-gray-200 p-6 flex: 1 w-1/2">
-      <h2 class="text-xl font-semibold mb-4">Subscription</h2>
+            <div>
+              <p class="text-sm text-gray-400">Current Period Start</p>
+              <p class="text-base">
+                {{ store.profile()?.subscription?.currentPeriodStart | date }}
+              </p>
+            </div>
 
-      <div class="space-y-4">
-        <!-- Tier -->
-        <div>
-          <p class="text-sm text-gray-400">Tier</p>
-          <p class="text-base capitalize">{{ store.profile()?.subscription?.tier }}</p>
-        </div>
+            <div>
+              <p class="text-sm text-gray-400">Current Period End</p>
+              <p class="text-base">{{ store.profile()?.subscription?.currentPeriodEnd | date }}</p>
+            </div>
 
-        <!-- Status -->
-        <div>
-          <p class="text-sm text-gray-400">Status</p>
-          <p class="text-base capitalize text-green-400">
-            {{ store.profile()?.subscription?.status }}
-          </p>
-        </div>
+            <div>
+              <p class="text-sm text-gray-400">Cancel at Period End</p>
+              <p class="text-base">
+                <span
+                  class="font-semibold"
+                  [class]="
+                    store.profile()?.subscription?.cancelAtPeriodEnd
+                      ? 'text-red-400'
+                      : 'text-green-400'
+                  "
+                  >{{ store.profile()?.subscription?.cancelAtPeriodEnd ? 'Yes' : 'No' }}</span
+                >
+              </p>
+            </div>
 
-        <!-- Current Period Start -->
-        <div>
-          <p class="text-sm text-gray-400">Current Period Start</p>
-          <p class="text-base">{{ store.profile()?.subscription?.currentPeriodStart | date }}</p>
-        </div>
-
-        <!-- Current Period End -->
-        <div>
-          <p class="text-sm text-gray-400">Current Period End</p>
-          <p class="text-base">{{ store.profile()?.subscription?.currentPeriodEnd | date }}</p>
-        </div>
-
-        <!-- Cancel at Period End -->
-        <div>
-          <p class="text-sm text-gray-400">Cancel at Period End</p>
-          <p class="text-base">
-            <span
-              class="font-semibold"
-              [class]="
-                store.profile()?.subscription?.cancelAtPeriodEnd ? 'text-red-400' : 'text-green-400'
-              "
-              >{{ store.profile()?.subscription?.cancelAtPeriodEnd ? 'Yes' : 'No' }}</span
-            >
-          </p>
-        </div>
-
-        <!-- Trial End -->
-        <div>
-          <p class="text-sm text-gray-400">Trial Ends</p>
-          <p class="text-base text-gray-400">
-            {{ store.profile()?.subscription?.trialEnd | date }}
-          </p>
+            <div>
+              <p class="text-sm text-gray-400">Trial Ends</p>
+              <p class="text-base text-gray-400">
+                {{ store.profile()?.subscription?.trialEnd | date }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="bg-[#1E1F25] text-gray-200 p-6 r max-w-md flex: 1 w-1/2">
-      <h2 class="text-xl font-semibold mb-4">Features</h2>
+      <div class="bg-[#1E1F25] colspan-1 text-gray-200 p-6 w-full flex: 1">
+        <h2 class="text-xl font-semibold mb-4">Features</h2>
 
-      <div class="space-y-4">
-        <!-- Numeric Features -->
-        <div>
-          <p class="text-sm text-gray-400">Max Analyses Per Month</p>
-          <p class="text-base font-medium">{{ store.profile()?.features?.maxAnalysesPerMonth }}</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-gray-400">Max Channels Per User</p>
-          <p class="text-base font-medium">{{ store.profile()?.features?.maxChannelsPerUser }}</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-gray-400">AI Suggestions Limit</p>
-          <p class="text-base font-medium">{{ store.profile()?.features?.aiSuggestionsLimit }}</p>
-        </div>
-
-        <!-- Boolean Features -->
-        <div class="pt-2 space-y-3">
-          <!-- Advanced Analytics -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.advancedAnalytics ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">Advanced Analytics</span>
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-gray-400">Max Analyses Per Month</p>
+            <p class="text-base font-medium">
+              {{ store.profile()?.features?.maxAnalysesPerMonth }}
+            </p>
           </div>
 
-          <!-- Priority Support -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.prioritySupport ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">Priority Support</span>
+          <div>
+            <p class="text-sm text-gray-400">Max Channels Per User</p>
+            <p class="text-base font-medium">{{ store.profile()?.features?.maxChannelsPerUser }}</p>
           </div>
 
-          <!-- Custom Branding -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.customBranding ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">Custom Branding</span>
+          <div>
+            <p class="text-sm text-gray-400">AI Suggestions Limit</p>
+            <p class="text-base font-medium">{{ store.profile()?.features?.aiSuggestionsLimit }}</p>
           </div>
 
-          <!-- API Access -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.apiAccess ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">API Access</span>
-          </div>
+          <div class="pt-2 space-y-3">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="
+                  store.profile()?.features?.advancedAnalytics ? 'bg-green-500' : 'bg-red-500'
+                "
+              ></div>
+              <span class="text-sm">Advanced Analytics</span>
+            </div>
 
-          <!-- Bulk Operations -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.bulkOperations ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">Bulk Operations</span>
-          </div>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="store.profile()?.features?.prioritySupport ? 'bg-green-500' : 'bg-red-500'"
+              ></div>
+              <span class="text-sm">Priority Support</span>
+            </div>
 
-          <!-- Export Features -->
-          <div class="flex items-center gap-3">
-            <div
-              class="w-3 h-3 rounded-full"
-              [class]="store.profile()?.features?.exportFeatures ? 'bg-green-500' : 'bg-red-500'"
-            ></div>
-            <span class="text-sm">Export Features</span>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="store.profile()?.features?.customBranding ? 'bg-green-500' : 'bg-red-500'"
+              ></div>
+              <span class="text-sm">Custom Branding</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="store.profile()?.features?.apiAccess ? 'bg-green-500' : 'bg-red-500'"
+              ></div>
+              <span class="text-sm">API Access</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="store.profile()?.features?.bulkOperations ? 'bg-green-500' : 'bg-red-500'"
+              ></div>
+              <span class="text-sm">Bulk Operations</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full"
+                [class]="store.profile()?.features?.exportFeatures ? 'bg-green-500' : 'bg-red-500'"
+              ></div>
+              <span class="text-sm">Export Features</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-} @else {
-  <p class="text-center text-gray-400">Loading profile...</p>
+  </section>
 }

@@ -1,0 +1,52 @@
+/* Animated border glow */
+@keyframes borderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes dividerGlow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+.animate-border-glow {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.3),
+    transparent,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: borderGlow 5s linear infinite;
+  border-radius: inherit;
+}
+
+.animate-divider-glow {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  animation: dividerGlow 3.5s ease-in-out infinite;
+}

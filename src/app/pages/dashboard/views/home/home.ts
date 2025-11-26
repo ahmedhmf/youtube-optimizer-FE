@@ -2,14 +2,11 @@ import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { JobStatusService } from '../../../../services/job-status.service';
 import { interval, Subject, switchMap, takeUntil } from 'rxjs';
-import { TitleCasePipe } from '@angular/common';
 import type { UserJob } from '../../../../models/jobs/user-job.model';
-import type { RetryJobResponce } from '../../../../models/jobs/retry-job-responce.model';
-import type { CanceledJobResponse } from '../../../../models/jobs/canceled-job-responce.model';
 
 @Component({
   selector: 'app-home',
-  imports: [TitleCasePipe],
+  imports: [],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

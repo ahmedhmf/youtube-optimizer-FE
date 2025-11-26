@@ -4,10 +4,11 @@ import { ApiService } from '../../../../services/api';
 import { videoAuditsStore } from '../../../../stores/video-audits.store';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-history',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, RouterLink],
   templateUrl: './history.html',
   styleUrl: './history.scss',
 })
@@ -61,19 +62,27 @@ export class History implements OnInit {
   protected loadNextPage(): void {
     const currentPagination = this.pagination();
     if (currentPagination.hasNext) {
-      this.loadHistory(currentPagination.page + 1, false);
+      this.goToPage(currentPagination.page + 1);
     }
   }
 
   protected loadPreviousPage(): void {
     const currentPagination = this.pagination();
     if (currentPagination.hasPrev) {
-      this.loadHistory(currentPagination.page - 1, true);
+      this.goToPage(currentPagination.page - 1);
     }
   }
 
   protected goToPage(page: number): void {
     this.loadHistory(page, true);
+  }
+
+  protected goToFirstPage(): void {
+    this.goToPage(1);
+  }
+  protected goToLastPage(): void {
+    const totalPages = this.pagination().totalPages;
+    this.goToPage(totalPages);
   }
 
   protected deleteAudit(id: string): void {

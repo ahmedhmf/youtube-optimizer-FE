@@ -1,19 +1,19 @@
 /* filepath: c:\Ahmed\projects\Github\youtube-optimizer-FE\src\styles.scss */
-@use "tailwindcss";
+@use 'tailwindcss';
 
 @theme {
   /* Primary Colors */
   --color-primary: #c5a8ff;
-  --color-primary-light: #E8D8FF;
+  --color-primary-light: #e8d8ff;
 
   /* Background Colors */
-  --color-background-light: #F9F9FF;
+  --color-background-light: #f9f9ff;
   --color-background-dark: #160f23;
 
   /* Text Colors */
-  --color-text-light: #1A1A2E;
-  --color-text-dark: #F9F9FF;
-  --color-text-secondary-light: #6D6D80;
+  --color-text-light: #1a1a2e;
+  --color-text-dark: #f9f9ff;
+  --color-text-secondary-light: #6d6d80;
   --color-text-secondary-dark: #b0b0c0;
 
   /* Border Colors */
@@ -21,8 +21,8 @@
   --color-border-dark: #3a3a5a;
 
   /* Font Family */
-  --font-family-display: "Special Gothic Expanded One", sans-serif;
-  --font-family-sans: "Montserrat", sans-serif;
+  --font-family-display: 'Special Gothic Expanded One', sans-serif;
+  --font-family-sans: 'Montserrat', sans-serif;
   /* Border Radius */
   --radius: 0.25rem;
   --radius-lg: 0.5rem;
@@ -39,7 +39,7 @@
 
   .btn-primary:hover {
     @apply transform -translate-y-0.5;
-    background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+    background-color: color-mix(in srgb, var(--color-secondary-dark) 80%, black);
   }
 
   .card {
@@ -116,21 +116,10 @@
   }
 }
 
-/* Base Styles */
-@layer base {
-  body, p {
-    font-family: var(--font-family-sans);
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-family-display);
-  }
-}
-
 /* Utility Classes */
 @layer utilities {
   .font-display {
-    font-family: var(--font-family-display);
+    // font-family: var(--font-family-display);
   }
 
   .rounded-default {
@@ -154,21 +143,24 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-light)));
+    background: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-light))
+    );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 }
 
-
 .font-primary {
   font-family: var(--font-family-sans), monospace;
 }
 
-
 @keyframes float1 {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -177,7 +169,8 @@
 }
 
 @keyframes float2 {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -186,7 +179,8 @@
 }
 
 @keyframes float3 {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -195,19 +189,27 @@
 }
 
 .animate-fade-in-up-float {
-  animation: fadeInUp 1s forwards, float1 6s ease-in-out 1s infinite;
+  animation:
+    fadeInUp 1s forwards,
+    float1 6s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(2) {
-  animation: fadeInUp 1s forwards, float2 7s ease-in-out 1s infinite;
+  animation:
+    fadeInUp 1s forwards,
+    float2 7s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(3) {
-  animation: fadeInUp 1s forwards, float3 5s ease-in-out 1s infinite;
+  animation:
+    fadeInUp 1s forwards,
+    float3 5s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(4) {
-  animation: fadeInUp 1s forwards, float1 6s ease-in-out 1s infinite;
+  animation:
+    fadeInUp 1s forwards,
+    float1 6s ease-in-out 1s infinite;
 }
 
 @keyframes fadeInUp {
@@ -239,7 +241,3 @@
     transform: translateY(0);
   }
 }
-
-
-
-
