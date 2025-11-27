@@ -1,7 +1,8 @@
 import { inject } from '@angular/core';
-import type { HttpInterceptorFn } from '@angular/common/http';
+import type { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http';
 import { switchMap, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { throwError, from } from 'rxjs';
+import type { Observable } from 'rxjs';
 import { AuthService } from '../services/auth/auth.service';
 
 /**
@@ -10,7 +11,7 @@ import { AuthService } from '../services/auth/auth.service';
  * Automatically adds JWT access tokens to authenticated requests
  * - Intercepts all outgoing HTTP requests
  * - Adds Authorization header with Bearer token
- * - Handles token refresh for expired tokens
+ * - Handles token refresh for expired tokens (401 errors)
  * - Manages authentication failures and logout
  */
 export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
@@ -37,17 +38,55 @@ export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      return next(authenticatedRequest);
+      
+      return next(authenticatedRequest).pipe(
+        catchError((error: HttpErrorResponse) => {
+          // Handle 401 errors by attempting token refresh
+          if (error.status === HTTP_UNAUTHORIZED && !request.url.includes('/auth/refresh')) {
+            return handleTokenRefresh(request, next, authService);
+          }
+
+          if (error.status === HTTP_FORBIDDEN) {
+            authService.forceLogout();
+          }
+
+          return throwError(() => error);
+        }),
+      );
     }),
     catchError((error) => {
-      if (error.status === HTTP_UNAUTHORIZED || error.status === HTTP_FORBIDDEN) {
-        authService.forceLogout();
-      }
-
+      // Initial token fetch failed
+      authService.forceLogout();
       return throwError(() => error);
     }),
   );
 };
+
+/**
+ * Handle token refresh and retry original request
+ */
+function handleTokenRefresh(
+  request: HttpRequest<unknown>,
+  next: Parameters<HttpInterceptorFn>[1],
+  authService: AuthService,
+): Observable<HttpEvent<unknown>> {
+  return from(authService.getValidAccessToken()).pipe(
+    switchMap((newAccessToken) => {
+      // Retry original request with new token
+      const retryRequest = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+      });
+      return next(retryRequest);
+    }),
+    catchError((refreshError) => {
+      // Refresh failed - logout user
+      authService.forceLogout();
+      return throwError(() => refreshError);
+    }),
+  );
+}
 
 /**
  * Check if JWT should be skipped for this URL
@@ -57,6 +96,7 @@ function shouldSkipJwt(url: string): boolean {
     '/auth/login',
     '/auth/register',
     '/auth/refresh',
+    '/auth/csrf-token',
     '/csrf/token',
     '/public/',
     '/login',

@@ -24,11 +24,13 @@ export class OAuthCallback implements OnInit {
   private readonly REDIRECT_DELAY = 2000;
 
   public ngOnInit(): void {
-    // Backend should redirect here with query params after successful OAuth
+    // Backend redirects here with tokens in query params after successful OAuth
     this.route.queryParams.subscribe((params) => {
       const success = params['success'];
       const error = params['error'];
       const state = params['state'];
+      const accessToken = params['access_token'];
+      const refreshToken = params['refresh_token'];
 
       // Validate state for CSRF protection
       const storedState = sessionStorage.getItem('oauth_state');
@@ -54,8 +56,11 @@ export class OAuthCallback implements OnInit {
         return;
       }
 
-      if (success === 'true') {
-        // Backend has already set the session cookie and access token
+      if (success === 'true' && accessToken && refreshToken) {
+        // Save tokens from OAuth callback
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
+
         // Re-initialize auth state to load user info
         this.message = 'Loading your account...';
 
