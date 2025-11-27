@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { userProfileStore } from '../../../../stores/dashboard/user-profile.store';
 import { DatePipe } from '@angular/common';
-import { ResetPasswordModal } from '../../../../ui-components/reset-password-modal/reset-password-modal';
+import { ResetPasswordModal } from './reset-password-modal/reset-password-modal';
 
 @Component({
   selector: 'app-profile',

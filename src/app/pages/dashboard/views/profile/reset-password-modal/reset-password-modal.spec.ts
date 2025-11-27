@@ -1,6 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
-import { ResetPasswordModal } from '../../pages/dashboard/views/profile/reset-password-modal/reset-password-modal';
+import { ResetPasswordModal } from './reset-password-modal';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ResetPasswordModal', () => {

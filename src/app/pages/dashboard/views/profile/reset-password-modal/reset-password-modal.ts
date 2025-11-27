@@ -2,11 +2,11 @@ import { Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { CsrfService } from '../../services/auth/csrf.service';
-import type { ResetPasswordResponse } from '../../models/auth/reset-password-request.type';
+import { environment } from '../../../../../../environments/environment';
+import { CsrfService } from '../../../../../services/auth/csrf.service';
+import type { ResetPasswordResponse } from '../../../../../models/auth/reset-password-request.type';
 
 @Component({
   selector: 'app-reset-password-modal',
@@ -54,7 +54,6 @@ export class ResetPasswordModal {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    // Validation
     if (!this.currentPassword() || !this.newPassword() || !this.confirmPassword()) {
       this.errorMessage.set('All fields are required');
       return;
@@ -85,8 +84,8 @@ export class ResetPasswordModal {
             'X-CSRF-Token': csrfToken,
           };
 
-          return this.http.post<ResetPasswordResponse>(
-            `${environment.backendURL}/auth/reset-password`,
+          return this.http.put<ResetPasswordResponse>(
+            `${environment.backendURL}/auth/change-password`,
             {
               currentPassword: this.currentPassword(),
               newPassword: this.newPassword(),
