@@ -53,7 +53,7 @@ export class CoreTab {
       });
 
     // this.http
-    //   .patch<UserData>(`${environment.backendURL}/admin/users/${this.store.user().id}`, {
+    //   .patch<UserData>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}`, {
     //     [field]: value,
     //   })
     //   .subscribe({

@@ -14,7 +14,7 @@ export class JobStatusService {
   private readonly http = inject(HttpClient);
   private readonly retryService = inject(RetryService);
 
-  private readonly API_BASE = `${environment.backendURL}/analyze`;
+  private readonly API_BASE = `${environment.backendURL}/api/v1/analyze`;
 
   /**
    * Get user jobs with retry logic - jobs list should load reliably

@@ -15,7 +15,7 @@ export class Control {
   public resetLimits(): void {
     // TODO: Add confirmation UI in template instead of inline confirmation
     // this.http
-    //   .post(`${environment.backendURL}/admin/users/${this.store.user().id}/reset-limits`, {})
+    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/reset-limits`, {})
     //   .subscribe({
     //     next: () => {
     //       this.showSuccess('Limits reset successfully');
@@ -32,7 +32,7 @@ export class Control {
     //   return;
     // }
     //   this.http
-    //     .post(`${environment.backendURL}/admin/users/${this.store.user().id}/bonus-credits`, {
+    //     .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/bonus-credits`, {
     //       credits: this.bonusCredits,
     //     })
     //     .subscribe({
@@ -53,7 +53,7 @@ export class Control {
     // }
     // // TODO: Add confirmation modal
     // this.http
-    //   .post(`${environment.backendURL}/admin/users/${this.store.user().id}/suspend`, {})
+    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/suspend`, {})
     //   .subscribe({
     //     next: () => {
     //       this.showSuccess('User suspended successfully');
@@ -72,7 +72,7 @@ export class Control {
     //   return;
     // }
     // this.http
-    //   .post(`${environment.backendURL}/admin/users/${this.store.user().id}/activate`, {})
+    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/activate`, {})
     //   .subscribe({
     //     next: () => {
     //       this.showSuccess('User activated successfully');
@@ -91,7 +91,7 @@ export class Control {
     // this.http
     //   .post<{
     //     token: string;
-    //   }>(`${environment.backendURL}/admin/users/${this.store.user().id}/impersonate`, {})
+    //   }>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/impersonate`, {})
     //   .subscribe({
     //     next: (response) => {
     //       // Store impersonation token and redirect

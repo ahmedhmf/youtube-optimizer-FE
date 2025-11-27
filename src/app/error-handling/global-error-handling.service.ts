@@ -246,7 +246,7 @@ export class GlobalErrorHandler implements ErrorHandler {
     };
 
     // Fire and forget - don't handle errors from error reporting
-    fetch(`${environment.backendURL}/errors/report`, {
+    fetch(`${environment.backendURL}/api/v1/errors/report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(errorReport),

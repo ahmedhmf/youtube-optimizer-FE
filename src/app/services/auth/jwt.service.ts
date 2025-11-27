@@ -130,7 +130,7 @@ export class JwtService {
         };
 
         return this.http.post<JwtRefreshResponse>(
-          `${environment.backendURL}/auth/refresh`,
+          `${environment.backendURL}/api/v1/auth/refresh`,
           { refreshToken: storedRefreshToken },
           {
             headers,
@@ -175,7 +175,7 @@ export class JwtService {
     if (storedAccessToken && storedRefreshToken) {
       this.accessToken = storedAccessToken;
       this.refreshToken = storedRefreshToken;
-      
+
       try {
         const decoded = this.decodeJwtToken(storedAccessToken);
         this.userInfoSubject.next(decoded);

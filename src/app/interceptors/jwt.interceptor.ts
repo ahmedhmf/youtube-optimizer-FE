@@ -1,5 +1,10 @@
 import { inject } from '@angular/core';
-import type { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpEvent } from '@angular/common/http';
+import type {
+  HttpInterceptorFn,
+  HttpErrorResponse,
+  HttpRequest,
+  HttpEvent,
+} from '@angular/common/http';
 import { switchMap, catchError } from 'rxjs/operators';
 import { throwError, from } from 'rxjs';
 import type { Observable } from 'rxjs';
@@ -38,7 +43,7 @@ export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      
+
       return next(authenticatedRequest).pipe(
         catchError((error: HttpErrorResponse) => {
           // Handle 401 errors by attempting token refresh

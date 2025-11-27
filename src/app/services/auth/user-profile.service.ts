@@ -17,7 +17,7 @@ export class UserProfileService {
    */
   public fetchProfile(): Observable<UserProfile> {
     return this.http
-      .get<UserProfile>(`${environment.backendURL}/auth/profile/subscription`, {
+      .get<UserProfile>(`${environment.backendURL}/api/v1/auth/profile/subscription`, {
         withCredentials: true,
       })
       .pipe(

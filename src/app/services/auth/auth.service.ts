@@ -135,7 +135,7 @@ export class AuthService {
         };
 
         return this.http.post<AuthResponse>(
-          `${environment.backendURL}/auth/register`,
+          `${environment.backendURL}/api/v1/auth/register`,
           registerData,
           {
             headers,
@@ -177,10 +177,14 @@ export class AuthService {
           'X-CSRF-Token': csrfToken,
         };
 
-        return this.http.post<AuthResponse>(`${environment.backendURL}/auth/login`, loginData, {
-          headers,
-          withCredentials: true,
-        });
+        return this.http.post<AuthResponse>(
+          `${environment.backendURL}/api/v1/auth/login`,
+          loginData,
+          {
+            headers,
+            withCredentials: true,
+          },
+        );
       }),
       tap((response) => {
         if (response.accessToken) {
@@ -217,7 +221,7 @@ export class AuthService {
         };
 
         return this.http.post<LogoutResponse>(
-          `${environment.backendURL}/auth/logout`,
+          `${environment.backendURL}/api/v1/auth/logout`,
           {},
           {
             headers,

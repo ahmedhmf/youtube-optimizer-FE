@@ -32,7 +32,7 @@ export class CsrfService {
     this.clearToken();
 
     this.tokenRequest$ = this.http
-      .get<CsrfResponse>(`${environment.backendURL}/auth/csrf-token`, {
+      .get<CsrfResponse>(`${environment.backendURL}/api/v1/auth/csrf-token`, {
         withCredentials: true,
       })
       .pipe(
@@ -84,7 +84,7 @@ export class CsrfService {
       return this.tokenRequest$;
     }
     this.tokenRequest$ = this.http
-      .get<CsrfResponse>(`${environment.backendURL}/auth/csrf-token`, {
+      .get<CsrfResponse>(`${environment.backendURL}/api/v1/auth/csrf-token`, {
         withCredentials: true,
       })
       .pipe(

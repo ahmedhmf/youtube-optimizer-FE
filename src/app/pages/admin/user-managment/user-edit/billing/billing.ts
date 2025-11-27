@@ -15,7 +15,7 @@ export class Billing {
 
   // public loadBillingInfo(userId: string): void {
   //   this.http
-  //     .get<BillingInfo>(`${environment.backendURL}/admin/users/${userId}/billing`)
+  //     .get<BillingInfo>(`${environment.backendURL}/api/v1/admin/users/${userId}/billing`)
   //     .subscribe({
   //       next: (data) => {
   //         this.billingInfo = data;
@@ -31,7 +31,7 @@ export class Billing {
   //         };
   //       },
   //     });
-  //   this.http.get<Invoice[]>(`${environment.backendURL}/admin/users/${userId}/invoices`).subscribe({
+  //   this.http.get<Invoice[]>(`${environment.backendURL}/api/v1/admin/users/${userId}/invoices`).subscribe({
   //     next: (data) => {
   //       this.invoices = data;
   //     },

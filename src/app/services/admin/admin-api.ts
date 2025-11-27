@@ -27,7 +27,7 @@ export class AdminApi {
     }
 
     this.httpClient
-      .get<UserListResponse>(`${this.baseUrl}/admin/users`, {
+      .get<UserListResponse>(`${this.baseUrl}/api/v1/admin/users`, {
         params: requestParams,
         withCredentials: true,
       })

@@ -85,7 +85,7 @@ export class ResetPasswordModal {
           };
 
           return this.http.put<ResetPasswordResponse>(
-            `${environment.backendURL}/auth/change-password`,
+            `${environment.backendURL}/api/v1/auth/change-password`,
             {
               currentPassword: this.currentPassword(),
               newPassword: this.newPassword(),

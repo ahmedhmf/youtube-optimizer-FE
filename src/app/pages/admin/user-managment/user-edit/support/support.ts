@@ -14,7 +14,7 @@ export class Support {
   private readonly adminUserService = inject(AdminUserService);
 
   public loadAdminNotes(userId: string): void {
-    // this.http.get<AdminNote[]>(`${environment.backendURL}/admin/users/${userId}/notes`).subscribe({
+    // this.http.get<AdminNote[]>(`${environment.backendURL}/api/v1/admin/users/${userId}/notes`).subscribe({
     //   next: (data) => {
     //     this.adminNotes = data;
     //   },
@@ -37,7 +37,7 @@ export class Support {
     //   return;
     // }
     // this.http
-    //   .post<AdminNote>(`${environment.backendURL}/admin/users/${this.store.user().id}/notes`, {
+    //   .post<AdminNote>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/notes`, {
     //     note: this.newNote,
     //   })
     //   .subscribe({
@@ -53,7 +53,7 @@ export class Support {
   }
 
   public loadErrorLogs(userId: string): void {
-    // this.http.get<ErrorLog[]>(`${environment.backendURL}/admin/users/${userId}/errors`).subscribe({
+    // this.http.get<ErrorLog[]>(`${environment.backendURL}/api/v1/admin/users/${userId}/errors`).subscribe({
     //   next: (data) => {
     //     this.errorLogs = data;
     //   },
@@ -78,7 +78,7 @@ export class Support {
     //   return;
     // }
     // this.http
-    //   .post(`${environment.backendURL}/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
+    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
     //   .subscribe({
     //     next: () => {
     //       this.showSuccess('Video analysis rerun successfully');

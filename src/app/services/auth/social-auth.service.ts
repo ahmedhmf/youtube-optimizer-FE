@@ -17,7 +17,7 @@ export class SocialAuthService {
    */
   public async initiateGoogleOAuth(): Promise<void> {
     try {
-      const response = await fetch(`${environment.backendURL}/auth/social/google/url`);
+      const response = await fetch(`${environment.backendURL}/api/v1/auth/social/google/url`);
 
       if (!response.ok) {
         throw new Error(`Failed to get OAuth URL: ${response.statusText}`);
@@ -41,7 +41,7 @@ export class SocialAuthService {
     };
 
     return this.http
-      .post<SocialAuthResponse>(`${environment.backendURL}/auth/social/google`, payload)
+      .post<SocialAuthResponse>(`${environment.backendURL}/api/v1/auth/social/google`, payload)
       .pipe(
         catchError(() => {
           return throwError(() => new Error('Failed to sign in with Google'));

@@ -45,7 +45,7 @@ export class Monitoring implements OnInit {
     this.store.setIsSaving(true);
 
     // this.http
-    //   .patch<UserData>(`${environment.backendURL}/admin/users/${this.store.user().id}`, {
+    //   .patch<UserData>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}`, {
     //     [field]: value,
     //   })
     //   .subscribe({
@@ -67,7 +67,7 @@ export class Monitoring implements OnInit {
     }
 
     // this.http
-    //   .post(`${environment.backendURL}/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
+    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
     //   .subscribe({
     //     next: () => {
     //       this.showSuccess('Video analysis rerun successfully');
