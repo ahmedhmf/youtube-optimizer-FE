@@ -5,12 +5,14 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "npm run generate-env && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:debug": "jest --detectOpenHandles",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "generate-env": "tsx scripts/generate-env.ts"
   },
   "prettier": {
     "printWidth": 100,
@@ -61,6 +63,7 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.17",
     "ts-jest": "^29.4.5",
+    "tsx": "^4.20.6",
     "typescript": "~5.9.2",
     "typescript-eslint": "8.46.2"
   }
