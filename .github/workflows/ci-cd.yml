@@ -56,6 +56,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Install dependencies (if cache missed)
+        run: npm ci
+
       - name: Run ESLint
         run: npm run lint
 
@@ -79,6 +82,9 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache missed)
+        run: npm ci
 
       - name: Run tests with coverage
         run: npm run test:coverage
