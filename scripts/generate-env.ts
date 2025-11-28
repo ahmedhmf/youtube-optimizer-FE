@@ -21,6 +21,8 @@ const envFile = `export const environment = {
 };
 `;
 
+// For production, create environment.ts
+// For development, create environment.development.ts
 const targetPath = isProd
   ? resolve(__dirname, '../src/environments/environment.ts')
   : resolve(__dirname, '../src/environments/environment.development.ts');
