@@ -7,7 +7,7 @@ import type {
 import { inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { throwError } from 'rxjs';
-import { catchError, switchMap, retry } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { CsrfService } from '../services/auth/csrf.service';
 
 /**
@@ -69,7 +69,9 @@ export const csrfInterceptor: HttpInterceptorFn = (
  */
 function isCsrfError(error: HttpErrorResponse): boolean {
   // Common CSRF error indicators
-  const csrfErrorCodes = [403, 419];
+  const forbiddenStatus = 403;
+  const csrfStatus = 419;
+  const csrfErrorCodes = [forbiddenStatus, csrfStatus];
   const csrfErrorMessages = [
     'csrf',
     'token',
