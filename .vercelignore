@@ -1,0 +1,8 @@
+# Vercel
+
+\*.vercel.app
+!vercel.json
+
+# Ignore everything - let GitHub Actions handle deployments
+
+enabled = false
