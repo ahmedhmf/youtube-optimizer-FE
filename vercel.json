@@ -1,23 +1,13 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/youtube-optimizer-fe/browser"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
   "buildCommand": "npm run build:prod",
-  "devCommand": "npm run start",
+  "outputDirectory": "dist/youtube-optimizer-fe/browser",
   "installCommand": "npm ci",
+  "devCommand": "npm run start",
   "framework": null,
-  "outputDirectory": "dist/youtube-optimizer-fe/browser"
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
