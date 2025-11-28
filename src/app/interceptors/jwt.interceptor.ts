@@ -101,8 +101,6 @@ function shouldSkipJwt(url: string): boolean {
     '/auth/login',
     '/auth/register',
     '/auth/refresh',
-    '/auth/csrf-token',
-    '/csrf/token',
     '/public/',
     '/login',
     '/register',
