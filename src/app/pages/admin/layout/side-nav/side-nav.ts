@@ -7,4 +7,5 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './side-nav.html',
   styleUrl: './side-nav.scss',
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class SideNav {}

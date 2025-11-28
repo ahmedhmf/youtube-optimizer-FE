@@ -189,7 +189,21 @@ export class AnalyzeUrl {
 
     if (event.dataTransfer?.files.length) {
       const file = event.dataTransfer.files[0];
-      this.onFileSelected({ target: { files: [file] } } as any);
+
+      if (!this.isValidFileType(file)) {
+        throw new Error(
+          `Invalid file type. Please select a video file (${this.VALID_VIDEO_TYPES.map((type) => type.split('/')[1].toUpperCase()).join(', ')})`,
+        );
+      }
+      if (!this.isValidFileSize(file)) {
+        throw new Error(
+          `File size too large. Maximum allowed size is ${this.MAX_FILE_SIZE / (this.SIZE_1024 * this.SIZE_1024)}MB. Your file is ${(file.size / (this.SIZE_1024 * this.SIZE_1024)).toFixed(2)}MB`,
+        );
+      }
+      if (file.size === 0) {
+        throw new Error('The selected file appears to be empty or corrupted');
+      }
+      this.selectedFile.set(file);
     }
   }
 

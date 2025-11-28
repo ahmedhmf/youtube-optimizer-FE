@@ -48,7 +48,7 @@ export class Login {
     this.socialLoginLoading.set(true);
     this.error.set(null);
 
-    this.socialAuthService.initiateGoogleOAuth().catch((err) => {
+    this.socialAuthService.initiateGoogleOAuth().catch(() => {
       this.socialLoginLoading.set(false);
       this.error.set({
         message: 'Failed to start Google authentication. Please try again.',

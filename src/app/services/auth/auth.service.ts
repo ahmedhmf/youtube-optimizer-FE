@@ -123,93 +123,91 @@ export class AuthService {
    * Register new user account
    */
   public register(registerData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
-      `${environment.backendURL}/api/v1/auth/register`,
-      registerData,
-      {
+    return this.http
+      .post<AuthResponse>(`${environment.backendURL}/api/v1/auth/register`, registerData, {
         withCredentials: true,
-      },
-    ).pipe(
-      tap((response) => {
-        if (response.accessToken) {
-          this.jwtService.storeTokens(
-            response.accessToken,
-            response.expiresIn,
-            response.refreshToken,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.jwtService.storeTokens(
+              response.accessToken,
+              response.expiresIn,
+              response.refreshToken,
+            );
+            this.isAuthenticatedSubject.next(true);
+          }
+        }),
+        switchMap((response) => {
+          return this.userProfileService.fetchProfile().pipe(
+            map(() => response),
+            catchError(() => {
+              return of(response);
+            }),
           );
-          this.isAuthenticatedSubject.next(true);
-        }
-      }),
-      switchMap((response) => {
-        return this.userProfileService.fetchProfile().pipe(
-          map(() => response),
-          catchError(() => {
-            return of(response);
-          }),
-        );
-      }),
-      catchError((error) => {
-        return throwError(() => new Error(`Registration failed: ${error.message}`));
-      }),
-    );
+        }),
+        catchError((error) => {
+          return throwError(() => new Error(`Registration failed: ${error.message}`));
+        }),
+      );
   }
 
   /**
    * Login user with email and password
    */
   public login(loginData: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
-      `${environment.backendURL}/api/v1/auth/login`,
-      loginData,
-      {
+    return this.http
+      .post<AuthResponse>(`${environment.backendURL}/api/v1/auth/login`, loginData, {
         withCredentials: true,
-      },
-    ).pipe(
-      tap((response) => {
-        if (response.accessToken) {
-          this.jwtService.storeTokens(
-            response.accessToken,
-            response.expiresIn,
-            response.refreshToken,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.jwtService.storeTokens(
+              response.accessToken,
+              response.expiresIn,
+              response.refreshToken,
+            );
+            this.isAuthenticatedSubject.next(true);
+          }
+        }),
+        switchMap((response) => {
+          return this.userProfileService.fetchProfile().pipe(
+            map(() => response),
+            catchError(() => {
+              return of(response);
+            }),
           );
-          this.isAuthenticatedSubject.next(true);
-        }
-      }),
-      switchMap((response) => {
-        return this.userProfileService.fetchProfile().pipe(
-          map(() => response),
-          catchError(() => {
-            return of(response);
-          }),
-        );
-      }),
-      catchError((error) => {
-        return throwError(() => new Error(`Login failed: ${error.message}`));
-      }),
-    );
+        }),
+        catchError((error) => {
+          return throwError(() => new Error(`Login failed: ${error.message}`));
+        }),
+      );
   }
 
   /**
    * Logout current user
    */
   public logout(): Observable<boolean> {
-    return this.http.post<LogoutResponse>(
-      `${environment.backendURL}/api/v1/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      },
-    ).pipe(
-      tap(() => {
-        this.clearAuthenticationState();
-        void this.router.navigate(['/']);
-      }),
-      map((response) => response.success),
-      catchError(() => {
-        this.clearAuthenticationState();
-        return of(true);
-      }),
-    );
+    return this.http
+      .post<LogoutResponse>(
+        `${environment.backendURL}/api/v1/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap(() => {
+          this.clearAuthenticationState();
+          void this.router.navigate(['/']);
+        }),
+        map((response) => response.success),
+        catchError(() => {
+          this.clearAuthenticationState();
+          return of(true);
+        }),
+      );
   }
 
   /**

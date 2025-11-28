@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './video-analysis.html',
   styleUrl: './video-analysis.scss',
 })
-export class VideoAnalysis {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class VideoAnalysis {}

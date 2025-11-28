@@ -3,6 +3,7 @@ import type {
   HttpRequest,
   HttpHandlerFn,
   HttpErrorResponse,
+  HttpEvent,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import type { Observable } from 'rxjs';
@@ -14,12 +15,11 @@ import { CsrfService } from '../services/auth/csrf.service';
  * 🛡️ CSRF Interceptor - BULLETPROOF VERSION
  *
  * Automatically adds CSRF tokens to protected requests
- * with retry logic and proper error handling
- */
+ * with retry logic and proper error handling*/
 export const csrfInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
-): Observable<any> => {
+): Observable<HttpEvent<unknown>> => {
   const csrfService = inject(CsrfService);
   if (!csrfService.needsCsrfProtection(req.method, req.url)) {
     return next(req);

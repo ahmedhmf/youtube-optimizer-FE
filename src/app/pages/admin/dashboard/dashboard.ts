@@ -8,12 +8,10 @@ import { DashboardValueCard } from '../../../ui-components/dashboard-value-card/
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  totalUsers = 0;
-  newUsersToday = 0;
-
-  totalVideos = 0;
-  videosToday = 0;
-
-  totalTokens = 0;
-  errors24h = 0;
+  protected totalUsers = 0;
+  protected newUsersToday = 0;
+  protected totalVideos = 0;
+  protected videosToday = 0;
+  protected totalTokens = 0;
+  protected errors24h = 0;
 }

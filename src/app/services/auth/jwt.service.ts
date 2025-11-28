@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { tap, catchError, map, switchMap } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import type { DecodedJwtToken } from '../../models/auth/decoded-jwt-token.type';
 import type { JwtRefreshResponse } from '../../models/auth/jwt-refresh-response.type';
@@ -121,26 +121,28 @@ export class JwtService {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    this.refreshRequest$ = this.http.post<JwtRefreshResponse>(
-      `${environment.backendURL}/api/v1/auth/refresh`,
-      { refreshToken: storedRefreshToken },
-      {
-        withCredentials: true,
-      },
-    ).pipe(
-      tap((response) => {
-        this.storeTokens(response.accessToken, response.expiresIn, response.refreshToken);
-      }),
-      map((response) => response.accessToken),
-      catchError((error) => {
-        this.clearTokens();
-        this.refreshRequest$ = null;
-        return throwError(() => new Error(`Token refresh failed: ${error.message}`));
-      }),
-      tap(() => {
-        this.refreshRequest$ = null;
-      }),
-    );
+    this.refreshRequest$ = this.http
+      .post<JwtRefreshResponse>(
+        `${environment.backendURL}/api/v1/auth/refresh`,
+        { refreshToken: storedRefreshToken },
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap((response) => {
+          this.storeTokens(response.accessToken, response.expiresIn, response.refreshToken);
+        }),
+        map((response) => response.accessToken),
+        catchError((error) => {
+          this.clearTokens();
+          this.refreshRequest$ = null;
+          return throwError(() => new Error(`Token refresh failed: ${error.message}`));
+        }),
+        tap(() => {
+          this.refreshRequest$ = null;
+        }),
+      );
 
     return this.refreshRequest$;
   }

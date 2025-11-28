@@ -163,7 +163,10 @@ export class Home implements OnInit, OnDestroy {
       });
   }
 
-  protected viewJobDetails(jobId: string): void {}
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  protected viewJobDetails(_jobId: string): void {
+    // Implement navigation to job details page if needed
+  }
 
   private isActiveJob(job: UserJob): boolean {
     return job.status === 'pending' || job.status === 'processing';
