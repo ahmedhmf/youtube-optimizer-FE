@@ -13,6 +13,7 @@ export type Notification = {
   link?: string;
   actionUrl?: string;
   actionButtonText?: string;
+  callback?: string;
   metadata?: Record<string, unknown>;
   createdAt: Date;
   readAt?: Date;

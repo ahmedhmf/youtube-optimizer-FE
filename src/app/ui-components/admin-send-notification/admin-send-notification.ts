@@ -13,6 +13,7 @@ type SendNotificationRequest = {
   link?: string;
   actionUrl?: string;
   actionButtonText?: string;
+  callback?: string;
   sendToAll?: boolean;
   severity: NotificationType;
 };
@@ -34,7 +35,14 @@ export class AdminSendNotificationComponent {
   protected readonly link = signal<string>('');
   protected readonly actionUrl = signal<string>('');
   protected readonly actionButtonText = signal<string>('');
+  protected readonly callback = signal<string>('');
   protected readonly sendToAll = signal<boolean>(false);
+  protected readonly availableCallbacks: string[] = [
+    'refreshVideoList',
+    'openSettings',
+    'reloadDashboard',
+    'showUpgradeModal',
+  ];
   protected readonly isLoading = signal<boolean>(false);
   protected readonly successMessage = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
@@ -117,6 +125,10 @@ export class AdminSendNotificationComponent {
       payload.actionButtonText = this.actionButtonText();
     }
 
+    if (this.callback()) {
+      payload.callback = this.callback();
+    }
+
     return payload;
   }
 
@@ -151,6 +163,7 @@ export class AdminSendNotificationComponent {
     this.link.set('');
     this.actionUrl.set('');
     this.actionButtonText.set('');
+    this.callback.set('');
     this.sendToAll.set(false);
   }
 }
