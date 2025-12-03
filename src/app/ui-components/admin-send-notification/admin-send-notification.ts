@@ -11,6 +11,8 @@ type SendNotificationRequest = {
   message: string;
   priority: NotificationPriority;
   link?: string;
+  actionUrl?: string;
+  actionButtonText?: string;
   sendToAll?: boolean;
   severity: NotificationType;
 };
@@ -30,6 +32,8 @@ export class AdminSendNotificationComponent {
   protected readonly message = signal<string>('');
   protected readonly priority = signal<NotificationPriority>('medium');
   protected readonly link = signal<string>('');
+  protected readonly actionUrl = signal<string>('');
+  protected readonly actionButtonText = signal<string>('');
   protected readonly sendToAll = signal<boolean>(false);
   protected readonly isLoading = signal<boolean>(false);
   protected readonly successMessage = signal<string | null>(null);
@@ -105,6 +109,14 @@ export class AdminSendNotificationComponent {
       payload.link = this.link();
     }
 
+    if (this.actionUrl()) {
+      payload.actionUrl = this.actionUrl();
+    }
+
+    if (this.actionButtonText()) {
+      payload.actionButtonText = this.actionButtonText();
+    }
+
     return payload;
   }
 
@@ -137,6 +149,8 @@ export class AdminSendNotificationComponent {
     this.message.set('');
     this.priority.set('medium');
     this.link.set('');
+    this.actionUrl.set('');
+    this.actionButtonText.set('');
     this.sendToAll.set(false);
   }
 }

@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { JwtService } from './auth/jwt.service';
+import { notificationStore } from '../stores/notification.store';
 import type {
   Notification as AppNotification,
   NotificationResponse,
@@ -20,23 +21,24 @@ export class NotificationService {
 
   private readonly http = inject(HttpClient);
   private readonly jwtService = inject(JwtService);
+  private readonly store = inject(notificationStore);
   private socket: Socket | null = null;
-  private readonly unreadCountSubject = new BehaviorSubject<number>(0);
-  private readonly notificationsSubject = new BehaviorSubject<AppNotification[]>([]);
+  private readonly newNotificationSubject = new Subject<AppNotification>();
   private isConnected = false;
 
   /**
-   * Get unread notification count as observable
+   * Get new notification observable (for real-time updates)
    */
-  public getUnreadCount(): Observable<number> {
-    return this.unreadCountSubject.asObservable();
+  public getNewNotification(): Observable<AppNotification> {
+    return this.newNotificationSubject.asObservable();
   }
 
   /**
-   * Get notifications as observable
+   * Initialize notifications - load from API and setup WebSocket
    */
-  public getNotifications(): Observable<AppNotification[]> {
-    return this.notificationsSubject.asObservable();
+  public initialize(): void {
+    this.store.setLoading(true);
+    this.connect();
   }
 
   /**
@@ -121,23 +123,15 @@ export class NotificationService {
   /**
    * Mark notification as read
    */
-  public markAsRead(notificationId: string): Observable<{ success: boolean }> {
-    return this.http.patch<{ success: boolean }>(
-      `${environment.backendURL}/api/v1/notifications/${notificationId}/read`,
-      {},
-      { withCredentials: true },
-    );
+  public markAsRead(notificationId: string): void {
+    this.socket?.emit('mark-as-read', { notificationId });
   }
 
   /**
    * Mark all notifications as read
    */
-  public markAllAsRead(): Observable<{ success: boolean; updatedCount: number }> {
-    return this.http.patch<{ success: boolean; updatedCount: number }>(
-      `${environment.backendURL}/api/v1/notifications/read-all`,
-      {},
-      { withCredentials: true },
-    );
+  public markAllAsRead(): void {
+    this.socket?.emit('mark-all-as-read');
   }
 
   /**
@@ -175,11 +169,17 @@ export class NotificationService {
     });
 
     this.socket.on('unread-count', (data: UnreadCountData) => {
-      this.unreadCountSubject.next(data.count);
+      this.store.setUnreadCount(data.count);
     });
 
     this.socket.on('notification-read', (data: { notificationId: string }) => {
-      this.updateNotificationReadStatus(data.notificationId);
+      this.store.markAsReadLocal(data.notificationId);
+    });
+
+    this.socket.on('initial-notifications', (data) => {
+      this.store.setNotifications(data.notifications);
+      this.store.setUnreadCount(data.unreadCount);
+      this.store.setLoading(false);
     });
   }
 
@@ -187,26 +187,11 @@ export class NotificationService {
    * Handle new notification
    */
   private handleNewNotification(notification: AppNotification): void {
-    const currentNotifications = this.notificationsSubject.value;
-    this.notificationsSubject.next([notification, ...currentNotifications]);
-    this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
+    this.store.addNotification(notification);
+    this.newNotificationSubject.next(notification);
 
     // Show browser notification if permission granted
     this.showBrowserNotification(notification);
-  }
-
-  /**
-   * Update notification read status in local state
-   */
-  private updateNotificationReadStatus(notificationId: string): void {
-    const currentNotifications = this.notificationsSubject.value;
-    const updatedNotifications = currentNotifications.map((n) =>
-      n.id === notificationId ? { ...n, isRead: true, readAt: new Date() } : n,
-    );
-    this.notificationsSubject.next(updatedNotifications);
-
-    const unreadCount = updatedNotifications.filter((n) => !n.isRead).length;
-    this.unreadCountSubject.next(unreadCount);
   }
 
   /**

@@ -1,0 +1,60 @@
+<div class="fixed top-6 right-6 z-50">
+  @for (notification of store.unreadNotifications(); track notification.id) {
+    <div
+      class="flex items-start gap-3 bg-[#1F201D] text-gray-200 px-5 py-4 rounded-xl shadow-xl border border-zinc-800 w-[420px]"
+    >
+      <div
+        class="flex items-center justify-center h-10 w-10 rounded-full"
+        [class]="getNotificationStyle(notification.severity)"
+      >
+        @switch (notification.severity) {
+          @case ('success') {
+            <span class="material-symbols-outlined"> check </span>
+          }
+          @case ('error') {
+            <span class="material-symbols-outlined"> error </span>
+          }
+          @case ('warning') {
+            <span class="material-symbols-outlined"> warning </span>
+          }
+          @case ('info') {
+            <span class="material-symbols-outlined"> info </span>
+          }
+        }
+      </div>
+
+      <!-- Text -->
+      <div class="flex-1">
+        <p class="font-semibold text-gray-100">
+          {{ notification.title }}
+        </p>
+        <p class="text-sm text-gray-400 mt-1">
+          {{ notification.message }}
+        </p>
+      </div>
+      @if (notification.actionUrl || notification.actionButtonText) {
+        <a
+          [routerLink]="notification.actionUrl"
+          class="px-3 py-1 text-sm rounded-md border border-gray-600/40 text-gray-300 hover:bg-gray-700/40 transition"
+        >
+          {{ notification.actionButtonText ?? 'Open' }}
+        </a>
+      }
+      <!-- Close Button -->
+      <button class="text-gray-500 hover:text-gray-300 transition" (click)="close(notification.id)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

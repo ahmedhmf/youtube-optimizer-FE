@@ -1,0 +1,130 @@
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { computed, inject } from '@angular/core';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { pipe, switchMap, tap } from 'rxjs';
+import { tapResponse } from '@ngrx/operators';
+import type { Notification } from '../models/notification.model';
+import { NotificationService } from '../services/notification.service';
+
+const DEFAULT_LIMIT = 20;
+
+type NotificationState = {
+  notifications: Notification[];
+  unreadCount: number;
+  isLoading: boolean;
+  error: string | null;
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+};
+
+const initialState: NotificationState = {
+  notifications: [],
+  unreadCount: 0,
+  isLoading: false,
+  error: null,
+  currentPage: 1,
+  totalPages: 1,
+  hasMore: true,
+};
+
+export const notificationStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+  withComputed((store) => ({
+    unreadNotifications: computed(() => store.notifications().filter((n) => !n.isRead)),
+    readNotifications: computed(() => store.notifications().filter((n) => n.isRead)),
+    hasUnread: computed(() => store.unreadCount() > 0),
+  })),
+  withMethods((store) => {
+    const notificationService = inject(NotificationService);
+
+    return {
+      initialize: (): void => {
+        notificationService.connect();
+        notificationService.getUnreadCount().subscribe((count) => {
+          patchState(store, { unreadCount: count });
+        });
+
+        notificationService.getNotifications().subscribe((notifications) => {
+          patchState(store, { notifications });
+        });
+      },
+      markAsRead: rxMethod<string>(
+        pipe(
+          switchMap((notificationId) =>
+            notificationService.markAsRead(notificationId).pipe(
+              tapResponse({
+                next: () => {
+                  const notifications = store
+                    .notifications()
+                    .map((n) =>
+                      n.id === notificationId ? { ...n, isRead: true, readAt: new Date() } : n,
+                    );
+                  const unreadCount = notifications.filter((n) => !n.isRead).length;
+                  patchState(store, { notifications, unreadCount });
+                },
+                error: (error: Error) => {
+                  console.error('Failed to mark notification as read:', error);
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+      markAllAsRead: rxMethod<undefined>(
+        pipe(
+          switchMap(() =>
+            notificationService.markAllAsRead().pipe(
+              tapResponse({
+                next: () => {
+                  const notifications = store.notifications().map((n) => ({
+                    ...n,
+                    isRead: true,
+                    readAt: new Date(),
+                  }));
+                  patchState(store, { notifications, unreadCount: 0 });
+                },
+                error: (error: Error) => {
+                  console.error('Failed to mark all as read:', error);
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+      deleteNotification: rxMethod<string>(
+        pipe(
+          switchMap((notificationId) =>
+            notificationService.deleteNotification(notificationId).pipe(
+              tapResponse({
+                next: () => {
+                  const notifications = store
+                    .notifications()
+                    .filter((n) => n.id !== notificationId);
+                  const unreadCount = notifications.filter((n) => !n.isRead).length;
+                  patchState(store, { notifications, unreadCount });
+                },
+                error: (error: Error) => {
+                  console.error('Failed to delete notification:', error);
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+      requestPermission: async (): Promise<void> => {
+        await notificationService.requestNotificationPermission();
+      },
+      disconnect: (): void => {
+        notificationService.disconnect();
+      },
+      clearAll: (): void => {
+        patchState(store, initialState);
+      },
+      updateNotifications: (notifications: Notification[]): void => {
+        patchState(store, { notifications });
+      },
+    };
+  }),
+);
