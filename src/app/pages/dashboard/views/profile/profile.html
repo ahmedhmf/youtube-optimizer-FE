@@ -200,6 +200,11 @@
       </div>
     </div>
 
+    <!-- AI Preferences Section -->
+    <div class="mt-6">
+      <app-ai-preferences />
+    </div>
+
     <!-- Reset Password Modal -->
     @if (showResetPasswordModal()) {
       <app-reset-password-modal (closeModal)="closeResetPasswordModal()" />

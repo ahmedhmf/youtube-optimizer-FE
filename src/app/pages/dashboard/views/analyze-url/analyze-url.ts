@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import type { AiSettings } from '../../../../models/ai-settings.model';
 import { ApiService } from '../../../../services/api';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import type { AIConfigurationSettings } from '../../../../models/language.model';
 import type { ApiError } from '../../../../models/api-error.model';
 import type { Audits } from '../../../../models/audits.model';
+import { JobQueueService, type JobEventData } from '../../../../services/job-queue.service';
 
 type TabType = {
   id: 'url' | 'upload' | 'text';
@@ -22,8 +23,11 @@ type TabType = {
   styleUrl: './analyze-url.scss',
   standalone: true,
 })
-export class AnalyzeUrl {
+export class AnalyzeUrl implements OnDestroy {
   protected readonly activeTab = signal<TabType['id']>('url');
+  protected readonly currentJobId = signal<string | null>(null);
+  protected readonly jobProgress = signal<number>(0);
+  protected readonly jobStage = signal<string>('');
   protected readonly tabs: TabType[] = [
     { id: 'url', label: 'YouTube URL', icon: 'link' },
     { id: 'upload', label: 'Upload Video', icon: 'upload_file' },
@@ -69,6 +73,7 @@ export class AnalyzeUrl {
     aiModel: 'midjourney',
   });
   private readonly api = inject(ApiService);
+  private readonly jobQueue = inject(JobQueueService);
   private readonly SIZE_1024 = 1024;
   private readonly MAX_FILE_SIZE = 209715200; // 200MB
   private readonly VALID_VIDEO_TYPES = [
@@ -228,6 +233,11 @@ export class AnalyzeUrl {
 
     this.showSettings.set(false);
     this.loading.set(true);
+    this.jobProgress.set(0);
+    this.jobStage.set('Initializing...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     const urlConfig: AiMessageConfiguration = {
       url: url,
@@ -238,11 +248,21 @@ export class AnalyzeUrl {
 
     this.api.analyzeVideoUrl(urlConfig).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (res && typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -264,14 +284,29 @@ export class AnalyzeUrl {
 
     this.loading.set(true);
     this.showSettings.set(false);
+    this.jobProgress.set(0);
+    this.jobStage.set('Uploading file...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     this.api.analyzeVideoUpload(file, this.settings()).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (res && typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -303,14 +338,29 @@ export class AnalyzeUrl {
 
     this.loading.set(true);
     this.showSettings.set(false);
+    this.jobProgress.set(0);
+    this.jobStage.set('Processing text...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     this.api.analyzeText(text, this.settings()).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (res && typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -360,5 +410,39 @@ export class AnalyzeUrl {
   private resetFileInput(): void {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput.value = '';
+  }
+
+  private trackJobProgress(jobId: string): void {
+    this.jobQueue.onJobEvent(jobId, (data: JobEventData) => {
+      this.jobProgress.set(data.progress);
+      
+      if (data.stage) {
+        this.jobStage.set(data.stage);
+      }
+
+      if (data.status === 'completed' && data.data) {
+        this.result = data.data.data as unknown as Audits;
+        this.loading.set(false);
+        this.jobProgress.set(100);
+        this.jobStage.set('Completed!');
+        this.currentJobId.set(null);
+      } else if (data.status === 'failed') {
+        this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
+        this.currentJobId.set(null);
+        const errorMessage = data.error ?? 'Analysis failed. Please try again.';
+        throw new Error(errorMessage);
+      } else if (data.status === 'cancelled') {
+        this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
+        this.currentJobId.set(null);
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.jobQueue.disconnect();
   }
 }

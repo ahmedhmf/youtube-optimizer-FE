@@ -31,7 +31,7 @@ export class Login {
   constructor() {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(this.MIN_PASSWORD_LENGTH)]],
+      password: ['', [Validators.required]],
     });
   }
 
@@ -60,23 +60,6 @@ export class Login {
   protected signInWithGitHub(): void {
     this.socialLoginLoading.set(true);
     this.error.set(null);
-  }
-
-  protected getFieldError(fieldName: string): string {
-    const field = this.form.get(fieldName);
-    if (field?.errors && field.touched) {
-      if (field.errors['required']) {
-        return `${this.getFieldDisplayName(fieldName)} is required`;
-      }
-      if (field.errors['email']) {
-        return 'Please enter a valid email address';
-      }
-      if (field.errors['minlength']) {
-        const requiredLength = field.errors['minlength'].requiredLength;
-        return `${this.getFieldDisplayName(fieldName)} must be at least ${requiredLength} characters`;
-      }
-    }
-    return '';
   }
 
   protected hasFieldError(fieldName: string): boolean {
@@ -123,13 +106,5 @@ export class Login {
         });
       },
     });
-  }
-
-  private getFieldDisplayName(fieldName: string): string {
-    const names: Record<string, string> = {
-      email: 'Email',
-      password: 'Password',
-    };
-    return names[fieldName] || fieldName;
   }
 }

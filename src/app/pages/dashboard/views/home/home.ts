@@ -1,8 +1,9 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { JobStatusService } from '../../../../services/job-status.service';
-import { interval, Subject, switchMap, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import type { UserJob } from '../../../../models/jobs/user-job.model';
+import { JobQueueService } from '../../../../services/job-queue.service';
 
 @Component({
   selector: 'app-home',
@@ -15,9 +16,9 @@ export class Home implements OnInit, OnDestroy {
   protected isLoading = false;
   private readonly cancellingJobs = new Set<string>();
   private readonly retryingJobs = new Set<string>();
-  private readonly autoRefresh = true;
   private readonly destroy$ = new Subject<void>();
   private readonly jobStatusService = inject(JobStatusService);
+  private readonly jobQueue = inject(JobQueueService);
 
   private readonly DAYS_IN_YEAR = 365;
   private readonly DAYS_IN_MONTH = 30;
@@ -28,12 +29,14 @@ export class Home implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.loadJobs();
-    this.startAutoRefresh();
+    this.jobQueue.connect();
+    this.setupJobEventListeners();
   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.jobQueue.disconnect();
   }
 
   protected loadJobs(): void {
@@ -55,27 +58,6 @@ export class Home implements OnInit, OnDestroy {
 
   protected refreshJobs(): void {
     this.loadJobs();
-  }
-
-  protected startAutoRefresh(): void {
-    interval(this.FIVE_SECONDS)
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(() => {
-          const hasActiveJobs = this.jobs.some((job) => this.isActiveJob(job));
-          return hasActiveJobs ? this.jobStatusService.getUserJobs() : [];
-        }),
-      )
-      .subscribe({
-        next: (jobs) => {
-          if (jobs.length > 0) {
-            this.jobs = jobs;
-          }
-        },
-        error: (error) => {
-          throw error;
-        },
-      });
   }
 
   protected cancelJob(jobId: string): void {
@@ -166,6 +148,33 @@ export class Home implements OnInit, OnDestroy {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   protected viewJobDetails(_jobId: string): void {
     // Implement navigation to job details page if needed
+  }
+
+  private setupJobEventListeners(): void {
+    // Listen for updates on all active jobs
+    this.jobs.forEach((job) => {
+      if (this.isActiveJob(job)) {
+        this.jobQueue.onJobEvent(job.id, (data) => {
+          this.updateJobInList(data);
+        });
+      }
+    });
+  }
+
+  private updateJobInList(eventData: { jobId: string; status: string; progress: number; data?: UserJob }): void {
+    const jobIndex = this.jobs.findIndex((j) => j.id === eventData.jobId);
+    if (jobIndex !== -1) {
+      // Update existing job
+      this.jobs[jobIndex] = {
+        ...this.jobs[jobIndex],
+        status: eventData.status,
+        progress: eventData.progress,
+        ...(eventData.data && { data: eventData.data.data }),
+      };
+    } else if (eventData.data) {
+      // Add new job if not in list
+      this.jobs.unshift(eventData.data);
+    }
   }
 
   private isActiveJob(job: UserJob): boolean {
