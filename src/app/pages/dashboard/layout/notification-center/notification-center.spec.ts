@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { NotificationCenter } from './notification-center';
 
@@ -8,9 +9,8 @@ describe('NotificationCenter', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NotificationCenter]
-    })
-    .compileComponents();
+      imports: [NotificationCenter],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NotificationCenter);
     component = fixture.componentInstance;

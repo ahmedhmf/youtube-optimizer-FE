@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './notification-center.html',
   styleUrl: './notification-center.scss',
 })
-export class NotificationCenter {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class NotificationCenter {}

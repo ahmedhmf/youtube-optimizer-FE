@@ -25,7 +25,6 @@ export class Home implements OnInit, OnDestroy {
   private readonly HOURES_IN_DAY = 24;
   private readonly MINUTES_PER_HOUR_SECONDS_PER_MIN = 60;
   private readonly MS_IN_SECONT = 1000;
-  private readonly FIVE_SECONDS = 5000;
 
   public ngOnInit(): void {
     this.loadJobs();

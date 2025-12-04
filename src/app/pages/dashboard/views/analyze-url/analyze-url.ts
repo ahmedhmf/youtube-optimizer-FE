@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
-import { Component, inject, signal, OnDestroy } from '@angular/core';
+import type { OnDestroy } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import type { AiSettings } from '../../../../models/ai-settings.model';
 import { ApiService } from '../../../../services/api';
@@ -75,6 +76,7 @@ export class AnalyzeUrl implements OnDestroy {
   private readonly api = inject(ApiService);
   private readonly jobQueue = inject(JobQueueService);
   private readonly SIZE_1024 = 1024;
+  private readonly PROGRESS_COMPLETE = 100;
   private readonly MAX_FILE_SIZE = 209715200; // 200MB
   private readonly VALID_VIDEO_TYPES = [
     'video/mp4',
@@ -115,6 +117,10 @@ export class AnalyzeUrl implements OnDestroy {
     } else {
       return 'Analyze Text';
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.jobQueue.disconnect();
   }
 
   protected setActiveTab(tabId: TabType['id']): void {
@@ -249,7 +255,7 @@ export class AnalyzeUrl implements OnDestroy {
     this.api.analyzeVideoUrl(urlConfig).subscribe({
       next: (res) => {
         // API returns jobId, not the result
-        if (res && typeof res === 'object' && 'jobId' in res) {
+        if (typeof res === 'object' && 'jobId' in res) {
           const jobId = (res as { jobId: string }).jobId;
           this.currentJobId.set(jobId);
           this.trackJobProgress(jobId);
@@ -293,7 +299,7 @@ export class AnalyzeUrl implements OnDestroy {
     this.api.analyzeVideoUpload(file, this.settings()).subscribe({
       next: (res) => {
         // API returns jobId, not the result
-        if (res && typeof res === 'object' && 'jobId' in res) {
+        if (typeof res === 'object' && 'jobId' in res) {
           const jobId = (res as { jobId: string }).jobId;
           this.currentJobId.set(jobId);
           this.trackJobProgress(jobId);
@@ -347,7 +353,7 @@ export class AnalyzeUrl implements OnDestroy {
     this.api.analyzeText(text, this.settings()).subscribe({
       next: (res) => {
         // API returns jobId, not the result
-        if (res && typeof res === 'object' && 'jobId' in res) {
+        if (typeof res === 'object' && 'jobId' in res) {
           const jobId = (res as { jobId: string }).jobId;
           this.currentJobId.set(jobId);
           this.trackJobProgress(jobId);
@@ -423,7 +429,7 @@ export class AnalyzeUrl implements OnDestroy {
       if (data.status === 'completed' && data.data) {
         this.result = data.data.data as unknown as Audits;
         this.loading.set(false);
-        this.jobProgress.set(100);
+        this.jobProgress.set(this.PROGRESS_COMPLETE);
         this.jobStage.set('Completed!');
         this.currentJobId.set(null);
       } else if (data.status === 'failed') {
@@ -440,9 +446,5 @@ export class AnalyzeUrl implements OnDestroy {
         this.currentJobId.set(null);
       }
     });
-  }
-
-  public ngOnDestroy(): void {
-    this.jobQueue.disconnect();
   }
 }
