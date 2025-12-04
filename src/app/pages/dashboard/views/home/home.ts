@@ -161,7 +161,12 @@ export class Home implements OnInit, OnDestroy {
     });
   }
 
-  private updateJobInList(eventData: { jobId: string; status: string; progress: number; data?: UserJob }): void {
+  private updateJobInList(eventData: {
+    jobId: string;
+    status: string;
+    progress: number;
+    data?: UserJob;
+  }): void {
     const jobIndex = this.jobs.findIndex((j) => j.id === eventData.jobId);
     if (jobIndex !== -1) {
       // Update existing job

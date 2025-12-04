@@ -70,7 +70,7 @@
               />
             </svg>
             <p class="text-[#8A2BE2] font-semibold">{{ analyzeButtonText }}...</p>
-            
+
             @if (jobStage()) {
               <div class="w-full">
                 <div class="flex justify-between text-sm mb-2">
@@ -78,7 +78,7 @@
                   <span class="text-[#8A2BE2] font-medium">{{ jobProgress() }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     class="bg-[#8A2BE2] h-2 rounded-full transition-all duration-300"
                     [style.width.%]="jobProgress()"
                   ></div>

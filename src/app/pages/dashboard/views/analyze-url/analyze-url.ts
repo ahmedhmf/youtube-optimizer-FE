@@ -415,7 +415,7 @@ export class AnalyzeUrl implements OnDestroy {
   private trackJobProgress(jobId: string): void {
     this.jobQueue.onJobEvent(jobId, (data: JobEventData) => {
       this.jobProgress.set(data.progress);
-      
+
       if (data.stage) {
         this.jobStage.set(data.stage);
       }
