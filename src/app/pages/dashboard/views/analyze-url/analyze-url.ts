@@ -374,7 +374,7 @@ export class AnalyzeUrl implements OnDestroy {
 
   private isValidYouTubeUrl(url: string): boolean {
     const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/;
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+([&?][\w=%.-]*)*$/;
     return youtubeRegex.test(url);
   }
 
