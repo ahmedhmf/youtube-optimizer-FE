@@ -1,0 +1,701 @@
+<div class="thumbnail-config-form">
+  <div class="form-header">
+    <h3>Customize Your Thumbnail</h3>
+    <p class="required-note">* Required fields</p>
+  </div>
+
+  <div class="form-content">
+    <!-- BIG_BOLD_TEXT Template -->
+    @if (templateType === 'big_bold_text') {
+      <div class="form-group">
+        <label for="mainText">Main Text *</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter your bold headline"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="textColor">Text Color</label>
+          <input
+            id="textColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textColor']"
+            (input)="updateField('textColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="textOutlineColor">Text Outline Color</label>
+          <input
+            id="textOutlineColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textOutlineColor']"
+            (input)="updateField('textOutlineColor', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fontWeight">Font Weight</label>
+        <select
+          id="fontWeight"
+          class="form-control"
+          [value]="formData()['fontWeight']"
+          (change)="updateField('fontWeight', $any($event.target).value)"
+        >
+          <option value="bold">Bold</option>
+          <option value="extra-bold">Extra Bold</option>
+        </select>
+      </div>
+    }
+
+    <!-- FACE_LEFT_TEXT_RIGHT Template -->
+    @if (templateType === 'face_left_text_right') {
+      <div class="form-group">
+        <label for="personImage">Person Image *</label>
+        <input
+          id="personImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('personImage', $event)"
+        />
+        @if (formData()['personImage']) {
+          <img [src]="formData()['personImage']" alt="Person Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="mainText">Main Text *</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter your headline"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="textColor">Text Color</label>
+          <input
+            id="textColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textColor']"
+            (input)="updateField('textColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="textBackground">Text Background</label>
+          <input
+            id="textBackground"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textBackground']"
+            (input)="updateField('textBackground', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="formData()['arrowPointer']"
+            (change)="updateField('arrowPointer', $any($event.target).checked)"
+          />
+          Add Arrow Pointer
+        </label>
+      </div>
+    }
+
+    <!-- DOCUMENTARY_STORY Template -->
+    @if (templateType === 'documentary_story') {
+      <div class="form-group">
+        <label for="mainTitle">Main Title *</label>
+        <input
+          id="mainTitle"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainTitle']"
+          (input)="updateField('mainTitle', $any($event.target).value)"
+          placeholder="Enter main title"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="subtitle">Subtitle *</label>
+        <input
+          id="subtitle"
+          type="text"
+          class="form-control"
+          [value]="formData()['subtitle']"
+          (input)="updateField('subtitle', $any($event.target).value)"
+          placeholder="Enter subtitle"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="titleColor">Title Color</label>
+          <input
+            id="titleColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['titleColor']"
+            (input)="updateField('titleColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="subtitleColor">Subtitle Color</label>
+          <input
+            id="subtitleColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['subtitleColor']"
+            (input)="updateField('subtitleColor', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mood">Mood</label>
+        <select
+          id="mood"
+          class="form-control"
+          [value]="formData()['mood']"
+          (change)="updateField('mood', $any($event.target).value)"
+        >
+          <option value="cinematic">Cinematic</option>
+          <option value="serious">Serious</option>
+          <option value="dramatic">Dramatic</option>
+        </select>
+      </div>
+    }
+
+    <!-- BEFORE_AFTER Template -->
+    @if (templateType === 'before_after') {
+      <div class="form-group">
+        <label for="beforeImage">Before Image *</label>
+        <input
+          id="beforeImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('beforeImage', $event)"
+        />
+        @if (formData()['beforeImage']) {
+          <img [src]="formData()['beforeImage']" alt="Before Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="afterImage">After Image *</label>
+        <input
+          id="afterImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('afterImage', $event)"
+        />
+        @if (formData()['afterImage']) {
+          <img [src]="formData()['afterImage']" alt="After Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="dividerStyle">Divider Style</label>
+        <select
+          id="dividerStyle"
+          class="form-control"
+          [value]="formData()['dividerStyle']"
+          (change)="updateField('dividerStyle', $any($event.target).value)"
+        >
+          <option value="arrow">Arrow</option>
+          <option value="line">Line</option>
+          <option value="vs">VS</option>
+        </select>
+      </div>
+    }
+
+    <!-- CENTER_OBJECT_MINIMAL Template -->
+    @if (templateType === 'center_object_minimal') {
+      <div class="form-group">
+        <label for="centerObjectImage">Center Object Image *</label>
+        <input
+          id="centerObjectImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('centerObjectImage', $event)"
+        />
+        @if (formData()['centerObjectImage']) {
+          <img [src]="formData()['centerObjectImage']" alt="Object Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="topText">Top Text (Optional)</label>
+        <input
+          id="topText"
+          type="text"
+          class="form-control"
+          [value]="formData()['topText']"
+          (input)="updateField('topText', $any($event.target).value)"
+          placeholder="Text above object"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="bottomText">Bottom Text (Optional)</label>
+        <input
+          id="bottomText"
+          type="text"
+          class="form-control"
+          [value]="formData()['bottomText']"
+          (input)="updateField('bottomText', $any($event.target).value)"
+          placeholder="Text below object"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="textColor">Text Color</label>
+        <input
+          id="textColor"
+          type="color"
+          class="form-control color-picker"
+          [value]="formData()['textColor']"
+          (input)="updateField('textColor', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="backgroundBlur">Background Blur (0-20)</label>
+        <input
+          id="backgroundBlur"
+          type="range"
+          min="0"
+          max="20"
+          class="form-control"
+          [value]="formData()['backgroundBlur']"
+          (input)="updateField('backgroundBlur', $any($event.target).value)"
+        />
+      </div>
+    }
+
+    <!-- NEON_TECH Template -->
+    @if (templateType === 'neon_tech') {
+      <div class="form-group">
+        <label for="mainText">Main Text *</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter neon text"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="neonColor">Primary Neon Color</label>
+          <input
+            id="neonColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['neonColor']"
+            (input)="updateField('neonColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="secondaryNeonColor">Secondary Neon Color</label>
+          <input
+            id="secondaryNeonColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['secondaryNeonColor']"
+            (input)="updateField('secondaryNeonColor', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="textGlowIntensity">Glow Intensity (0-100)</label>
+        <input
+          id="textGlowIntensity"
+          type="range"
+          min="0"
+          max="100"
+          class="form-control"
+          [value]="formData()['textGlowIntensity']"
+          (input)="updateField('textGlowIntensity', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="formData()['gridOverlay']"
+            (change)="updateField('gridOverlay', $any($event.target).checked)"
+          />
+          Add Grid Overlay
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="formData()['scanlines']"
+            (change)="updateField('scanlines', $any($event.target).checked)"
+          />
+          Add Scanlines
+        </label>
+      </div>
+    }
+
+    <!-- REACTION_OBJECT Template -->
+    @if (templateType === 'reaction_object') {
+      <div class="form-group">
+        <label for="personImage">Person Image *</label>
+        <input
+          id="personImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('personImage', $event)"
+        />
+        @if (formData()['personImage']) {
+          <img [src]="formData()['personImage']" alt="Person Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="objectImage">Object Image *</label>
+        <input
+          id="objectImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('objectImage', $event)"
+        />
+        @if (formData()['objectImage']) {
+          <img [src]="formData()['objectImage']" alt="Object Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="mainText">Main Text (Optional)</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter text"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="emotionEmphasis">Emotion</label>
+        <select
+          id="emotionEmphasis"
+          class="form-control"
+          [value]="formData()['emotionEmphasis']"
+          (change)="updateField('emotionEmphasis', $any($event.target).value)"
+        >
+          <option value="surprised">Surprised</option>
+          <option value="shocked">Shocked</option>
+          <option value="excited">Excited</option>
+          <option value="happy">Happy</option>
+          <option value="angry">Angry</option>
+        </select>
+      </div>
+    }
+
+    <!-- TWO_TONE Template -->
+    @if (templateType === 'two_tone') {
+      <div class="form-group">
+        <label for="mainText">Main Text *</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter text"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="leftColor">Left Color</label>
+          <input
+            id="leftColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['leftColor']"
+            (input)="updateField('leftColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="rightColor">Right Color</label>
+          <input
+            id="rightColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['rightColor']"
+            (input)="updateField('rightColor', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="textColor">Text Color</label>
+          <input
+            id="textColor"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textColor']"
+            (input)="updateField('textColor', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="textOutline">Text Outline</label>
+          <input
+            id="textOutline"
+            type="color"
+            class="form-control color-picker"
+            [value]="formData()['textOutline']"
+            (input)="updateField('textOutline', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dividerStyle">Divider Style</label>
+        <select
+          id="dividerStyle"
+          class="form-control"
+          [value]="formData()['dividerStyle']"
+          (change)="updateField('dividerStyle', $any($event.target).value)"
+        >
+          <option value="hard-split">Hard Split</option>
+          <option value="gradient-blend">Gradient Blend</option>
+          <option value="diagonal">Diagonal</option>
+        </select>
+      </div>
+    }
+
+    <!-- BLUR_BACKGROUND_TEXT Template -->
+    @if (templateType === 'blur_background_text') {
+      <div class="form-group">
+        <label for="mainText">Main Text *</label>
+        <input
+          id="mainText"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainText']"
+          (input)="updateField('mainText', $any($event.target).value)"
+          placeholder="Enter text"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="textColor">Text Color</label>
+        <input
+          id="textColor"
+          type="color"
+          class="form-control color-picker"
+          [value]="formData()['textColor']"
+          (input)="updateField('textColor', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="textStyle">Text Style</label>
+        <select
+          id="textStyle"
+          class="form-control"
+          [value]="formData()['textStyle']"
+          (change)="updateField('textStyle', $any($event.target).value)"
+        >
+          <option value="clean">Clean</option>
+          <option value="outlined">Outlined</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="blurIntensity">Blur Intensity (0-30)</label>
+        <input
+          id="blurIntensity"
+          type="range"
+          min="0"
+          max="30"
+          class="form-control"
+          [value]="formData()['blurIntensity']"
+          (input)="updateField('blurIntensity', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="formData()['textBackgroundBox']"
+            (change)="updateField('textBackgroundBox', $any($event.target).checked)"
+          />
+          Add Text Background Box
+        </label>
+      </div>
+    }
+
+    <!-- MAGAZINE_STYLE Template -->
+    @if (templateType === 'magazine_style') {
+      <div class="form-group">
+        <label for="mainHeadline">Main Headline *</label>
+        <input
+          id="mainHeadline"
+          type="text"
+          class="form-control"
+          [value]="formData()['mainHeadline']"
+          (input)="updateField('mainHeadline', $any($event.target).value)"
+          placeholder="Enter headline"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="subtitleTagline">Subtitle/Tagline</label>
+        <input
+          id="subtitleTagline"
+          type="text"
+          class="form-control"
+          [value]="formData()['subtitleTagline']"
+          (input)="updateField('subtitleTagline', $any($event.target).value)"
+          placeholder="Enter subtitle"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="coverImage">Cover Image (Optional)</label>
+        <input
+          id="coverImage"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('coverImage', $event)"
+        />
+        @if (formData()['coverImage']) {
+          <img [src]="formData()['coverImage']" alt="Cover Preview" class="image-preview" />
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="accentColor">Accent Color</label>
+        <input
+          id="accentColor"
+          type="color"
+          class="form-control color-picker"
+          [value]="formData()['accentColor']"
+          (input)="updateField('accentColor', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="layoutStyle">Layout Style</label>
+        <select
+          id="layoutStyle"
+          class="form-control"
+          [value]="formData()['layoutStyle']"
+          (change)="updateField('layoutStyle', $any($event.target).value)"
+        >
+          <option value="traditional">Traditional</option>
+          <option value="modern-minimal">Modern Minimal</option>
+          <option value="bold-graphic">Bold Graphic</option>
+        </select>
+      </div>
+    }
+
+    <!-- Common Fields for All Templates -->
+    <div class="common-fields">
+      <h4>Optional Settings</h4>
+
+      <div class="form-group">
+        <label for="brandLogo">Brand Logo (Optional)</label>
+        <input
+          id="brandLogo"
+          type="file"
+          class="form-control"
+          accept="image/*"
+          (change)="handleImageUpload('brandLogo', $event)"
+        />
+        @if (formData()['brandLogo']) {
+          <img [src]="formData()['brandLogo']" alt="Logo Preview" class="image-preview-small" />
+        }
+      </div>
+
+      @if (formData()['brandLogo']) {
+        <div class="form-row">
+          <div class="form-group">
+            <label for="logoSize">Logo Size</label>
+            <select
+              id="logoSize"
+              class="form-control"
+              [value]="formData()['logoSize']"
+              (change)="updateField('logoSize', $any($event.target).value)"
+            >
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="logoPosition">Logo Position</label>
+            <select
+              id="logoPosition"
+              class="form-control"
+              [value]="formData()['logoPosition']"
+              (change)="updateField('logoPosition', $any($event.target).value)"
+            >
+              <option value="top-left">Top Left</option>
+              <option value="top-right">Top Right</option>
+              <option value="bottom-left">Bottom Left</option>
+              <option value="bottom-right">Bottom Right</option>
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="form-footer">
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!isValid()"
+      (click)="saveConfiguration()"
+    >
+      Save Configuration
+    </button>
+  </div>
+</div>
