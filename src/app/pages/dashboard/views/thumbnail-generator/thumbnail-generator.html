@@ -1,0 +1,1000 @@
+<!--<div class="mx-auto max-w-7xl">-->
+<!--  <div class="flex flex-wrap justify-between gap-3 px-4">-->
+<!--    <p class="text-3xl font-bold tracking-tight mb-8">Create new thumbnail</p>-->
+<!--  </div>-->
+
+<!--  <div class="flex flex-col gap-6 rounded-2xl">-->
+<!--    <div class="flex">-->
+<!--      <div class="flex items-center gap-2">-->
+<!--      @for (tab of tabs; track tab.id) {-->
+<!--        <button-->
+<!--          class="flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm transition-colors hover:text-primary dark:text-gray-400 dark:hover:text-primary"-->
+<!--          [class.border-primary]="activeTab() === tab.id"-->
+<!--          [class.border-transparent]="activeTab() !== tab.id"-->
+<!--          [class.text-gray-500]="activeTab() !== tab.id"-->
+<!--          [class.text-primary]="activeTab() === tab.id"-->
+<!--          (click)="setActiveTab(tab.id)"-->
+<!--        >-->
+<!--          <span class="material-symbols-outlined text-lg">{{ tab.icon }}</span>-->
+<!--          {{ tab.label }}-->
+<!--        </button>-->
+<!--      }-->
+<!--    </div>-->
+<!--    </div>-->
+<!--    &lt;!&ndash; Tab Content &ndash;&gt;-->
+<!--    <div [class.opacity-50]="loading()" [class.pointer-events-none]="loading()" class="bg-black">-->
+<!--      @if (this.error()) {-->
+<!--        <div-->
+<!--          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"-->
+<!--          role="alert"-->
+<!--        >-->
+<!--          <span class="block sm:inline">{{ this.error()?.message }}</span>-->
+<!--          <span class="absolute top-0 bottom-0 right-0 px-4 py-3">-->
+<!--            <svg-->
+<!--              class="fill-current h-6 w-6 text-red-500"-->
+<!--              role="button"-->
+<!--              xmlns="http://www.w3.org/2000/svg"-->
+<!--              viewBox="0 0 20 20"-->
+<!--            >-->
+<!--              <title>Close</title>-->
+<!--              <path-->
+<!--                d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"-->
+<!--              />-->
+<!--            </svg>-->
+<!--          </span>-->
+<!--        </div>-->
+<!--      }-->
+<!--      &lt;!&ndash; Loading Overlay &ndash;&gt;-->
+<!--      @if (loading()) {-->
+<!--        <div-->
+<!--          class="absolute inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center rounded-xl z-10"-->
+<!--        >-->
+<!--          <div class="flex flex-col items-center gap-3">-->
+<!--            <svg-->
+<!--              class="animate-spin h-8 w-8 text-[#8A2BE2]"-->
+<!--              fill="none"-->
+<!--              viewBox="0 0 24 24"-->
+<!--              xmlns="http://www.w3.org/2000/svg"-->
+<!--            >-->
+<!--              <circle-->
+<!--                class="opacity-25"-->
+<!--                cx="12"-->
+<!--                cy="12"-->
+<!--                r="10"-->
+<!--                stroke="currentColor"-->
+<!--                stroke-width="4"-->
+<!--              />-->
+<!--              <path-->
+<!--                class="opacity-75"-->
+<!--                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"-->
+<!--                fill="currentColor"-->
+<!--              />-->
+<!--            </svg>-->
+<!--            <p class="text-[#8A2BE2] font-semibold">{{ analyzeButtonText }}...</p>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      }-->
+
+<!--      <div class="flex flex-col gap-4">-->
+<!--        &lt;!&ndash; URL Tab Content &ndash;&gt;-->
+<!--        @if (activeTab() === 'url') {-->
+<!--          <div class="relative w-full">-->
+<!--            <input-->
+<!--              class="w-full p-4 pr-20 rounded-md border border-gray-200 bg-white shadow-xs placeholder-gray-400 focus:outline-none focus:shadow-sm transition-shadow duration-100"-->
+<!--              placeholder="Paste a YouTube video URL to analyze"-->
+<!--              [disabled]="loading()"-->
+<!--              [value]="videoUrl()"-->
+<!--              (input)="videoUrl.set($event.target.value)"-->
+<!--            />-->
+<!--            <div class="absolute inset-y-0 right-2 flex items-center gap-1 pr-1">-->
+<!--              <button-->
+<!--                class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"-->
+<!--                aria-label="Filter"-->
+<!--                (click)="showSettings.set(!showSettings())"-->
+<!--              >-->
+<!--                <svg-->
+<!--                  class="w-6 h-6 text-black"-->
+<!--                  fill="currentColor"-->
+<!--                  viewBox="-25.6 -25.6 307.20 307.20"-->
+<!--                  xmlns="http://www.w3.org/2000/svg"-->
+<!--                >-->
+<!--                  <path-->
+<!--                    d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"-->
+<!--                  ></path>-->
+<!--                </svg>-->
+<!--              </button>-->
+<!--              <button-->
+<!--                class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"-->
+<!--                [disabled]="isAnalyzeDisabled"-->
+<!--                (click)="analyzeVideo()"-->
+<!--                aria-label="Analyze"-->
+<!--              >-->
+<!--                <span class="material-symbols-outlined text-lg"> arrow_upward_alt </span>-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        }-->
+
+<!--        &lt;!&ndash; Upload Tab Content &ndash;&gt;-->
+<!--        @if (activeTab() === 'upload') {-->
+<!--          <div class="flex flex-col gap-4">-->
+<!--            @if (!selectedFile()) {-->
+<!--              <div-->
+<!--                class="min-h-[250px] border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-8 text-center bg-white/50 hover:bg-white/70 transition-colors duration-200 bg-purple-50"-->
+<!--                [ngClass]="{-->
+<!--                  'bg-purple-50 border-purple-300': isDragging,-->
+<!--                  'bg-white/50 border-gray-200': !isDragging,-->
+<!--                }"-->
+<!--                (dragover)="onDragOver($event)"-->
+<!--                (dragleave)="onDragLeave($event)"-->
+<!--                (drop)="onDrop($event)"-->
+<!--              >-->
+<!--                <input-->
+<!--                  accept="video/*"-->
+<!--                  class="hidden"-->
+<!--                  id="video-upload"-->
+<!--                  type="file"-->
+<!--                  [disabled]="loading()"-->
+<!--                  (change)="onFileSelected($event)"-->
+<!--                />-->
+<!--                <label class="flex flex-col items-center gap-4" for="video-upload">-->
+<!--                  <div class="rounded-full p-5 shadow-sm bg-gray-50/50">-->
+<!--                    <svg-->
+<!--                      width="45px"-->
+<!--                      height="45px"-->
+<!--                      viewBox="0 0 24 24"-->
+<!--                      fill="none"-->
+<!--                      xmlns="http://www.w3.org/2000/svg"-->
+<!--                      stroke="#c5a8ff"-->
+<!--                      stroke-width="0.00024000000000000003"-->
+<!--                    >-->
+<!--                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>-->
+<!--                      <g-->
+<!--                        id="SVGRepo_tracerCarrier"-->
+<!--                        stroke-linecap="round"-->
+<!--                        stroke-linejoin="round"-->
+<!--                      ></g>-->
+<!--                      <g id="SVGRepo_iconCarrier">-->
+<!--                        <path-->
+<!--                          fill-rule="evenodd"-->
+<!--                          clip-rule="evenodd"-->
+<!--                          d="M12 1.25C12.2189 1.25 12.427 1.34567 12.5694 1.51191L15.5694 5.01191C15.839 5.3264 15.8026 5.79988 15.4881 6.06944C15.1736 6.33901 14.7001 6.30259 14.4306 5.98809L12.75 4.02744L12.75 15C12.75 15.4142 12.4142 15.75 12 15.75C11.5858 15.75 11.25 15.4142 11.25 15L11.25 4.02744L9.56944 5.98809C9.29988 6.30259 8.8264 6.33901 8.51191 6.06944C8.19741 5.79988 8.16099 5.3264 8.43056 5.01191L11.4306 1.51191C11.573 1.34567 11.7811 1.25 12 1.25ZM6.99583 8.25196C7.41003 8.24966 7.74768 8.58357 7.74999 8.99778C7.7523 9.41198 7.41838 9.74963 7.00418 9.75194C5.91068 9.75803 5.1356 9.78642 4.54735 9.89448C3.98054 9.99859 3.65246 10.1658 3.40901 10.4092C3.13225 10.686 2.9518 11.0746 2.85315 11.8083C2.75159 12.5637 2.75 13.5648 2.75 15.0002V16.0002C2.75 17.4356 2.75159 18.4367 2.85315 19.1921C2.9518 19.9259 3.13225 20.3144 3.40901 20.5912C3.68577 20.868 4.07434 21.0484 4.80812 21.1471C5.56347 21.2486 6.56458 21.2502 8 21.2502H16C17.4354 21.2502 18.4365 21.2486 19.1919 21.1471C19.9257 21.0484 20.3142 20.868 20.591 20.5912C20.8678 20.3144 21.0482 19.9259 21.1469 19.1921C21.2484 18.4367 21.25 17.4356 21.25 16.0002V15.0002C21.25 13.5648 21.2484 12.5637 21.1469 11.8083C21.0482 11.0746 20.8678 10.686 20.591 10.4092C20.3475 10.1658 20.0195 9.99859 19.4527 9.89448C18.8644 9.78642 18.0893 9.75803 16.9958 9.75194C16.5816 9.74963 16.2477 9.41198 16.25 8.99778C16.2523 8.58357 16.59 8.24966 17.0042 8.25196C18.0857 8.25798 18.9871 8.28387 19.7236 8.41916C20.4816 8.55839 21.1267 8.82363 21.6517 9.34856C22.2536 9.95048 22.5125 10.7084 22.6335 11.6085C22.75 12.4754 22.75 13.5778 22.75 14.9453V16.0551C22.75 17.4227 22.75 18.525 22.6335 19.392C22.5125 20.2921 22.2536 21.0499 21.6517 21.6519C21.0497 22.2538 20.2919 22.5127 19.3918 22.6337C18.5248 22.7503 17.4225 22.7502 16.0549 22.7502H7.94513C6.57754 22.7502 5.47522 22.7503 4.60825 22.6337C3.70814 22.5127 2.95027 22.2538 2.34835 21.6519C1.74643 21.0499 1.48754 20.2921 1.36652 19.392C1.24996 18.525 1.24998 17.4227 1.25 16.0551V14.9453C1.24998 13.5777 1.24996 12.4754 1.36652 11.6085C1.48754 10.7084 1.74643 9.95048 2.34835 9.34856C2.87328 8.82363 3.51835 8.55839 4.27635 8.41916C5.01291 8.28386 5.9143 8.25798 6.99583 8.25196Z"-->
+<!--                          fill="#c5a8ff"-->
+<!--                        ></path>-->
+<!--                      </g>-->
+<!--                    </svg>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">-->
+<!--                      Drop your video here or click to browse-->
+<!--                    </p>-->
+<!--                    <p class="text-sm text-gray-400 dark:text-gray-400">-->
+<!--                      Supports MP4, AVI, MOV, MKV (max 100MB)-->
+<!--                    </p>-->
+<!--                  </div>-->
+<!--                </label>-->
+<!--              </div>-->
+<!--            } @else {-->
+<!--              <div-->
+<!--                class="min-h-[250px] flex items-center justify-center border-2 relative border-dashed border-gray-200 dark:border-gray-600 rounded-lg p-8 text-center bg-white/50 hover:bg-white/70 transition-colors duration-200 bg-purple-50"-->
+<!--                [ngClass]="{-->
+<!--                  'bg-purple-50 border-purple-300': isDragging,-->
+<!--                  'bg-white/50 border-gray-200': !isDragging,-->
+<!--                }"-->
+<!--              >-->
+<!--                <div class="flex items-start">-->
+<!--                  <div class="bg-white/70 rounded-lg p-4 flex items-center justify-between">-->
+<!--                    <div class="flex flex-col items-center justify-center gap-3">-->
+<!--                      <span class="material-symbols-outlined text-xl">video_file</span>-->
+<!--                      <div>-->
+<!--                        <p class="text-sm font-medium text-gray-800">{{ selectedFile()?.name }}</p>-->
+<!--                        <p class="text-sm text-gray-500">-->
+<!--                          {{ (selectedFile()?.size! / (1024 * 1024)).toFixed(2) }} MB-->
+<!--                        </p>-->
+<!--                      </div>-->
+<!--                      <button-->
+<!--                        class="px-4 py-1 cursor-pointer border border-black text-black rounded-md hover:border-red-500 hover:text-red-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"-->
+<!--                        [disabled]="loading()"-->
+<!--                        (click)="removeFile()"-->
+<!--                      >-->
+<!--                        Delete File-->
+<!--                      </button>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="absolute bottom-3 right-2 flex items-center gap-1">-->
+<!--                  <button-->
+<!--                    class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"-->
+<!--                    aria-label="Filter"-->
+<!--                    (click)="showSettings.set(!showSettings())"-->
+<!--                  >-->
+<!--                    <svg-->
+<!--                      class="w-6 h-6 text-black"-->
+<!--                      fill="currentColor"-->
+<!--                      viewBox="-25.6 -25.6 307.20 307.20"-->
+<!--                      xmlns="http://www.w3.org/2000/svg"-->
+<!--                    >-->
+<!--                      <path-->
+<!--                        d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"-->
+<!--                      ></path>-->
+<!--                    </svg>-->
+<!--                  </button>-->
+<!--                  <button-->
+<!--                    class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"-->
+<!--                    [disabled]="isAnalyzeDisabled"-->
+<!--                    (click)="analyzeVideo()"-->
+<!--                    aria-label="Analyze"-->
+<!--                  >-->
+<!--                    <span class="material-symbols-outlined text-lg"> arrow_upward_alt </span>-->
+<!--                  </button>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            }-->
+<!--          </div>-->
+<!--        }-->
+
+<!--        &lt;!&ndash; Text Tab Content &ndash;&gt;-->
+<!--        @if (activeTab() === 'text') {-->
+<!--          <div class="flex flex-col">-->
+<!--            <div class="relative w-full">-->
+<!--              <textarea-->
+<!--                class="w-full min-h-[200px] resize-none p-3 pr-20 rounded-md border border-gray-200 bg-white shadow-xs placeholder-gray-400 focus:outline-none focus:shadow-sm transition-shadow duration-100"-->
+<!--                placeholder="Write or summarize the video content here…"-->
+<!--                [disabled]="loading()"-->
+<!--                [value]="textContent()"-->
+<!--                (input)="onTextAreaInput($event)"-->
+<!--              ></textarea>-->
+<!--              <div class="absolute bottom-3 right-2 flex items-center gap-1">-->
+<!--                <button-->
+<!--                  class="p-2 cursor-pointer rounded rounded-lg hover:bg-gray-100 transition-colors duration-200"-->
+<!--                  aria-label="Filter"-->
+<!--                  (click)="showSettings.set(!showSettings())"-->
+<!--                >-->
+<!--                  <svg-->
+<!--                    class="w-6 h-6 text-black"-->
+<!--                    fill="currentColor"-->
+<!--                    viewBox="-25.6 -25.6 307.20 307.20"-->
+<!--                    xmlns="http://www.w3.org/2000/svg"-->
+<!--                  >-->
+<!--                    <path-->
+<!--                      d="M132,64.3396V39.99988a4,4,0,1,0-8,0V64.3396a23.99522,23.99522,0,0,0,0,47.32056V215.99988a4,4,0,0,0,8,0V111.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,128,103.99988Zm96,64a24.03441,24.03441,0,0,0-20-23.66028l.001-104.33972a4,4,0,1,0-8,0L196,144.3396a23.99529,23.99529,0,0,0,0,47.32068l.001,24.3396a4,4,0,0,0,8,0L204,191.66016A24.03443,24.03443,0,0,0,224,167.99988Zm-24,16a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,200,183.99988ZM60,112.3396l-.00049-72.33972a4,4,0,0,0-8,0L52,112.3396a23.99522,23.99522,0,0,0,0,47.32056l-.00049,56.33972a4,4,0,0,0,8,0L60,159.66016a23.99522,23.99522,0,0,0,0-47.32056Zm-4,39.66028a16,16,0,1,1,16-16A16.01833,16.01833,0,0,1,56,151.99988Z"-->
+<!--                    ></path>-->
+<!--                  </svg>-->
+<!--                </button>-->
+<!--                <button-->
+<!--                  class="cursor-pointer p-2 bg-primary text-white rounded rounded-lg hover:bg-[#7e26cc] disabled:bg-gray-100 disabled:text-gray-300 transition-colors duration-200 flex items-center justify-center"-->
+<!--                  [disabled]="isAnalyzeDisabled"-->
+<!--                  (click)="analyzeVideo()"-->
+<!--                  aria-label="Analyze"-->
+<!--                >-->
+<!--                  <span class="material-symbols-outlined text-lg"> arrow_upward_alt </span>-->
+<!--                </button>-->
+<!--              </div>-->
+<!--              <div class="absolute bottom-4 left-2 text-xs text-gray-400 flex items-center gap-1">-->
+<!--                @if (textContent().length > 0 && textContent().length < 50) {-->
+<!--                  <span>Minimum Characters 50 required</span>-->
+<!--                }-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        }-->
+
+
+<!--        <div-->
+<!--          [style.max-height]="showSettings() ? '50vh' : '0'"-->
+<!--          class="overflow-hidden transition-all duration-300 ease-in-out"-->
+<!--        >-->
+<!--          <div class="p-4 border border-gray-200 rounded-md bg-gray-50"></div>-->
+<!--          &lt;!&ndash;          <div class="p-4 border border-gray-200 rounded-md bg-gray-50">&ndash;&gt;-->
+<!--          &lt;!&ndash;            <div class="group/settings">&ndash;&gt;-->
+<!--          &lt;!&ndash;              <button&ndash;&gt;-->
+<!--          &lt;!&ndash;                class="flex items-center gap-2 text-sm font-medium text-gray-800 hover:text-black"&ndash;&gt;-->
+<!--          &lt;!&ndash;                [disabled]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;              >&ndash;&gt;-->
+<!--          &lt;!&ndash;                <span>Advanced Settings</span>&ndash;&gt;-->
+<!--          &lt;!&ndash;                <span&ndash;&gt;-->
+<!--          &lt;!&ndash;                  class="material-symbols-outlined transition-transform duration-300 group-focus-within/settings:rotate-180"&ndash;&gt;-->
+<!--          &lt;!&ndash;                >expand_more</span&ndash;&gt;-->
+<!--          &lt;!&ndash;                >&ndash;&gt;-->
+<!--          &lt;!&ndash;              </button>&ndash;&gt;-->
+<!--          &lt;!&ndash;              <div&ndash;&gt;-->
+<!--          &lt;!&ndash;                class="overflow-hidden max-h-0 opacity-0 group-focus-within/settings:max-h-[500px] group-focus-within/settings:opacity-100 transition-all duration-500 ease-in-out"&ndash;&gt;-->
+<!--          &lt;!&ndash;              >&ndash;&gt;-->
+<!--          &lt;!&ndash;                <div&ndash;&gt;-->
+<!--          &lt;!&ndash;                  class="mt-4 rounded-xl shadow-lg p-6 bg-white/70 dark:bg-background-dark/50 backdrop-blur-sm text-gray-800 dark:text-white"&ndash;&gt;-->
+<!--          &lt;!&ndash;                >&ndash;&gt;-->
+<!--          &lt;!&ndash;                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">&ndash;&gt;-->
+<!--          &lt;!&ndash;                    <div class="space-y-3">&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <label class="block text-sm font-bold tracking-wide" for="language-dropdown"&ndash;&gt;-->
+<!--          &lt;!&ndash;                      >Language</label&ndash;&gt;-->
+<!--          &lt;!&ndash;                      >&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <div class="flex flex-col gap-2">&ndash;&gt;-->
+<!--          &lt;!&ndash;                        @for (language of languages; track language) {&ndash;&gt;-->
+<!--          &lt;!&ndash;                          <label&ndash;&gt;-->
+<!--          &lt;!&ndash;                            class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.cursor-not-allowed]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.opacity-50]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                          >&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <input&ndash;&gt;-->
+<!--          &lt;!&ndash;                              class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              name="language-dropdown"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              type="radio"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [checked]="settings().language === language.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [disabled]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [value]="language.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              (change)="onLanguageChange(language.value)"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            />&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <span class="ml-3 text-sm font-medium">{{ language.name }}</span>&ndash;&gt;-->
+<!--          &lt;!&ndash;                          </label>&ndash;&gt;-->
+<!--          &lt;!&ndash;                        }&ndash;&gt;-->
+<!--          &lt;!&ndash;                      </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                    <div class="space-y-3">&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <p class="block text-sm font-bold tracking-wide">AI Model</p>&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <div class="flex flex-col gap-2">&ndash;&gt;-->
+<!--          &lt;!&ndash;                        @for (model of aiModels; track model) {&ndash;&gt;-->
+<!--          &lt;!&ndash;                          <label&ndash;&gt;-->
+<!--          &lt;!&ndash;                            class="flex items-center p-3 rounded-lg border border-transparent bg-white/50 dark:bg-background-dark/30 cursor-pointer has-[:checked]:border-primary has-[:checked]:ring-2 has-[:checked]:ring-primary dark:has-[:checked]:border-primary transition-all"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.cursor-not-allowed]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.opacity-50]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                          >&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <input&ndash;&gt;-->
+<!--          &lt;!&ndash;                              class="form-radio text-primary bg-transparent border-gray-400 dark:border-gray-500 focus:ring-offset-0 focus:ring-primary dark:focus:ring-offset-background-dark/50 disabled:cursor-not-allowed"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              name="ai-model-dropdown"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              type="radio"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [checked]="settings().aiModel === model.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [disabled]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [value]="model.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              (change)="onModelChange(model.value)"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            />&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <span class="ml-3 text-sm font-medium">{{ model.name }}</span>&ndash;&gt;-->
+<!--          &lt;!&ndash;                          </label>&ndash;&gt;-->
+<!--          &lt;!&ndash;                        }&ndash;&gt;-->
+<!--          &lt;!&ndash;                      </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                    <div class="space-y-3">&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <p class="block text-sm font-bold tracking-wide">Tone</p>&ndash;&gt;-->
+<!--          &lt;!&ndash;                      <div class="flex flex-wrap gap-2">&ndash;&gt;-->
+<!--          &lt;!&ndash;                        @for (tone of tones; track tone) {&ndash;&gt;-->
+<!--          &lt;!&ndash;                          <label&ndash;&gt;-->
+<!--          &lt;!&ndash;                            class="cursor-pointer"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.cursor-not-allowed]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            [class.opacity-50]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                          >&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <input&ndash;&gt;-->
+<!--          &lt;!&ndash;                              class="sr-only peer disabled:cursor-not-allowed"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              name="tone-dropdown"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              type="radio"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [checked]="settings().tone === tone.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [disabled]="loading()"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              [value]="tone.value"&ndash;&gt;-->
+<!--          &lt;!&ndash;                              (change)="onToneChange(tone.value)"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            />&ndash;&gt;-->
+<!--          &lt;!&ndash;                            <span&ndash;&gt;-->
+<!--          &lt;!&ndash;                              class="px-3 py-1.5 text-sm font-medium rounded-full bg-gray-200 dark:bg-gray-700 peer-checked:bg-primary peer-checked:text-black transition-colors peer-disabled:cursor-not-allowed"&ndash;&gt;-->
+<!--          &lt;!&ndash;                            >&ndash;&gt;-->
+<!--          &lt;!&ndash;                          {{ tone.name }}&ndash;&gt;-->
+<!--          &lt;!&ndash;                        </span>&ndash;&gt;-->
+<!--          &lt;!&ndash;                          </label>&ndash;&gt;-->
+<!--          &lt;!&ndash;                        }&ndash;&gt;-->
+<!--          &lt;!&ndash;                      </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                  </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;                </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;              </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;            </div>&ndash;&gt;-->
+<!--          &lt;!&ndash;            &ndash;&gt;-->
+<!--          &lt;!&ndash;          </div>&ndash;&gt;-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; Results Section (same as before) &ndash;&gt;-->
+<!--  @if (result) {-->
+<!--    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">-->
+<!--      <div class="lg:col-span-2 flex flex-col gap-6">-->
+<!--        <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm overflow-hidden">-->
+<!--          @if (result.thumbnail_url) {-->
+<!--            <div-->
+<!--              class="bg-center bg-no-repeat aspect-video bg-cover"-->
+<!--              style="background-image: url(&quot;{{ result.thumbnail_url }}&quot;);"-->
+<!--            ></div>-->
+<!--          }-->
+<!--          <div class="p-6">-->
+<!--            <h3 class="text-xl font-bold text-[#131018] dark:text-white">-->
+<!--              {{ result.video_title }}-->
+<!--            </h3>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm p-6">-->
+<!--          <div class="flex items-center gap-3 mb-4">-->
+<!--            <span class="material-symbols-outlined text-primary">summarize</span>-->
+<!--            <h3 class="text-lg font-bold text-[#131018] dark:text-white">AI Description</h3>-->
+<!--          </div>-->
+<!--          <p class="text-gray-600 dark:text-gray-400 leading-relaxed">-->
+<!--            {{ result.ai_description }}-->
+<!--          </p>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="flex flex-col gap-6">-->
+<!--        <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm p-6">-->
+<!--          <div class="flex items-center gap-3 mb-3">-->
+<!--            <span class="material-symbols-outlined text-primary">sentiment_very_satisfied</span>-->
+<!--            <h4 class="text-md font-bold text-[#131018] dark:text-white">AI-Titles</h4>-->
+<!--          </div>-->
+<!--          <div class="flex flex-col items-baseline gap-2">-->
+<!--            @for (title of result.ai_titles; track title) {-->
+<!--              <p class="text-sm font-black text-green-500">{{ title }}</p>-->
+<!--            }-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm p-6">-->
+<!--          <div class="flex items-center gap-3 mb-4">-->
+<!--            <span class="material-symbols-outlined text-primary">sell</span>-->
+<!--            <h4 class="text-md font-bold text-[#131018] dark:text-white">AI-Tags</h4>-->
+<!--          </div>-->
+<!--          <div class="flex flex-wrap gap-2">-->
+<!--            @for (tag of result.ai_tags; track tag) {-->
+<!--              <span-->
+<!--                class="bg-primary/20 text-primary-darker dark:text-primary-lighter rounded-full px-3 py-1 text-sm font-medium"-->
+<!--                >{{ tag }}</span-->
+<!--              >-->
+<!--            }-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        @if (result.ai_thumbnail_prompts) {-->
+<!--          <div class="bg-white dark:bg-background-dark/80 rounded-xl shadow-sm p-6">-->
+<!--            <div class="flex items-center gap-3 mb-3">-->
+<!--              <span class="material-symbols-outlined text-primary">insights</span>-->
+<!--              <h4 class="text-md font-bold text-[#131018] dark:text-white">AI-Thumbnail Prompt</h4>-->
+<!--            </div>-->
+<!--            <p class="text-sm text-gray-500 dark:text-gray-400">-->
+<!--              {{ result.ai_thumbnail_prompts }}-->
+<!--            </p>-->
+<!--          </div>-->
+<!--        }-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  }-->
+<!--</div>-->
+
+
+<div>
+<!--  <section class="w-full grid grid-cols-1 md:grid-cols-3 gap-4">-->
+<!--    <div class="statistics-card">-->
+<!--      <div class="flex justify-between items-start">-->
+<!--        <span class="text-xs font-medium text-stone-500 uppercase tracking-wider">Total Videos Analyzed</span>-->
+<!--        <svg class="lucide lucide-video-icon lucide-video" fill="none" height="20" stroke="currentColor"-->
+<!--             stroke-linecap="round"-->
+<!--             stroke-linejoin="round" stroke-width="2" style="opacity: 0.7" viewBox="0 0 24 24" width="20"-->
+<!--             xmlns="http://www.w3.org/2000/svg">-->
+<!--          <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/>-->
+<!--          <rect height="12" rx="2" width="14" x="2" y="6"/>-->
+<!--        </svg>-->
+<!--      </div>-->
+<!--      <div class="flex items-end gap-3">-->
+<!--        <span class="text-3xl font-display font-medium text-stone-100 tracking-tight">28</span>-->
+<!--        <span class="text-xs text-emerald-500 font-medium mb-1.5">+12%</span>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="statistics-card">-->
+<!--      <div class="flex justify-between items-start">-->
+<!--        <span class="text-xs font-medium text-stone-500 uppercase tracking-wider">Avg. Analysis Duration</span>-->
+<!--        <svg class="lucide lucide-timer-icon lucide-timer" fill="none" height="20" stroke="currentColor"-->
+<!--             stroke-linecap="round"-->
+<!--             stroke-linejoin="round" stroke-width="2" style="opacity: 0.7" viewBox="0 0 24 24" width="20"-->
+<!--             xmlns="http://www.w3.org/2000/svg">-->
+<!--          <line x1="10" x2="14" y1="2" y2="2"/>-->
+<!--          <line x1="12" x2="15" y1="14" y2="11"/>-->
+<!--          <circle cx="12" cy="14" r="8"/>-->
+<!--        </svg>-->
+<!--      </div>-->
+<!--      <div class="flex items-end gap-3">-->
+<!--      <span class="text-3xl font-display font-medium text-stone-100 tracking-tight">12.4<span-->
+<!--        class="text-lg text-stone-500 mx-1">s</span></span>-->
+<!--        <div class="h-6 w-16 mb-1">-->
+<!--          <svg class="w-full h-full stroke-violet-500/50 fill-none stroke-2" viewBox="0 0 64 24">-->
+<!--            <path d="M0 20 L10 15 L20 18 L30 10 L40 12 L50 5 L64 15" stroke-linecap="round" stroke-linejoin="round"/>-->
+<!--          </svg>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="statistics-card">-->
+<!--      <div class="flex justify-between items-start">-->
+<!--        <span class="text-xs font-medium text-stone-500 uppercase tracking-wider">Avg. Video Time</span>-->
+<!--        <svg class="lucide lucide-square-play-icon lucide-square-play" fill="none" height="20" stroke="currentColor"-->
+<!--             stroke-linecap="round"-->
+<!--             stroke-linejoin="round" stroke-width="2" style="opacity: 0.7" viewBox="0 0 24 24" width="20"-->
+<!--             xmlns="http://www.w3.org/2000/svg">-->
+<!--          <rect height="18" rx="2" width="18" x="3" y="3"/>-->
+<!--          <path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z"/>-->
+<!--        </svg>-->
+<!--      </div>-->
+<!--      <div class="flex items-end gap-1">-->
+<!--<span class="text-3xl font-display font-medium text-stone-100 tracking-tight">-->
+<!--  9.1-->
+<!--  <span class="text-lg text-stone-500">m</span>-->
+<!--</span>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </section>-->
+  <section
+    class="
+     flex flex-col justify-start
+     ">
+    <h2 class="text-2xl font-bold font-primary">Create New Thumbnail</h2>
+    <div class="rounded-2xl w-full flex flex-col gap-5 mt-18 h-full">
+    <div class="relative">
+      <div class="flex gap-2 absolute -top-6 left-0">
+        @for (tab of tabs; track tab.id) {
+          <button
+            (click)="setActiveTab(tab.id)"
+            [ngClass]="{
+            'bg-[#1f2121] text-stone-200 z-10': activeTab() === tab.id,
+            'bg-transparent text-stone-400 hover:text-stone-200': activeTab() !== tab.id
+             }"
+            class="cursor-pointer
+          flex items-center gap-2
+          px-3 py-2
+          rounded-t-xl
+          text-xs transition-colors"
+          >
+            <span class="material-symbols-outlined text-lg">{{ tab.icon }}</span>
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+      <div
+        [ngClass]="{
+    'rounded-tl-none rounded-tr-xl rounded-br-xl rounded-bl-xl': activeTab() === tabs[0].id,
+    'rounded-xl': activeTab() !== tabs[0].id
+  }"
+        class="bg-[#1f2121] p-4 mt-4"
+      >
+        @if (activeTab() === 'url') {
+          <div class="relative">
+            <input
+              (input)="videoUrl.set($event.target.value)"
+              [disabled]="loading()"
+              [value]="videoUrl()"
+              class="
+                  w-full
+                  p-5
+                  bg-black
+                  border-none
+                  border-zinc-800
+                  rounded-lg
+                  shadow-inner
+                  resize-none
+                  placeholder-neutral-600
+                  text-sm
+                  text-stone-200
+                  outline-none
+                  transition-all
+                  focus:ring-[0.5px]
+                  focus:ring-white/30
+                  focus:border-white/50
+                  duration-150
+                  group/field
+                "
+              placeholder="Paste a YouTube video URL to analyze"
+            />
+            <div class="absolute inset-y-2 right-2 flex items-center gap-1 pr-1">
+              <button
+                (click)="showSettings.set(!showSettings())"
+                aria-label="Filter"
+                class="p-2 cursor-pointer rounded-lg hover:bg-zinc-800/60 transition-colors duration-200"
+              >
+                <svg class="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal" fill="none" height="18"
+                     stroke="currentColor" stroke-linecap="round"
+                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 5H3"/>
+                  <path d="M12 19H3"/>
+                  <path d="M14 3v4"/>
+                  <path d="M16 17v4"/>
+                  <path d="M21 12h-9"/>
+                  <path d="M21 19h-5"/>
+                  <path d="M21 5h-7"/>
+                  <path d="M8 10v4"/>
+                  <path d="M8 12H3"/>
+                </svg>
+              </button>
+              <button
+                (click)="analyzeFromUrl()"
+                aria-label="Analyze"
+                class="cursor-pointer
+                      flex items-center justify-center gap-1
+                      px-4 py-2
+                      rounded-md
+                      text-sm
+                      font-medium
+                      bg-zinc-900
+                      text-stone-200
+                      border border-zinc-800
+                      hover:bg-zinc-800
+                      hover:border-zinc-700
+                      hover:text-white
+                      active:bg-zinc-700
+                      focus:ring-[0.5px]
+                      focus:ring-white/20
+                      focus:border-white/30
+                      outline-none
+                      disabled:opacity-40
+                      disabled:cursor-pointer
+                      disabled:hover:bg-zinc-900
+                      disabled:hover:border-zinc-800
+                      transition-all duration-200 ease-out"
+              >
+                <svg class="lucide lucide-sparkles-icon lucide-sparkles" fill="none" height="18" stroke="currentColor"
+                     stroke-linecap="round"
+                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
+                  <path d="M20 2v4"/>
+                  <path d="M22 4h-4"/>
+                  <circle cx="4" cy="20" r="2"/>
+                </svg>
+                <span>Generate</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Upload Tab Content -->
+        @if (activeTab() === 'upload') {
+          <div class="flex flex-col gap-4">
+            @if (!selectedFile()) {
+              <div
+                (dragleave)="onDragLeave($event)"
+                (dragover)="onDragOver($event)"
+                (drop)="onDrop($event)"
+                [ngClass]="{
+          'bg-zinc-900 border-zinc-700': isDragging,
+          'bg-black border-zinc-800': !isDragging,
+        }"
+                class="min-h-[250px] border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200"
+              >
+                <input
+                  (change)="onFileSelected($event)"
+                  [disabled]="loading()"
+                  accept="video/*"
+                  class="hidden"
+                  id="video-upload"
+                  type="file"
+                />
+                <label class="flex flex-col items-center gap-4 cursor-pointer" for="video-upload">
+                  <div class="rounded-full p-5 shadow-sm bg-zinc-900 border border-zinc-800">
+                    <svg class="lucide lucide-cloud-upload-icon lucide-cloud-upload" fill="none" height="36"
+                         stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="36"
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 13v8"/>
+                      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                      <path d="m8 17 4-4 4 4"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-lg font-semibold text-stone-200 mb-1">
+                      Drop your video here or click to browse
+                    </p>
+                    <p class="text-sm text-neutral-600">
+                      Supports MP4, AVI, MOV, MKV (max 100MB)
+                    </p>
+                  </div>
+                </label>
+              </div>
+            } @else {
+              <div
+                [ngClass]="{
+          'bg-zinc-900 border-zinc-700': isDragging,
+          'bg-black border-zinc-800': !isDragging,
+        }"
+                class="min-h-[250px] flex items-center justify-center border-2 relative border-dashed rounded-lg p-8 text-center transition-colors duration-200"
+              >
+                <div class="flex items-start">
+                  <div class="bg-zinc-900/70 rounded-lg p-4 flex items-center justify-between border border-zinc-700">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <div>
+                        <p class="text-sm font-medium text-stone-200">{{ selectedFile()?.name }}</p>
+                        <p class="text-sm text-neutral-600">
+                          {{ (selectedFile()?.size! / (1024 * 1024)).toFixed(2) }} MB
+                        </p>
+                      </div>
+                      <button
+                        (click)="removeFile()"
+                        [disabled]="loading()"
+                        class="cursor-pointer
+                      flex items-center justify-center gap-1
+                      px-4 py-1
+                      rounded-md
+                      text-sm
+                      font-light
+                      bg-zinc-900
+                      text-red-500
+                      border border-zinc-800
+                      hover:bg-zinc-800
+                      hover:border-red-500
+                      hover:text-red-400
+                      active:bg-zinc-700
+                      focus:ring-[0.5px]
+                      focus:ring-red-500/20
+                      focus:border-red-500/30
+                      outline-none
+                      disabled:opacity-40
+                      disabled:cursor-default
+                      disabled:hover:bg-zinc-900
+                      disabled:hover:border-zinc-800
+                      transition-all duration-200 ease-out"
+                      >
+                        Delete File
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="absolute bottom-3 right-2 flex items-center gap-1 pr-1">
+                  <button
+                    (click)="showSettings.set(!showSettings())"
+                    aria-label="Filter"
+                    class="p-2 cursor-pointer rounded-lg hover:bg-zinc-800/60 transition-colors duration-200"
+                  >
+                    <svg class="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal text-stone-200"
+                         fill="none" height="18" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 5H3"/>
+                      <path d="M12 19H3"/>
+                      <path d="M14 3v4"/>
+                      <path d="M16 17v4"/>
+                      <path d="M21 12h-9"/>
+                      <path d="M21 19h-5"/>
+                      <path d="M21 5h-7"/>
+                      <path d="M8 10v4"/>
+                      <path d="M8 12H3"/>
+                    </svg>
+                  </button>
+                  <button
+                    (click)="analyzeVideo()"
+                    [disabled]="isAnalyzeDisabled"
+                    aria-label="Analyze"
+                    class="cursor-pointer
+                  flex items-center justify-center gap-1
+                  px-4 py-2
+                  rounded-md
+                  text-sm
+                  font-medium
+                  bg-zinc-900
+                  text-stone-200
+                  border border-zinc-800
+                  hover:bg-zinc-800
+                  hover:border-zinc-700
+                  hover:text-white
+                  active:bg-zinc-700
+                  focus:ring-[0.5px]
+                  focus:ring-white/20
+                  focus:border-white/30
+                  outline-none
+                  disabled:opacity-40
+                  disabled:cursor-default
+                  disabled:hover:bg-zinc-900
+                  disabled:hover:border-zinc-800
+                  transition-all duration-200 ease-out"
+                  >
+                    <svg class="lucide lucide-sparkles-icon lucide-sparkles" fill="none" height="18"
+                         stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
+                      <path d="M20 2v4"/>
+                      <path d="M22 4h-4"/>
+                      <circle cx="4" cy="20" r="2"/>
+                    </svg>
+                    <span>Generate</span>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Text Tab Content -->
+        @if (activeTab() === 'text') {
+          <div class="flex flex-col">
+            <div class="relative w-full">
+      <textarea
+        (input)="onTextAreaInput($event)"
+        [disabled]="loading()"
+        [value]="textContent()"
+        class="
+          w-full
+          min-h-[200px]
+          resize-none
+          p-5
+          pr-24
+          bg-black
+          border
+          border-zinc-800
+          rounded-lg
+          shadow-inner
+          placeholder-neutral-600
+          text-sm
+          text-stone-200
+          outline-none
+          transition-all
+          focus:ring-[0.5px]
+          focus:ring-white/30
+          focus:border-white/50
+          duration-150
+          group/field
+        "
+        placeholder="Write or paste the video content/transcript here..."
+      ></textarea>
+                <div class="absolute bottom-3 right-2 flex items-center gap-1 pr-1">
+                <button
+                  (click)="showSettings.set(!showSettings())"
+                  aria-label="Filter"
+                  class="p-2 cursor-pointer rounded-lg hover:bg-zinc-800/60 transition-colors duration-200"
+                >
+                  <svg class="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal text-stone-200"
+                       fill="none" height="18" stroke="currentColor" stroke-linecap="round"
+                       stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 5H3"/>
+                    <path d="M12 19H3"/>
+                    <path d="M14 3v4"/>
+                    <path d="M16 17v4"/>
+                    <path d="M21 12h-9"/>
+                    <path d="M21 19h-5"/>
+                    <path d="M21 5h-7"/>
+                    <path d="M8 10v4"/>
+                    <path d="M8 12H3"/>
+                  </svg>
+                </button>
+                <button
+                  (click)="analyzeVideo()"
+                  [disabled]="isAnalyzeDisabled"
+                  aria-label="Analyze"
+                  class="cursor-pointer
+                flex items-center justify-center gap-1
+                px-4 py-2
+                rounded-md
+                text-sm
+                font-medium
+                bg-zinc-900
+                text-stone-200
+                border border-zinc-800
+                hover:bg-zinc-800
+                hover:border-zinc-700
+                hover:text-white
+                active:bg-zinc-700
+                focus:ring-[0.5px]
+                focus:ring-white/20
+                focus:border-white/30
+                outline-none
+                disabled:opacity-40
+                disabled:cursor-default
+                disabled:hover:bg-zinc-900
+                disabled:hover:border-zinc-800
+                transition-all duration-200 ease-out"
+                >
+                  <svg class="lucide lucide-sparkles-icon lucide-sparkles" fill="none" height="18" stroke="currentColor"
+                       stroke-linecap="round"
+                       stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
+                    <path d="M20 2v4"/>
+                    <path d="M22 4h-4"/>
+                    <circle cx="4" cy="20" r="2"/>
+                  </svg>
+                  <span>Generate</span>
+                </button>
+              </div>
+              <div class="absolute bottom-4 left-4 text-xs text-neutral-600 flex items-center gap-1">
+                @if (textContent().length > 0 && textContent().length < 50) {
+                  <span>Minimum Characters 50 required</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        <div
+          [ngClass]="{
+    'max-h-0 opacity-0 pointer-events-none': !showSettings(),
+    'max-h-[500px] opacity-100': showSettings()
+  }"
+          class="transition-all duration-300 ease-in-out"
+        >
+
+          <div class="pt-3 flex items-center gap-3 w-full">
+            <h2 class="text-lg font-medium text-stone-200 font-primary">
+              AI Preferences:
+            </h2>
+            <app-dropdown-input
+              [dropdownOptions]="languages"
+              placeholder="Select language"
+              (onSelect)="onLanguageChange($event.value)"
+            ></app-dropdown-input>
+
+            <app-dropdown-input
+              [dropdownOptions]="aiModels"
+              placeholder="Select AI Model"
+              (onSelect)="onModelChange($event.value)"
+            ></app-dropdown-input>
+
+            <app-dropdown-input
+              [dropdownOptions]="tones"
+              placeholder="Select Style"
+              (onSelect)="onToneChange($event.value)"
+            ></app-dropdown-input>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+  <div class="p-4 md:p-8 bg-[#0a0a0a] text-[#FCFBFC]">
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold flex items-center gap-2 mb-6">
+        <span class="text-white/90">Generation Queue</span>
+        <span class="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10">1 Active</span>
+      </h2>
+      <div
+        class="relative w-80 h-53 bg-[#0a0a0a] border border-zinc-800 rounded-xl
+  shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+  overflow-hidden
+  before:absolute before:inset-0 before:rounded-xl
+  before:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_75%)]
+
+  after:absolute after:inset-0 after:rounded-xl
+  after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]
+  flex flex-col justify-center items-center"
+      >
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent
+              animate-shimmer pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col items-center justify-center space-y-2">
+          <div class="flex gap-[4px]">
+            <div class="w-2 h-6 bg-white/30 rounded-full animate-loaderPulse"></div>
+            <div class="w-2 h-7 bg-white/50 rounded-full animate-loaderPulse delay-100"></div>
+            <div class="w-2 h-5 bg-white/30 rounded-full animate-loaderPulse delay-200"></div>
+            <div class="w-2 h-8 bg-white/50 rounded-full animate-loaderPulse delay-300"></div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-white/10 to-transparent"></div>
+      </div>
+
+    </section>
+
+    <section class="mt-12">
+      <h2 class="text-2xl font-bold text-white mb-8 flex items-center">
+        Generated Thumbnails
+      </h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+           style="column-gap: 1rem; row-gap: 1rem;">
+        <img
+          class="w-80 h-53 rounded-lg"
+          alt="Image 1"
+          src="/images/hero-5.png"
+          style="top: 10%; left: 15%"
+        />
+        <img
+          class="w-80 h-53 rounded-lg "
+          alt="Image 1"
+          src="/images/hero-4.png"
+          style="top: 10%; left: 15%"
+        />
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+

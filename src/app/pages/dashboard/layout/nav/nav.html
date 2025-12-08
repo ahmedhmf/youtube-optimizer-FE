@@ -1,85 +1,88 @@
-<div class="relative h-screen w-full overflow-hidden">
-  <!-- <div class="absolute inset-0 animate-border-glow"></div> -->
-
-  <div class="relative h-full w-full p-[1px]">
-    <div class="h-full w-full bg-black flex flex-col">
-      <!-- Logo -->
-      <div class="flex items-center gap-3 px-5 pt-4 pb-3">
-        <div
-          class="w-8 h-8 rounded-xl bg-white-400 flex items-center justify-center text-black font-bold bg-white"
-        >
-          D
-        </div>
-        <div class="leading-tight">
-          <p class="text-sm font-semibold text-white">Descripta</p>
-        </div>
-      </div>
-
-      <div class="relative h-px w-full my-3 overflow-hidden">
-        <div class="absolute inset-0 bg-white/40 shadow-[0_0_8px_2px_rgba(0,0,0,0.5)]"></div>
-        <div class="absolute inset-0 animate-divider-glow"></div>
-      </div>
-
-      <nav class="flex-1 px-2 space-y-1 text-sm overflow-y-auto text-white">
-        <a
-          href="#"
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-          routerLink="/dashboard"
-          routerLinkActive="bg-[#1F201D]"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-symbols-outlined">dashboard</span>
-          <span>Dashboard</span>
-        </a>
-        <a
-          href="#"
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-          routerLink="/dashboard/history"
-          routerLinkActive="bg-[#1F201D]"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-symbols-outlined">history</span>
-          <span>History</span>
-        </a>
-        <a
-          href="#"
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-          routerLink="/dashboard/analyze-url"
-          routerLinkActive="bg-[#1F201D]"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-symbols-outlined">credit_card</span>
-          <span>Tools</span>
-        </a>
-        <a
-          href="#"
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-          routerLink="/dashboard/profile"
-          routerLinkActive="bg-[#1F201D]"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-symbols-outlined">person</span>
-          <span>Profile</span>
-        </a>
-        <a
-          href="#"
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-        >
-          <span class="material-symbols-outlined">settings</span>
-          <span>Settings</span>
-        </a>
-      </nav>
-
-      <!-- Bottom Menu Item -->
-      <div class="px-2 pb-4">
-        <button
-          class="flex items-center gap-3 px-3 py-2 rounded-xl text-[#5C5D58] hover:bg-[#1F201D]"
-          (click)="logout()"
-        >
-          <span class="material-symbols-outlined">logout</span>
-          <span>Logout</span>
-        </button>
-      </div>
+<div
+  class="relative flex flex-col h-screen w-full overflow-hidden p-5
+        "
+>
+  <div class="flex items-center  gap-3 mb-6 cursor-pointer">
+    <div class="h-9 w-9 flex items-center justify-center rounded-xl
+                bg-black/40 border border-white/10 shadow-inner">
+      <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path
+          clip-rule="evenodd"
+          fill="none"
+          fill-rule="evenodd"
+          stroke="white"
+          stroke-opacity="0.9"
+          stroke-width="2"
+          d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z"
+        />
+      </svg>
     </div>
+
+    <div class="text-2xl font-semibold tracking-tight text-white/90">
+      Descripta
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav
+    class="flex-1 overflow-y-auto space-y-1 text-sm pr-1"
+  >
+    <a
+      routerLink="/dashboard/thumbnail-generator"
+      routerLinkActive="bg-white/[0.06] border border-white/10"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="group flex items-center gap-3 px-4 py-3 rounded-xl
+             text-white/50 hover:text-white/80
+             hover:bg-white/[0.04] transition-colors"
+    >
+      <span class="material-symbols-outlined text-xl"> dashboard </span>
+      <span>Dashboard</span>
+    </a>
+
+    <a
+      routerLink="/dashboard/history"
+      routerLinkActive="bg-white/[0.06] border border-white/10"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="group flex items-center gap-3 px-4 py-3 rounded-xl
+             text-white/50 hover:text-white/80
+             hover:bg-white/[0.04] transition-colors"
+    >
+      <span class="material-symbols-outlined text-xl"> history </span>
+      <span>History</span>
+    </a>
+
+    <a
+      routerLink="/dashboard/profile"
+      routerLinkActive="bg-white/[0.06] border border-white/10"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="group flex items-center gap-3 px-4 py-3 rounded-xl
+             text-white/50 hover:text-white/80
+             hover:bg-white/[0.04] transition-colors"
+    >
+      <span class="material-symbols-outlined text-xl"> person </span>
+      <span>Profile</span>
+    </a>
+
+    <a
+      class="group flex items-center gap-3 px-4 py-3 rounded-xl
+             text-white/50 hover:text-white/80
+             hover:bg-white/[0.04] transition-colors"
+    >
+      <span class="material-symbols-outlined text-xl"> settings </span>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <!-- BOTTOM ACTION -->
+  <div class="mt-4">
+    <button
+      (click)="logout()"
+      class="flex items-center w-full gap-3 px-4 py-3 rounded-xl
+             text-white/50 hover:text-white/80
+             hover:bg-white/[0.04] transition-colors"
+    >
+      <span class="material-symbols-outlined text-xl"> logout </span>
+      <span>Logout</span>
+    </button>
   </div>
 </div>

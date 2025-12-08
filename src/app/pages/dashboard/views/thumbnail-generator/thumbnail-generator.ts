@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import type { AIConfigurationSettings } from '../../../../models/language.model';
 import type { ApiError } from '../../../../models/api-error.model';
 import type { Audits } from '../../../../models/audits.model';
-
+import {DropdownInput} from '../../../../shared/components/dropdown/dropdown-input';
 type TabType = {
   id: 'url' | 'upload' | 'text';
   label: string;
@@ -16,22 +16,23 @@ type TabType = {
 };
 
 @Component({
-  selector: 'app-analyze-url',
-  imports: [FormsModule, NgClass],
-  templateUrl: './analyze-url.html',
-  styleUrl: './analyze-url.scss',
+  selector: 'app-thumbnail-generator',
+  imports: [FormsModule,NgClass, DropdownInput],
+  templateUrl: './thumbnail-generator.html',
+  styleUrl: './thumbnail-generator.scss',
   standalone: true,
 })
-export class AnalyzeUrl {
+export class ThumbnailGenerator {
   protected readonly activeTab = signal<TabType['id']>('url');
   protected readonly tabs: TabType[] = [
     { id: 'url', label: 'YouTube URL', icon: 'link' },
     { id: 'upload', label: 'Upload Video', icon: 'upload_file' },
     { id: 'text', label: 'Text Analysis', icon: 'edit_note' },
   ];
+
   protected languages: AIConfigurationSettings[] = [
-    { name: 'Arabic', value: 'arabic' },
     { name: 'English', value: 'english' },
+    { name: 'Arabic', value: 'arabic' },
     { name: 'Spanish', value: 'spanish' },
     { name: 'German', value: 'german' },
     { name: 'French', value: 'french' },
@@ -193,7 +194,7 @@ export class AnalyzeUrl {
     }
   }
 
-  private analyzeFromUrl(): void {
+  public analyzeFromUrl(): void {
     // Validation
     const url = this.videoUrl().trim();
 

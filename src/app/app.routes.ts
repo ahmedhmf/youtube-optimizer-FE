@@ -47,12 +47,13 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./pages/dashboard/views/home/home').then((m) => m.Home),
+        redirectTo: 'thumbnail-generator',
+        pathMatch: 'full',
       },
       {
-        path: 'analyze-url',
+        path: 'thumbnail-generator',
         loadComponent: () =>
-          import('./pages/dashboard/views/analyze-url/analyze-url').then((m) => m.AnalyzeUrl),
+          import('./pages/dashboard/views/thumbnail-generator/thumbnail-generator').then((m) => m.ThumbnailGenerator),
       },
       {
         path: 'history',
