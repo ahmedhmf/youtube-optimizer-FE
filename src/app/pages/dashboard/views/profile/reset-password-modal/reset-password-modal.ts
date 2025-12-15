@@ -2,10 +2,9 @@ import { Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { environment } from '../../../../../../environments/environment';
-import { CsrfService } from '../../../../../services/auth/csrf.service';
 import type { ResetPasswordResponse } from '../../../../../models/auth/reset-password-request.type';
 
 @Component({
@@ -32,7 +31,6 @@ export class ResetPasswordModal {
   protected readonly successMessage = signal('');
 
   private readonly http = inject(HttpClient);
-  private readonly csrfService = inject(CsrfService);
 
   protected onClose(): void {
     this.closeModal.emit();
@@ -76,26 +74,18 @@ export class ResetPasswordModal {
 
     this.isLoading.set(true);
 
-    this.csrfService
-      .getToken()
+    this.http
+      .put<ResetPasswordResponse>(
+        `${environment.backendURL}/api/v1/auth/change-password`,
+        {
+          currentPassword: this.currentPassword(),
+          newPassword: this.newPassword(),
+        },
+        {
+          withCredentials: true,
+        },
+      )
       .pipe(
-        switchMap((csrfToken) => {
-          const headers = {
-            'X-CSRF-Token': csrfToken,
-          };
-
-          return this.http.put<ResetPasswordResponse>(
-            `${environment.backendURL}/api/v1/auth/change-password`,
-            {
-              currentPassword: this.currentPassword(),
-              newPassword: this.newPassword(),
-            },
-            {
-              headers,
-              withCredentials: true,
-            },
-          );
-        }),
         catchError((error) => {
           this.isLoading.set(false);
           const errorMsg = error.error?.message ?? 'Failed to reset password';

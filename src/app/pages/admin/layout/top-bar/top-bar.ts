@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './top-bar.html',
   styleUrl: './top-bar.scss',
 })
-export class TopBar {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class TopBar {}

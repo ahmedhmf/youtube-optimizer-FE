@@ -56,9 +56,6 @@
                 placeholder="you@example.com"
                 type="email"
               />
-              @if (hasFieldError('email')) {
-                <p class="font-primary text-rose-400 text-xs mt-2">{{ getFieldError('email') }}</p>
-              }
             </div>
             <div class="flex flex-col">
               <span class="text-gray-400 text-sm font-primary my-2">Password</span>
@@ -69,11 +66,6 @@
                 placeholder="Enter your password"
                 type="password"
               />
-              @if (hasFieldError('password')) {
-                <p class="font-primary text-rose-400 text-xs mt-2">
-                  {{ getFieldError('password') }}
-                </p>
-              }
             </div>
           </div>
           <button

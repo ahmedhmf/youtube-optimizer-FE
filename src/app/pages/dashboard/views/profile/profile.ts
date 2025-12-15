@@ -2,10 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { userProfileStore } from '../../../../stores/dashboard/user-profile.store';
 import { DatePipe } from '@angular/common';
 import { ResetPasswordModal } from './reset-password-modal/reset-password-modal';
+import { AiPreferencesComponent } from './ai-preferences/ai-preferences';
 
 @Component({
   selector: 'app-profile',
-  imports: [DatePipe, ResetPasswordModal],
+  imports: [DatePipe, ResetPasswordModal, AiPreferencesComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

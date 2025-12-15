@@ -1,3 +1,4 @@
+import { NotificationService } from './notification.service';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth/auth.service';
@@ -9,6 +10,7 @@ import { SessionService } from './auth/session.service';
 export class AppInitializationService {
   private readonly authService = inject(AuthService);
   private readonly sessionService = inject(SessionService);
+  private readonly notificationService = inject(NotificationService);
 
   /**
    * Initialize the application with authentication and session management
@@ -24,6 +26,12 @@ export class AppInitializationService {
       await firstValueFrom(this.authService.initialize());
 
       this.sessionService.initialize();
+
+      // Initialize notifications after successful authentication
+      if (this.authService.isAuthenticated()) {
+        this.notificationService.initialize();
+        // await this.notificationService.requestPermission();
+      }
     } catch {
       this.authService.forceLogout();
     }

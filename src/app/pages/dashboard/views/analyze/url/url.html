@@ -1,0 +1,37 @@
+<div class="max-w-xl mx-auto mt-6 text-center rounded-lg">
+  <h1 class="text-3xl font-bold mb-4">Generate Everything from a YouTube Video</h1>
+  <p class="mb-8 text-gray-500">Titles, Descriptions, Tags, SEO & Thumbnails — in seconds.</p>
+
+  <div class="flex gap-2 flex-1">
+    <div class="flex flex-col flex-1 gap-2 h-full relative">
+      <input
+        [(ngModel)]="videoUrl"
+        class="form-field-dark h-full"
+        placeholder="Paste YouTube URL..."
+      />
+      @if (videoUrl && !isValidYoutubeUrl(videoUrl)) {
+        <p class="text-red-700 text-start text-sm mt-1 absolute -bottom-[30px]">
+          Please enter a valid YouTube URL.
+        </p>
+      }
+    </div>
+    <button
+      (click)="analyzeVideoUrl()"
+      [disabled]="!isValidYoutubeUrl(videoUrl)"
+      aria-label="Analyze"
+      class="btn-gradient "
+    >
+      <svg class="lucide lucide-sparkles-icon lucide-sparkles" fill="none" height="18" stroke="currentColor"
+           stroke-linecap="round"
+           stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"
+           xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
+        <path d="M20 2v4"/>
+        <path d="M22 4h-4"/>
+        <circle cx="4" cy="20" r="2"/>
+      </svg>
+      <span>Analyze</span>
+    </button>
+  </div>
+</div>

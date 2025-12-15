@@ -5,7 +5,6 @@ import type { Observable } from 'rxjs';
 import { tap, catchError, map, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { CsrfService } from './csrf.service';
 import { JwtService } from './jwt.service';
 import { UserProfileService } from './user-profile.service';
 import type { AuthResponse } from '../../models/auth/auth-response.type';
@@ -23,7 +22,6 @@ export class AuthService {
 
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly csrfService = inject(CsrfService);
   private readonly jwtService = inject(JwtService);
   private readonly userProfileService = inject(UserProfileService);
 
@@ -90,10 +88,7 @@ export class AuthService {
    * Initialize authentication service
    */
   public initialize(): Observable<boolean> {
-    return this.csrfService.initialize().pipe(
-      switchMap(() => {
-        return this.jwtService.initialize();
-      }),
+    return this.jwtService.initialize().pipe(
       tap((isAuthenticated) => {
         this.isAuthenticatedSubject.next(isAuthenticated);
       }),
@@ -128,117 +123,91 @@ export class AuthService {
    * Register new user account
    */
   public register(registerData: RegisterRequest): Observable<AuthResponse> {
-    return this.csrfService.getToken().pipe(
-      switchMap((csrfToken) => {
-        const headers = {
-          'X-CSRF-Token': csrfToken,
-        };
-
-        return this.http.post<AuthResponse>(
-          `${environment.backendURL}/api/v1/auth/register`,
-          registerData,
-          {
-            headers,
-            withCredentials: true,
-          },
-        );
-      }),
-      tap((response) => {
-        if (response.accessToken) {
-          this.jwtService.storeTokens(
-            response.accessToken,
-            response.expiresIn,
-            response.refreshToken,
+    return this.http
+      .post<AuthResponse>(`${environment.backendURL}/api/v1/auth/register`, registerData, {
+        withCredentials: true,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.jwtService.storeTokens(
+              response.accessToken,
+              response.expiresIn,
+              response.refreshToken,
+            );
+            this.isAuthenticatedSubject.next(true);
+          }
+        }),
+        switchMap((response) => {
+          return this.userProfileService.fetchProfile().pipe(
+            map(() => response),
+            catchError(() => {
+              return of(response);
+            }),
           );
-          this.isAuthenticatedSubject.next(true);
-        }
-      }),
-      switchMap((response) => {
-        return this.userProfileService.fetchProfile().pipe(
-          map(() => response),
-          catchError(() => {
-            return of(response);
-          }),
-        );
-      }),
-      catchError((error) => {
-        return throwError(() => new Error(`Registration failed: ${error.message}`));
-      }),
-    );
+        }),
+        catchError((error) => {
+          return throwError(() => new Error(`Registration failed: ${error.message}`));
+        }),
+      );
   }
 
   /**
    * Login user with email and password
    */
   public login(loginData: LoginRequest): Observable<AuthResponse> {
-    return this.csrfService.getToken().pipe(
-      switchMap((csrfToken) => {
-        const headers = {
-          'X-CSRF-Token': csrfToken,
-        };
-
-        return this.http.post<AuthResponse>(
-          `${environment.backendURL}/api/v1/auth/login`,
-          loginData,
-          {
-            headers,
-            withCredentials: true,
-          },
-        );
-      }),
-      tap((response) => {
-        if (response.accessToken) {
-          this.jwtService.storeTokens(
-            response.accessToken,
-            response.expiresIn,
-            response.refreshToken,
+    return this.http
+      .post<AuthResponse>(`${environment.backendURL}/api/v1/auth/login`, loginData, {
+        withCredentials: true,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.jwtService.storeTokens(
+              response.accessToken,
+              response.expiresIn,
+              response.refreshToken,
+            );
+            this.isAuthenticatedSubject.next(true);
+          }
+        }),
+        switchMap((response) => {
+          return this.userProfileService.fetchProfile().pipe(
+            map(() => response),
+            catchError(() => {
+              return of(response);
+            }),
           );
-          this.isAuthenticatedSubject.next(true);
-        }
-      }),
-      switchMap((response) => {
-        return this.userProfileService.fetchProfile().pipe(
-          map(() => response),
-          catchError(() => {
-            return of(response);
-          }),
-        );
-      }),
-      catchError((error) => {
-        return throwError(() => new Error(`Login failed: ${error.message}`));
-      }),
-    );
+        }),
+        catchError((error) => {
+          return throwError(() => new Error(`Login failed: ${error.message}`));
+        }),
+      );
   }
 
   /**
    * Logout current user
    */
   public logout(): Observable<boolean> {
-    return this.csrfService.getToken().pipe(
-      switchMap((csrfToken) => {
-        const headers = {
-          'X-CSRF-Token': csrfToken,
-        };
-
-        return this.http.post<LogoutResponse>(
-          `${environment.backendURL}/api/v1/auth/logout`,
-          {},
-          {
-            headers,
-            withCredentials: true,
-          },
-        );
-      }),
-      tap(() => {
-        this.clearAuthenticationState();
-        void this.router.navigate(['/']);
-      }),
-      map((response) => response.success),
-      catchError(() => {
-        this.clearAuthenticationState();
-        return of(true);
-      }),
-    );
+    return this.http
+      .post<LogoutResponse>(
+        `${environment.backendURL}/api/v1/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap(() => {
+          this.clearAuthenticationState();
+          void this.router.navigate(['/']);
+        }),
+        map((response) => response.success),
+        catchError(() => {
+          this.clearAuthenticationState();
+          return of(true);
+        }),
+      );
   }
 
   /**
@@ -273,7 +242,6 @@ export class AuthService {
    */
   private clearAuthenticationState(): void {
     this.jwtService.clearTokens();
-    this.csrfService.clearToken();
     this.userProfileService.clearProfile();
     this.isAuthenticatedSubject.next(false);
   }

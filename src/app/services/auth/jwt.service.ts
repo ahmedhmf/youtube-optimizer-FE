@@ -2,11 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { tap, catchError, map, switchMap } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import type { DecodedJwtToken } from '../../models/auth/decoded-jwt-token.type';
 import type { JwtRefreshResponse } from '../../models/auth/jwt-refresh-response.type';
-import { CsrfService } from './csrf.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +20,6 @@ export class JwtService {
   private static readonly REFRESH_TOKEN_KEY = 'refresh_token';
 
   private readonly http = inject(HttpClient);
-  private readonly csrfService = inject(CsrfService);
 
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
@@ -111,7 +109,7 @@ export class JwtService {
   }
 
   /**
-   * Refresh access token using refresh token with CSRF protection
+   * Refresh access token using refresh token
    */
   public refreshAccessToken(): Observable<string> {
     if (this.refreshRequest$) {
@@ -123,34 +121,28 @@ export class JwtService {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    this.refreshRequest$ = this.csrfService.getToken().pipe(
-      switchMap((csrfToken) => {
-        const headers = {
-          'X-CSRF-Token': csrfToken,
-        };
-
-        return this.http.post<JwtRefreshResponse>(
-          `${environment.backendURL}/api/v1/auth/refresh`,
-          { refreshToken: storedRefreshToken },
-          {
-            headers,
-            withCredentials: true,
-          },
-        );
-      }),
-      tap((response) => {
-        this.storeTokens(response.accessToken, response.expiresIn, response.refreshToken);
-      }),
-      map((response) => response.accessToken),
-      catchError((error) => {
-        this.clearTokens();
-        this.refreshRequest$ = null;
-        return throwError(() => new Error(`Token refresh failed: ${error.message}`));
-      }),
-      tap(() => {
-        this.refreshRequest$ = null;
-      }),
-    );
+    this.refreshRequest$ = this.http
+      .post<JwtRefreshResponse>(
+        `${environment.backendURL}/api/v1/auth/refresh`,
+        { refreshToken: storedRefreshToken },
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap((response) => {
+          this.storeTokens(response.accessToken, response.expiresIn, response.refreshToken);
+        }),
+        map((response) => response.accessToken),
+        catchError((error) => {
+          this.clearTokens();
+          this.refreshRequest$ = null;
+          return throwError(() => new Error(`Token refresh failed: ${error.message}`));
+        }),
+        tap(() => {
+          this.refreshRequest$ = null;
+        }),
+      );
 
     return this.refreshRequest$;
   }

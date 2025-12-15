@@ -1,0 +1,115 @@
+<div class="max-w-5xl mx-auto space-y-8 p-6">
+  <!-- Title Section -->
+  <section class="flex flex-col gap-4">
+    <h2 class="form-field-label">Video Title</h2>
+    <div class="space-y-3">
+      @for (title of analyzeStore.generatedContent()?.title; track title; let i = $index) {
+        <div
+          (click)="copy(title, 'title-' + i)"
+          class="flex items-start justify-between gap-3 bg-zinc-900 border border-zinc-800 p-4 rounded-md hover:border-zinc-700 hover:bg-zinc-800 transition-all cursor-pointer group"
+        >
+          <p class="text-sm font-medium text-stone-200 flex-1 py-1">{{ title }}</p>
+          <div class="flex-shrink-0 mt-0.5">
+            @if (copiedId() === 'title-' + i) {
+              <span class="material-symbols-outlined text-green-400 text-lg">
+                check_small
+              </span>
+            } @else {
+              <span class="material-symbols-outlined text-stone-400 group-hover:text-stone-200 transition-colors text-lg">
+                content_copy
+              </span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Description Section -->
+  <section class="flex flex-col gap-4">
+    <h2 class="form-field-label">Video Description</h2>
+    <div
+      (click)="copy(analyzeStore.generatedContent()?.description ?? '', 'description')"
+      class="flex items-start justify-between gap-3 bg-zinc-900 border border-zinc-800 p-4 rounded-md hover:border-zinc-700 hover:bg-zinc-800 transition-all cursor-pointer group"
+    >
+      <textarea
+        class="form-field-dark w-full h-40 p-0 bg-transparent border-0 resize-none focus:ring-0 focus:outline-none
+overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+"
+        [value]="analyzeStore.generatedContent()?.description"
+        readonly
+        (click)="$event.stopPropagation()"
+      ></textarea>
+      <div class="flex-shrink-0 mt-0.5">
+        @if (copiedId() === 'description') {
+          <span class="material-symbols-outlined text-green-400 text-lg">
+            check_small
+          </span>
+        } @else {
+          <span class="material-symbols-outlined text-stone-400 group-hover:text-stone-200 transition-colors text-lg">
+            content_copy
+          </span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Tags Section -->
+  <section class="flex flex-col gap-4">
+    <h2 class="form-field-label">Video Tags</h2>
+    <div class="flex flex-wrap gap-2">
+      @for (tag of analyzeStore.generatedContent()?.tags; track tag; let i = $index) {
+        <div
+          (click)="copy(tag, 'tag-' + i)"
+          class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-md text-sm font-medium text-stone-200 hover:border-zinc-700 hover:bg-zinc-800 transition-all cursor-pointer group"
+        >
+          <span>{{ tag }}</span>
+          @if (copiedId() === 'tag-' + i) {
+            <span class="material-symbols-outlined text-green-400 text-sm">
+              check_small
+            </span>
+          } @else {
+            <span class="material-symbols-outlined text-stone-400 group-hover:text-stone-200 transition-colors text-sm opacity-0 group-hover:opacity-100">
+              content_copy
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Thumbnail Section -->
+  <section class="flex flex-col gap-4">
+    <h2 class="form-field-label">Generated Thumbnail</h2>
+    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-md">
+      <img
+        [src]="analyzeStore.generatedThumbnail()?.thumbnailUrl"
+        alt="Generated Thumbnail"
+        class="w-full max-w-2xl rounded-md shadow-lg object-cover"
+      />
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        class="form-button-dark flex-1 min-w-[150px]"
+        title="Download the generated thumbnail"
+      >
+        Download
+      </button>
+      <button
+        (click)="regenerateThumbnail()"
+        class="form-button-dark flex-1 min-w-[150px]"
+        title="Regenerate a new thumbnail"
+      >
+        Regenerate
+      </button>
+      <button
+        (click)="changeTemplate()"
+        class="form-button-dark flex-1 min-w-[150px]"
+        title="Change to a different template"
+      >
+        Change Template
+      </button>
+    </div>
+  </section>
+</div>

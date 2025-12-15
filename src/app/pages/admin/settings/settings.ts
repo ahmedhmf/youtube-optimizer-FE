@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
-export class Settings {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class Settings {}

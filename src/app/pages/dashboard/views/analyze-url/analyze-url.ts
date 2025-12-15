@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import type { OnDestroy } from '@angular/core';
 import { Component, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import type { AiSettings } from '../../../../models/ai-settings.model';
@@ -8,7 +9,9 @@ import { FormsModule } from '@angular/forms';
 import type { AIConfigurationSettings } from '../../../../models/language.model';
 import type { ApiError } from '../../../../models/api-error.model';
 import type { Audits } from '../../../../models/audits.model';
+import { JobQueueService, type JobEventData } from '../../../../services/job-queue.service';
 import {DropdownInput} from '../../../../shared/components/dropdown/dropdown-input';
+
 type TabType = {
   id: 'url' | 'upload' | 'text';
   label: string;
@@ -16,23 +19,25 @@ type TabType = {
 };
 
 @Component({
-  selector: 'app-thumbnail-generator',
-  imports: [FormsModule,NgClass, DropdownInput],
-  templateUrl: './thumbnail-generator.html',
-  styleUrl: './thumbnail-generator.scss',
+  selector: 'app-analyze-url',
+  imports: [FormsModule, NgClass, DropdownInput],
+  templateUrl: './analyze-url.html',
+  styleUrl: './analyze-url.scss',
   standalone: true,
 })
-export class ThumbnailGenerator {
+export class AnalyzeUrl implements OnDestroy {
   protected readonly activeTab = signal<TabType['id']>('url');
+  protected readonly currentJobId = signal<string | null>(null);
+  protected readonly jobProgress = signal<number>(0);
+  protected readonly jobStage = signal<string>('');
   protected readonly tabs: TabType[] = [
     { id: 'url', label: 'YouTube URL', icon: 'link' },
     { id: 'upload', label: 'Upload Video', icon: 'upload_file' },
     { id: 'text', label: 'Text Analysis', icon: 'edit_note' },
   ];
-
   protected languages: AIConfigurationSettings[] = [
-    { name: 'English', value: 'english' },
     { name: 'Arabic', value: 'arabic' },
+    { name: 'English', value: 'english' },
     { name: 'Spanish', value: 'spanish' },
     { name: 'German', value: 'german' },
     { name: 'French', value: 'french' },
@@ -70,7 +75,9 @@ export class ThumbnailGenerator {
     aiModel: 'midjourney',
   });
   private readonly api = inject(ApiService);
+  private readonly jobQueue = inject(JobQueueService);
   private readonly SIZE_1024 = 1024;
+  private readonly PROGRESS_COMPLETE = 100;
   private readonly MAX_FILE_SIZE = 209715200; // 200MB
   private readonly VALID_VIDEO_TYPES = [
     'video/mp4',
@@ -111,6 +118,10 @@ export class ThumbnailGenerator {
     } else {
       return 'Analyze Text';
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.jobQueue.disconnect();
   }
 
   protected setActiveTab(tabId: TabType['id']): void {
@@ -190,11 +201,25 @@ export class ThumbnailGenerator {
 
     if (event.dataTransfer?.files.length) {
       const file = event.dataTransfer.files[0];
-      this.onFileSelected({ target: { files: [file] } } as any);
+
+      if (!this.isValidFileType(file)) {
+        throw new Error(
+          `Invalid file type. Please select a video file (${this.VALID_VIDEO_TYPES.map((type) => type.split('/')[1].toUpperCase()).join(', ')})`,
+        );
+      }
+      if (!this.isValidFileSize(file)) {
+        throw new Error(
+          `File size too large. Maximum allowed size is ${this.MAX_FILE_SIZE / (this.SIZE_1024 * this.SIZE_1024)}MB. Your file is ${(file.size / (this.SIZE_1024 * this.SIZE_1024)).toFixed(2)}MB`,
+        );
+      }
+      if (file.size === 0) {
+        throw new Error('The selected file appears to be empty or corrupted');
+      }
+      this.selectedFile.set(file);
     }
   }
 
-  public analyzeFromUrl(): void {
+  protected analyzeFromUrl(): void {
     // Validation
     const url = this.videoUrl().trim();
 
@@ -215,6 +240,11 @@ export class ThumbnailGenerator {
 
     this.showSettings.set(false);
     this.loading.set(true);
+    this.jobProgress.set(0);
+    this.jobStage.set('Initializing...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     const urlConfig: AiMessageConfiguration = {
       url: url,
@@ -225,11 +255,21 @@ export class ThumbnailGenerator {
 
     this.api.analyzeVideoUrl(urlConfig).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -251,14 +291,29 @@ export class ThumbnailGenerator {
 
     this.loading.set(true);
     this.showSettings.set(false);
+    this.jobProgress.set(0);
+    this.jobStage.set('Uploading file...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     this.api.analyzeVideoUpload(file, this.settings()).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -290,14 +345,29 @@ export class ThumbnailGenerator {
 
     this.loading.set(true);
     this.showSettings.set(false);
+    this.jobProgress.set(0);
+    this.jobStage.set('Processing text...');
+
+    // Connect to WebSocket if not already connected
+    this.jobQueue.connect();
 
     this.api.analyzeText(text, this.settings()).subscribe({
       next: (res) => {
-        this.result = res;
-        this.loading.set(false);
+        // API returns jobId, not the result
+        if (typeof res === 'object' && 'jobId' in res) {
+          const jobId = (res as { jobId: string }).jobId;
+          this.currentJobId.set(jobId);
+          this.trackJobProgress(jobId);
+        } else {
+          // Fallback: old API response with immediate result
+          this.result = res;
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
         throw err;
       },
     });
@@ -305,7 +375,7 @@ export class ThumbnailGenerator {
 
   private isValidYouTubeUrl(url: string): boolean {
     const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+(&[\w=]*)?$/;
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+([&?][\w=%.-]*)*$/;
     return youtubeRegex.test(url);
   }
 
@@ -347,5 +417,35 @@ export class ThumbnailGenerator {
   private resetFileInput(): void {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput.value = '';
+  }
+
+  private trackJobProgress(jobId: string): void {
+    this.jobQueue.onJobEvent(jobId, (data: JobEventData) => {
+      this.jobProgress.set(data.progress);
+
+      if (data.stage) {
+        this.jobStage.set(data.stage);
+      }
+
+      if (data.status === 'completed' && data.data) {
+        this.result = data.data.data as unknown as Audits;
+        this.loading.set(false);
+        this.jobProgress.set(this.PROGRESS_COMPLETE);
+        this.jobStage.set('Completed!');
+        this.currentJobId.set(null);
+      } else if (data.status === 'failed') {
+        this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
+        this.currentJobId.set(null);
+        const errorMessage = data.error ?? 'Analysis failed. Please try again.';
+        throw new Error(errorMessage);
+      } else if (data.status === 'cancelled') {
+        this.loading.set(false);
+        this.jobProgress.set(0);
+        this.jobStage.set('');
+        this.currentJobId.set(null);
+      }
+    });
   }
 }

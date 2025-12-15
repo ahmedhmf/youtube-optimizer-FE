@@ -9,4 +9,5 @@ import { TopBar } from './top-bar/top-bar';
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Layout {}

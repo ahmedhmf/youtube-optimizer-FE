@@ -42,6 +42,84 @@
     background-color: color-mix(in srgb, var(--color-secondary-dark) 80%, black);
   }
 
+  .form-field-dark {
+    @apply
+    flex items-center justify-between gap-2
+    w-full
+    min-w-[150px]
+    px-4 py-2
+    rounded-md
+    text-sm
+    font-medium
+    text-stone-200
+    placeholder:font-light
+    border border-zinc-800
+    hover:bg-zinc-800
+    hover:border-zinc-700
+    hover:text-white
+
+    active:bg-zinc-700
+
+    focus:outline-none
+    focus:ring-[0.5px]
+    focus:ring-white/20
+    focus:border-white/30
+
+    disabled:opacity-40
+    disabled:cursor-default
+    disabled:pointer-events-none
+    disabled:hover:bg-zinc-900
+    disabled:hover:border-zinc-800
+
+    transition-all
+    duration-200
+    ease-out;
+  }
+
+  .form-field-label {
+    @apply mb-1 text-sm text-zinc-200;
+  }
+
+  button.form-field-dark {
+    @apply cursor-pointer;
+  }
+
+  .form-button-dark {
+    @apply
+    flex items-center justify-center gap-2
+    w-full
+    min-w-[140px]
+    px-4 py-2
+    rounded-md
+    text-sm
+    font-medium
+    text-stone-200
+    cursor-pointer
+    border border-zinc-800
+    bg-black
+    hover:bg-zinc-800
+    hover:border-zinc-700
+    hover:text-white
+
+    active:bg-zinc-700
+    active:border-zinc-600
+
+    focus:outline-none
+    focus:ring-[0.5px]
+    focus:ring-white/20
+    focus:border-white/30
+
+    disabled:opacity-40
+    disabled:cursor-not-allowed
+    disabled:pointer-events-none
+    disabled:hover:bg-zinc-900
+    disabled:hover:border-zinc-800
+
+    transition-all
+    duration-200
+    ease-out;
+  }
+
   .card {
     @apply p-6 transition-all duration-200 rounded-xl shadow-sm;
     background-color: var(--color-background-light);
@@ -144,9 +222,9 @@
 
   .gradient-text {
     background: linear-gradient(
-      135deg,
-      var(--color-primary),
-      color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-light))
+        135deg,
+        var(--color-primary),
+        color-mix(in srgb, var(--color-primary) 70%, var(--color-primary-light))
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -193,27 +271,23 @@ body {
 }
 
 .animate-fade-in-up-float {
-  animation:
-    fadeInUp 1s forwards,
-    float1 6s ease-in-out 1s infinite;
+  animation: fadeInUp 1s forwards,
+  float1 6s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(2) {
-  animation:
-    fadeInUp 1s forwards,
-    float2 7s ease-in-out 1s infinite;
+  animation: fadeInUp 1s forwards,
+  float2 7s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(3) {
-  animation:
-    fadeInUp 1s forwards,
-    float3 5s ease-in-out 1s infinite;
+  animation: fadeInUp 1s forwards,
+  float3 5s ease-in-out 1s infinite;
 }
 
 .animate-fade-in-up-float:nth-child(4) {
-  animation:
-    fadeInUp 1s forwards,
-    float1 6s ease-in-out 1s infinite;
+  animation: fadeInUp 1s forwards,
+  float1 6s ease-in-out 1s infinite;
 }
 
 @keyframes fadeInUp {
@@ -247,8 +321,12 @@ body {
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .animate-shimmer {
@@ -256,24 +334,87 @@ body {
 }
 
 @keyframes loaderPulse {
-  0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
-  50% { transform: scaleY(1); opacity: 1; }
+  0%, 100% {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
 .animate-loaderPulse {
   animation: loaderPulse 0.9s ease-in-out infinite;
 }
 
-.animate-loaderPulse.delay-100 { animation-delay: 0.1s; }
-.animate-loaderPulse.delay-200 { animation-delay: 0.2s; }
-.animate-loaderPulse.delay-300 { animation-delay: 0.3s; }
+.animate-loaderPulse.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-loaderPulse.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-loaderPulse.delay-300 {
+  animation-delay: 0.3s;
+}
 
 
 @keyframes fadeInCard {
-  0% { opacity: 0; transform: translateY(5px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeInCard {
   animation: fadeInCard 0.5s ease-out forwards;
+}
+
+
+.btn-gradient {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white;
+  background: linear-gradient(to right, #181818, #1f1f1f, #181818);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.1s cubic-bezier(.4, .2, .2, 1);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease-in-out;
+  }
+
+  &:hover {
+    transform: scale(1.009);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:hover::after {
+    transform: translateX(100%);
+  }
+
+  z-index: 10;
 }

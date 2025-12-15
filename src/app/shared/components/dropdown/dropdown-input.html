@@ -1,76 +1,52 @@
-<div class="relative w-full max-w-xs">
-    <button
-      (click)="toggleDropdown()"
-      type="button"
-      [attr.aria-expanded]="isOpen()"
-      aria-haspopup="listbox"
-      class="
-                  cursor-pointer
-                  flex items-center justify-between gap-2
-                  w-full
-                  px-4 py-2
-                  rounded-md
-                  text-sm
-                  font-medium
-                  bg-zinc-900
-                  text-stone-200
-                  border border-zinc-800
-                  hover:bg-zinc-800
-                  hover:border-zinc-700
-                  hover:text-white
-                  active:bg-zinc-700
-                  focus:ring-[0.5px]
-                  focus:ring-white/20
-                  focus:border-white/30
-                  outline-none
-                  disabled:opacity-40
-                  disabled:cursor-default
-                  disabled:hover:bg-zinc-900
-                  disabled:hover:border-zinc-800
-                  transition-all duration-200 ease-out
-              "
-    >
-      <span class="font-light" id="selected-value">{{ selectedOption() ? selectedOption()?.name : placeholder() }}</span>
-      <svg
-        class="w-4 h-4 transition-transform duration-200"
-        [class.rotate-180]="isOpen()"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-      </svg>
-    </button>
-  @if (isOpen()) {
-    <div
-      class="
-      absolute z-100 w-full mt-1
-      bg-zinc-800 border border-zinc-700
-      rounded-md shadow-lg
-      origin-top
-      transition-all duration-200 ease-out
-      max-h-auto
-      opacity-100 scale-y-100
-    "
-      role="listbox"
-    >
-      @if (dropdownOptions().length === 0) {
-        <div class="px-4 py-3 text-sm text-stone-400 text-center select-none">
-          No items found
-        </div>
-      } @else {
-        @for (option of dropdownOptions(); track option.value) {
-          <div
-            (click)="selectOption(option)"
-            [attr.aria-selected]="selectedOption()?.value === option.value"
-            class="block px-4 py-2 text-sm text-stone-200 hover:bg-zinc-700 cursor-pointer transition-colors duration-150"
-            [class.bg-zinc-700]="selectedOption()?.value === option.value"
-            role="option"
-          >
-            {{ option.name }}
+  <div class="relative w-full max-w-xs">
+      <button
+        (click)="toggleDropdown()"
+        type="button"
+        [attr.aria-expanded]="isOpen()"
+        aria-haspopup="listbox"
+        class="form-field-dark"
+      >
+        <span class="font-light" id="selected-value">{{ selectedOption() ? selectedOption()?.name : placeholder() }}</span>
+        <svg
+          class="w-4 h-4 transition-transform duration-200"
+          [class.rotate-180]="isOpen()"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+    @if (isOpen()) {
+      <div
+        class="
+        absolute z-100 w-full mt-1
+        bg-zinc-800 border border-zinc-700
+        rounded-md shadow-lg
+        origin-top
+        transition-all duration-200 ease-out
+        max-h-auto
+        opacity-100 scale-y-100
+      "
+        role="listbox"
+      >
+        @if (dropdownOptions().length === 0) {
+          <div class="px-4 py-3 text-sm text-stone-400 text-center select-none">
+            No items found
           </div>
+        } @else {
+          @for (option of dropdownOptions(); track option.value) {
+            <div
+              (click)="selectOption(option)"
+              [attr.aria-selected]="selectedOption()?.value === option.value"
+              class="block px-4 py-2 text-sm text-stone-200 hover:bg-zinc-700 cursor-pointer transition-colors duration-150"
+              [class.bg-zinc-700]="selectedOption()?.value === option.value"
+              role="option"
+            >
+              {{ option.name }}
+            </div>
+          }
         }
-      }
-    </div>
-  }
-</div>
+      </div>
+    }
+  </div>

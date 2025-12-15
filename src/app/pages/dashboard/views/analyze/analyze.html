@@ -1,0 +1,78 @@
+<div class="stepper-progress-bar flex justify-between relative">
+
+    <div
+    class="absolute left-0 right-0 top-3 h-0.5 bg-zinc-800">
+    <div
+      [style.width]="(store.currentStep() - 1) / (store.steps().length - 1) * 100 + '%'"
+      class="h-full bg-zinc-400 transition-all duration-300 ease-in-out"
+    ></div>
+  </div>
+
+  @for (step of store.steps(); track step; let i = $index) {
+    <div
+      [attr.data-step-index]="i + 1"
+      class="flex flex-col items-center z-10 w-2/3"
+    >
+      <div
+        [ngClass]="{
+        'bg-zinc-900 text-zinc-200 ring-2 ring-zinc-400': store.currentStep() === i + 1,
+        'bg-zinc-800 text-zinc-500 border border-zinc-700': store.currentStep() < i + 1,
+        'bg-zinc-700 text-zinc-300': store.currentStep() > i + 1,
+      }"
+        class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors duration-300"
+      >
+        @if (store.currentStep() !== i + 1) {
+          <ng-container>
+            <div [ngClass]="{
+            'bg-zinc-500': store.currentStep() > i + 1,
+            'bg-zinc-600': store.currentStep() < i + 1
+          }"
+                 class="w-2 h-2 rounded-full"
+            ></div>
+          </ng-container>
+        }
+        @if (store.currentStep() === i + 1) {
+          <ng-container>
+            <span class="text-md font-bold">{{ i + 1 }}</span>
+          </ng-container>
+        }
+      </div>
+
+      <div class="mt-4 text-center">
+        <p [ngClass]="{
+          'text-zinc-200': store.currentStep() === i + 1,
+          'text-zinc-500': store.currentStep() < i + 1,
+          'text-zinc-600': store.currentStep() > i + 1
+        }"
+           class="text-xs font-medium uppercase transition-colors duration-300"
+        >
+          @if (store.currentStep() === i + 1) {
+          {{ step.label }}
+          }
+        </p>
+
+<!--        <p [ngClass]="{-->
+<!--          'text-zinc-300 bg-zinc-700/40 px-1.5 py-0.5 rounded': store.currentStep() === i + 1,-->
+<!--          'text-zinc-600': store.currentStep() < i + 1,-->
+<!--          'opacity-0': store.currentStep() > i + 1-->
+<!--        }"-->
+<!--           class="text-[10px] mt-1 font-semibold transition-opacity duration-300"-->
+<!--        >-->
+<!--          {{ store.currentStep() === i + 1 ? 'In Progress' : 'Pending' }}-->
+<!--        </p>-->
+      </div>
+    </div>
+  }
+</div>
+
+<div class="analyze-wrapper flex flex-col gap-6">
+
+
+  <div class="step-content rounded p-4 h-full">
+    <ng-container
+      *ngComponentOutlet="currentComponent()">
+    </ng-container>
+  </div>
+
+</div>
+
