@@ -13,21 +13,19 @@ import {
   analyzeStore,
   type ThumbnailTemplateType,
   type ThumbnailConfig,
-  type BigBoldTextConfig,
-  type FaceLeftTextRightConfig,
-  type DocumentaryStoryConfig,
-  type BeforeAfterConfig,
-  type CenterObjectMinimalConfig,
-  type NeonTechConfig,
-  type ReactionObjectConfig,
-  type TwoToneConfig,
-  type BlurBackgroundTextConfig,
-  type MagazineStyleConfig,
 } from '../../../../../../stores/dashboard/analyze.store';
+import { DropdownInput } from '../../../../../../shared/components/dropdown/dropdown-input';
+import {
+  FONT_WEIGHT_OPTIONS,
+  LOGO_SIZE_OPTIONS,
+  LOGO_POSITION_OPTIONS,
+  MOOD_OPTIONS,
+  DIVIDER_STYLE_OPTIONS,
+} from './thumbnail.options';
 
 @Component({
   selector: 'app-thumbnail-config-form',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DropdownInput],
   templateUrl: './thumbnail-config-form.html',
   styleUrl: './thumbnail-config-form.scss',
 })
@@ -39,7 +37,19 @@ export class ThumbnailConfigForm implements OnInit, OnChanges {
   // Form signals
   protected readonly formData = signal<Record<string, unknown>>({});
   protected readonly isValid = signal(false);
-
+  protected readonly brandLogoFileName = signal<string>('');
+  protected readonly personImageFileName = signal<string>('');
+  protected readonly beforeImageFileName = signal<string>('');
+  protected readonly afterImageFileName = signal<string>('');
+  protected readonly centerObjectImageFileName = signal<string>('');
+  protected readonly reactionPersonImageFileName = signal<string>('');
+  protected readonly objectImageFileName = signal<string>('');
+  protected readonly coverImageFileName = signal<string>('');
+  readonly fontWeightOptions = FONT_WEIGHT_OPTIONS;
+  readonly logoSizeOptions = LOGO_SIZE_OPTIONS;
+  readonly logoPositionOptions = LOGO_POSITION_OPTIONS;
+  readonly moodOptions = MOOD_OPTIONS;
+  readonly dividerStyleOptions = DIVIDER_STYLE_OPTIONS;
   public ngOnInit(): void {
     this.initializeFormData();
   }
@@ -227,6 +237,33 @@ export class ThumbnailConfigForm implements OnInit, OnChanges {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      // Update file name for all file upload fields
+      switch (field) {
+        case 'brandLogo':
+          this.brandLogoFileName.set(file.name);
+          break;
+        case 'personImage':
+          this.personImageFileName.set(file.name);
+          break;
+        case 'beforeImage':
+          this.beforeImageFileName.set(file.name);
+          break;
+        case 'afterImage':
+          this.afterImageFileName.set(file.name);
+          break;
+        case 'centerObjectImage':
+          this.centerObjectImageFileName.set(file.name);
+          break;
+        case 'reactionPersonImage':
+          this.reactionPersonImageFileName.set(file.name);
+          break;
+        case 'objectImage':
+          this.objectImageFileName.set(file.name);
+          break;
+        case 'coverImage':
+          this.coverImageFileName.set(file.name);
+          break;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;

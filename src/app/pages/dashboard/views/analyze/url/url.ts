@@ -1,8 +1,8 @@
-import { analyzeStore } from './../../../../../stores/dashboard/analyze.store';
-import { Component, inject } from '@angular/core';
+import { analyzeStore } from '../../../../../stores/dashboard/analyze.store';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AnalyzeService } from '../analyze.service';
+import { isValidYoutubeUrl } from '../../../../../shared/utils/video-url-validation';
 
 @Component({
   selector: 'app-url',
@@ -11,15 +11,20 @@ import { AnalyzeService } from '../analyze.service';
   styleUrl: './url.scss',
 })
 export class Url {
-  protected videoUrl = '';
-  private readonly analyzeStore = inject(analyzeStore);
-  private readonly analyzeService = inject(AnalyzeService);
-  private readonly router = inject(Router);
+  constructor() {}
 
-  protected nextStep(): void {
+  protected videoUrl = '';
+  protected loading = signal(false);
+  protected readonly isValidYoutubeUrl = isValidYoutubeUrl;
+  protected readonly analyzeStore = inject(analyzeStore);
+
+  private readonly analyzeService = inject(AnalyzeService);
+
+  protected analyzeVideoUrl(): void {
+    if (!isValidYoutubeUrl(this.videoUrl)) return;
+    this.analyzeStore.startLoading();
     this.analyzeStore.setVideoUrl(this.videoUrl);
     this.analyzeService.getAnalysisResults(this.videoUrl);
-    void this.router.navigate(['/dashboard/analyze/generation']);
     this.analyzeStore.nextStep();
   }
 }

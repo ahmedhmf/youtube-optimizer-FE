@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import type {
   VideoData,
@@ -27,6 +27,9 @@ export class AnalyzeService {
       .pipe(
         tap((results) => {
           this.analyzeStore.setAnalysisResults(results);
+        }),
+        finalize(() => {
+          this.analyzeStore.stopLoading();
         }),
       )
       .subscribe();

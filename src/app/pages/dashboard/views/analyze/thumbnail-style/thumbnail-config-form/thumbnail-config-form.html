@@ -1,116 +1,131 @@
 <div class="thumbnail-config-form">
-  <div class="form-header">
-    <h3>Customize Your Thumbnail</h3>
-    <p class="required-note">* Required fields</p>
+  <div class="flex flex-col gap-2 text-start mb-5">
+    <h3 class="font-bold text-lg text-start">Customize Your Thumbnail</h3>
   </div>
 
-  <div class="form-content">
+  <div class="flex flex-col gap-5">
     <!-- BIG_BOLD_TEXT Template -->
     @if (templateType === 'big_bold_text') {
-      <div class="form-group">
-        <label for="mainText">Main Text *</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="mainText">Main Text</label>
         <input
           id="mainText"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['mainText']"
           (input)="updateField('mainText', $any($event.target).value)"
           placeholder="Enter your bold headline"
         />
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="textColor">Text Color</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="fontWeight">Font Weight</label>
+        <app-dropdown-input
+          [dropdownOptions]="fontWeightOptions"
+          [placeholder]="'Select Font Weight'"
+          (onSelect)="updateField('fontWeight', $event.value)"
+        ></app-dropdown-input>
+      </div>
+      <div class="flex items-center justify-content-between gap-5">
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="textColor">Text Color</label>
           <input
             id="textColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['textColor']"
             (input)="updateField('textColor', $any($event.target).value)"
           />
         </div>
-
-        <div class="form-group">
-          <label for="textOutlineColor">Text Outline Color</label>
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="textOutlineColor">Text Outline Color</label>
           <input
             id="textOutlineColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['textOutlineColor']"
             (input)="updateField('textOutlineColor', $any($event.target).value)"
           />
         </div>
       </div>
-
-      <div class="form-group">
-        <label for="fontWeight">Font Weight</label>
-        <select
-          id="fontWeight"
-          class="form-control"
-          [value]="formData()['fontWeight']"
-          (change)="updateField('fontWeight', $any($event.target).value)"
-        >
-          <option value="bold">Bold</option>
-          <option value="extra-bold">Extra Bold</option>
-        </select>
-      </div>
     }
 
     <!-- FACE_LEFT_TEXT_RIGHT Template -->
     @if (templateType === 'face_left_text_right') {
-      <div class="form-group">
-        <label for="personImage">Person Image *</label>
-        <input
-          id="personImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('personImage', $event)"
-        />
+        <div class="flex flex-col items-start">
+        <label class="form-field-label" for="personImage">Person Image</label>
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark  min-w-60 pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="personImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (personImageFileName()) {
+                {{ personImageFileName() }}
+              } @else {
+                Click here to upload person image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="personImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('personImage', $event)"
+          >
+        </div>
         @if (formData()['personImage']) {
-          <img [src]="formData()['personImage']" alt="Person Preview" class="image-preview" />
+          <img [src]="formData()['personImage']" alt="Person Preview" class="image-preview-small mt-2 h-30" />
         }
       </div>
 
-      <div class="form-group">
-        <label for="mainText">Main Text *</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="mainText">Main Text *</label>
         <input
           id="mainText"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['mainText']"
           (input)="updateField('mainText', $any($event.target).value)"
           placeholder="Enter your headline"
         />
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="textColor">Text Color</label>
+      <div class="flex items-center justify-content-between gap-5">
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="textColor">Text Color</label>
           <input
             id="textColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['textColor']"
             (input)="updateField('textColor', $any($event.target).value)"
           />
         </div>
 
-        <div class="form-group">
-          <label for="textBackground">Text Background</label>
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="textBackground">Text Background</label>
           <input
             id="textBackground"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['textBackground']"
             (input)="updateField('textBackground', $any($event.target).value)"
           />
         </div>
       </div>
 
-      <div class="form-group">
-        <label>
+      <div class="flex flex-col items-start gap-2">
+        <label class="form-field-label">
           <input
             type="checkbox"
             [checked]="formData()['arrowPointer']"
@@ -123,173 +138,232 @@
 
     <!-- DOCUMENTARY_STORY Template -->
     @if (templateType === 'documentary_story') {
-      <div class="form-group">
-        <label for="mainTitle">Main Title *</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="mainTitle">Main Title *</label>
         <input
           id="mainTitle"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['mainTitle']"
           (input)="updateField('mainTitle', $any($event.target).value)"
           placeholder="Enter main title"
         />
       </div>
 
-      <div class="form-group">
-        <label for="subtitle">Subtitle *</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="subtitle">Subtitle *</label>
         <input
           id="subtitle"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['subtitle']"
           (input)="updateField('subtitle', $any($event.target).value)"
           placeholder="Enter subtitle"
         />
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="titleColor">Title Color</label>
+      <div class="flex items-center justify-content-between gap-5">
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="titleColor">Title Color</label>
           <input
             id="titleColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['titleColor']"
             (input)="updateField('titleColor', $any($event.target).value)"
           />
         </div>
 
-        <div class="form-group">
-          <label for="subtitleColor">Subtitle Color</label>
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="subtitleColor">Subtitle Color</label>
           <input
             id="subtitleColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['subtitleColor']"
             (input)="updateField('subtitleColor', $any($event.target).value)"
           />
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="mood">Mood</label>
-        <select
-          id="mood"
-          class="form-control"
-          [value]="formData()['mood']"
-          (change)="updateField('mood', $any($event.target).value)"
-        >
-          <option value="cinematic">Cinematic</option>
-          <option value="serious">Serious</option>
-          <option value="dramatic">Dramatic</option>
-        </select>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="mood">Mood</label>
+        <app-dropdown-input
+          [dropdownOptions]="moodOptions"
+          [placeholder]="'Select Mood'"
+          (onSelect)="updateField('mood', $event.value)"
+        ></app-dropdown-input>
       </div>
     }
 
     <!-- BEFORE_AFTER Template -->
     @if (templateType === 'before_after') {
-      <div class="form-group">
-        <label for="beforeImage">Before Image *</label>
-        <input
-          id="beforeImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('beforeImage', $event)"
-        />
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="beforeImage">Before Image *</label>
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="beforeImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (beforeImageFileName()) {
+                {{ beforeImageFileName() }}
+              } @else {
+                Click here to upload before image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="beforeImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('beforeImage', $event)"
+          >
+        </div>
         @if (formData()['beforeImage']) {
-          <img [src]="formData()['beforeImage']" alt="Before Preview" class="image-preview" />
+          <img [src]="formData()['beforeImage']" alt="Before Preview" class="image-preview-small mt-2 w-30" />
         }
       </div>
 
-      <div class="form-group">
-        <label for="afterImage">After Image *</label>
-        <input
-          id="afterImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('afterImage', $event)"
-        />
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="afterImage">After Image *</label>
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="afterImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (afterImageFileName()) {
+                {{ afterImageFileName() }}
+              } @else {
+                Click here to upload after image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="afterImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('afterImage', $event)"
+          >
+        </div>
         @if (formData()['afterImage']) {
-          <img [src]="formData()['afterImage']" alt="After Preview" class="image-preview" />
+          <img [src]="formData()['afterImage']" alt="After Preview" class="image-preview-small mt-2 w-30" />
         }
       </div>
 
-      <div class="form-group">
-        <label for="dividerStyle">Divider Style</label>
-        <select
-          id="dividerStyle"
-          class="form-control"
-          [value]="formData()['dividerStyle']"
-          (change)="updateField('dividerStyle', $any($event.target).value)"
-        >
-          <option value="arrow">Arrow</option>
-          <option value="line">Line</option>
-          <option value="vs">VS</option>
-        </select>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="dividerStyle">Divider Style</label>
+        <app-dropdown-input
+          [dropdownOptions]="dividerStyleOptions"
+          [placeholder]="'Select Divider Style'"
+          (onSelect)="updateField('dividerStyle', $event.value)"
+        ></app-dropdown-input>
       </div>
     }
 
     <!-- CENTER_OBJECT_MINIMAL Template -->
     @if (templateType === 'center_object_minimal') {
-      <div class="form-group">
-        <label for="centerObjectImage">Center Object Image *</label>
-        <input
-          id="centerObjectImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('centerObjectImage', $event)"
-        />
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="centerObjectImage">Center Object Image *</label>
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="centerObjectImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (centerObjectImageFileName()) {
+                {{ centerObjectImageFileName() }}
+              } @else {
+                Click here to upload object image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="centerObjectImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('centerObjectImage', $event)"
+          >
+        </div>
         @if (formData()['centerObjectImage']) {
-          <img [src]="formData()['centerObjectImage']" alt="Object Preview" class="image-preview" />
+          <img [src]="formData()['centerObjectImage']" alt="Object Preview" class="image-preview-small mt-2 w-30" />
         }
       </div>
 
-      <div class="form-group">
-        <label for="topText">Top Text (Optional)</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="topText">Top Text (Optional)</label>
         <input
           id="topText"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['topText']"
           (input)="updateField('topText', $any($event.target).value)"
           placeholder="Text above object"
         />
       </div>
 
-      <div class="form-group">
-        <label for="bottomText">Bottom Text (Optional)</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="bottomText">Bottom Text (Optional)</label>
         <input
           id="bottomText"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['bottomText']"
           (input)="updateField('bottomText', $any($event.target).value)"
           placeholder="Text below object"
         />
       </div>
 
-      <div class="form-group">
-        <label for="textColor">Text Color</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="textColor">Text Color</label>
         <input
           id="textColor"
           type="color"
-          class="form-control color-picker"
+          class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
           [value]="formData()['textColor']"
           (input)="updateField('textColor', $any($event.target).value)"
         />
       </div>
 
-      <div class="form-group">
-        <label for="backgroundBlur">Background Blur (0-20)</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="backgroundBlur">Background Blur: {{ formData()['backgroundBlur'] }}/20</label>
         <input
           id="backgroundBlur"
           type="range"
           min="0"
           max="20"
-          class="form-control"
+          class="w-full"
           [value]="formData()['backgroundBlur']"
           (input)="updateField('backgroundBlur', $any($event.target).value)"
         />
@@ -298,57 +372,57 @@
 
     <!-- NEON_TECH Template -->
     @if (templateType === 'neon_tech') {
-      <div class="form-group">
-        <label for="mainText">Main Text *</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="mainText">Main Text *</label>
         <input
           id="mainText"
           type="text"
-          class="form-control"
+          class="form-field-dark"
           [value]="formData()['mainText']"
           (input)="updateField('mainText', $any($event.target).value)"
           placeholder="Enter neon text"
         />
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="neonColor">Primary Neon Color</label>
+      <div class="flex items-center justify-content-between gap-5">
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="neonColor">Primary Neon Color</label>
           <input
             id="neonColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['neonColor']"
             (input)="updateField('neonColor', $any($event.target).value)"
           />
         </div>
 
-        <div class="form-group">
-          <label for="secondaryNeonColor">Secondary Neon Color</label>
+        <div class="flex flex-col items-start">
+          <label class="form-field-label" for="secondaryNeonColor">Secondary Neon Color</label>
           <input
             id="secondaryNeonColor"
             type="color"
-            class="form-control color-picker"
+            class="p-1 h-10 w-10 block bg-zinc-900 border border-zinc-800 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
             [value]="formData()['secondaryNeonColor']"
             (input)="updateField('secondaryNeonColor', $any($event.target).value)"
           />
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="textGlowIntensity">Glow Intensity (0-100)</label>
+      <div class="flex flex-col items-start">
+        <label class="form-field-label" for="textGlowIntensity">Glow Intensity: {{ formData()['textGlowIntensity'] }}/100</label>
         <input
           id="textGlowIntensity"
           type="range"
           min="0"
           max="100"
-          class="form-control"
+          class="w-full"
           [value]="formData()['textGlowIntensity']"
           (input)="updateField('textGlowIntensity', $any($event.target).value)"
         />
       </div>
 
-      <div class="form-group">
-        <label>
+      <div class="flex flex-col items-start gap-2">
+        <label class="form-field-label">
           <input
             type="checkbox"
             [checked]="formData()['gridOverlay']"
@@ -358,8 +432,8 @@
         </label>
       </div>
 
-      <div class="form-group">
-        <label>
+      <div class="flex flex-col items-start gap-2">
+        <label class="form-field-label">
           <input
             type="checkbox"
             [checked]="formData()['scanlines']"
@@ -374,13 +448,36 @@
     @if (templateType === 'reaction_object') {
       <div class="form-group">
         <label for="personImage">Person Image *</label>
-        <input
-          id="personImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('personImage', $event)"
-        />
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="personImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (reactionPersonImageFileName()) {
+                {{ reactionPersonImageFileName() }}
+              } @else {
+                Click here to upload person image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="personImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('reactionPersonImage', $event)"
+          >
+        </div>
         @if (formData()['personImage']) {
           <img [src]="formData()['personImage']" alt="Person Preview" class="image-preview" />
         }
@@ -388,13 +485,36 @@
 
       <div class="form-group">
         <label for="objectImage">Object Image *</label>
-        <input
-          id="objectImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('objectImage', $event)"
-        />
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="objectImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (objectImageFileName()) {
+                {{ objectImageFileName() }}
+              } @else {
+                Click here to upload object image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="objectImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('objectImage', $event)"
+          >
+        </div>
         @if (formData()['objectImage']) {
           <img [src]="formData()['objectImage']" alt="Object Preview" class="image-preview" />
         }
@@ -545,7 +665,7 @@
       </div>
 
       <div class="form-group">
-        <label for="blurIntensity">Blur Intensity (0-30)</label>
+        <label for="blurIntensity">Blur Intensity: {{ formData()['blurIntensity'] }}/30</label>
         <input
           id="blurIntensity"
           type="range"
@@ -597,13 +717,36 @@
 
       <div class="form-group">
         <label for="coverImage">Cover Image (Optional)</label>
-        <input
-          id="coverImage"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('coverImage', $event)"
-        />
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="coverImage"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (coverImageFileName()) {
+                {{ coverImageFileName() }}
+              } @else {
+                Click here to upload cover image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="coverImage"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('coverImage', $event)"
+          >
+        </div>
         @if (formData()['coverImage']) {
           <img [src]="formData()['coverImage']" alt="Cover Preview" class="image-preview" />
         }
@@ -637,61 +780,76 @@
 
     <!-- Common Fields for All Templates -->
     <div class="common-fields">
-      <h4>Optional Settings</h4>
+<!--      <h4>Optional Settings</h4>-->
 
       <div class="form-group">
-        <label for="brandLogo">Brand Logo (Optional)</label>
-        <input
-          id="brandLogo"
-          type="file"
-          class="form-control"
-          accept="image/*"
-          (change)="handleImageUpload('brandLogo', $event)"
-        />
-        @if (formData()['brandLogo']) {
-          <img [src]="formData()['brandLogo']" alt="Logo Preview" class="image-preview-small" />
-        }
+        <div class="flex flex-col items-start">
+        <label class="form-field-label" for="brandLogo">Brand Logo</label>
+        <div class="relative">
+          <span class="material-symbols-outlined
+          text-stone-200
+           absolute
+           left-3 top-1/2
+          -translate-y-1/2
+          [font-variation-settings:'wght'_100]
+           pointer-events-none">
+             upload
+          </span>
+          <label
+            class="form-field-dark pl-10 pr-3 py-2 cursor pointer overflow-hidden"
+            for="brandLogo"
+          >
+            <span class="text-sm font-medium text-stone-200">
+              @if (brandLogoFileName()) {
+                {{ brandLogoFileName() }}
+              } @else {
+                Click here to upload your logo image
+              }
+            </span>
+          </label>
+          <input
+            class="hidden"
+            id="brandLogo"
+            type="file"
+            accept="image/*"
+            (change)="handleImageUpload('brandLogo', $event)"
+          >
+        </div>
+        </div>
+<!--        @if (formData()['brandLogo']) {-->
+<!--          <img [src]="formData()['brandLogo']" alt="Logo Preview" class="image-preview-small mt-2 w-30" />-->
+<!--        }-->
       </div>
 
+
       @if (formData()['brandLogo']) {
-        <div class="form-row">
-          <div class="form-group">
-            <label for="logoSize">Logo Size</label>
-            <select
-              id="logoSize"
-              class="form-control"
-              [value]="formData()['logoSize']"
-              (change)="updateField('logoSize', $any($event.target).value)"
-            >
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
+        <div class="flex items-center gap-4 mt-4">
+          <div class="flex flex-col items-start">
+            <label class="form-field-label" for="logoSize">Logo Size</label>
+            <app-dropdown-input
+              [dropdownOptions]="logoSizeOptions"
+              [placeholder]="'Select Logo Size'"
+              (onSelect)="updateField('logoSize', $event.value)"
+            ></app-dropdown-input>
           </div>
 
-          <div class="form-group">
-            <label for="logoPosition">Logo Position</label>
-            <select
-              id="logoPosition"
-              class="form-control"
-              [value]="formData()['logoPosition']"
-              (change)="updateField('logoPosition', $any($event.target).value)"
-            >
-              <option value="top-left">Top Left</option>
-              <option value="top-right">Top Right</option>
-              <option value="bottom-left">Bottom Left</option>
-              <option value="bottom-right">Bottom Right</option>
-            </select>
+          <div class="flex flex-col items-start">
+            <label class="form-field-label" for="logoPosition">Logo Position</label>
+            <app-dropdown-input
+              [dropdownOptions]="logoPositionOptions"
+              [placeholder]="'Select Logo Position'"
+              (onSelect)="updateField('logoPosition', $event.value)"
+            ></app-dropdown-input>
           </div>
         </div>
       }
     </div>
   </div>
 
-  <div class="form-footer">
+  <div class="form-footer flex justify-center mt-5">
     <button
       type="button"
-      class="btn btn-primary"
+      class="form-button-dark w-50"
       [disabled]="!isValid()"
       (click)="saveConfiguration()"
     >

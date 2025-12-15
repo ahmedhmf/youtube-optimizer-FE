@@ -170,11 +170,11 @@ export class ThumbnailStyle implements OnInit {
         template: selectedTemplate,
         templateData: thumbnailConfig,
       });
-      void this.router.navigate(['/dashboard/analyze/results']);
+      void this.analyzeStore.nextStep();
     }
   }
 
   protected prevStep(): void {
-    void this.router.navigate([this.analyzeStore.prevStep()]);
+    void this.analyzeStore.prevStep();
   }
 }

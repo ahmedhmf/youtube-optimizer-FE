@@ -1,0 +1,35 @@
+<div class="flex flex-col items-start space-y-4 mb-8 w-80">
+  @if(analyzeStore.isLoading()){
+    <div
+      class="relative w-60 h-40 bg-[#0a0a0a] border border-zinc-800 rounded-xl
+             shadow-[0_8px_20px_rgba(0,0,0,0.45)]
+             overflow-hidden
+             before:absolute before:inset-0 before:rounded-xl
+             before:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_75%)]
+             after:absolute after:inset-0 after:rounded-xl
+             after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]
+             flex flex-col justify-center items-center"
+    >
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent
+                  animate-shimmer pointer-events-none"></div>
+      <div class="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-white/10 to-transparent"></div>
+    </div>
+    <div class="w-2/3 h-4 bg-white/20 rounded animate-pulse"></div>
+    <div class="w-1/2 h-4 bg-white/10 rounded animate-pulse"></div>
+  }
+@else if(this.analyzeStore.analysisResults() && !analyzeStore.isLoading()) {
+    <img
+      [src]="analyzeStore.analysisResults()?.thumbnailUrl"
+      alt="video thumbnail"
+      class="h-40 rounded-xl shadow"
+    />
+    <div>
+    <h2 class="text-xl font-bold">
+      {{ analyzeStore.analysisResults()?.title }}
+    </h2>
+    <p class="text-gray-500 ">
+      {{ analyzeStore.analysisResults()?.category }}
+    </p>
+    </div>
+}
+</div>

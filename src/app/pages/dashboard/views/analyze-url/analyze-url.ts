@@ -10,6 +10,7 @@ import type { AIConfigurationSettings } from '../../../../models/language.model'
 import type { ApiError } from '../../../../models/api-error.model';
 import type { Audits } from '../../../../models/audits.model';
 import { JobQueueService, type JobEventData } from '../../../../services/job-queue.service';
+import {DropdownInput} from '../../../../shared/components/dropdown/dropdown-input';
 
 type TabType = {
   id: 'url' | 'upload' | 'text';
@@ -19,7 +20,7 @@ type TabType = {
 
 @Component({
   selector: 'app-analyze-url',
-  imports: [FormsModule, NgClass],
+  imports: [FormsModule, NgClass, DropdownInput],
   templateUrl: './analyze-url.html',
   styleUrl: './analyze-url.scss',
   standalone: true,
@@ -218,7 +219,7 @@ export class AnalyzeUrl implements OnDestroy {
     }
   }
 
-  private analyzeFromUrl(): void {
+  protected analyzeFromUrl(): void {
     // Validation
     const url = this.videoUrl().trim();
 
