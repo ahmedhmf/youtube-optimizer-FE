@@ -35,7 +35,7 @@ export class JobStatusService {
   public retryJob(jobId: string): Observable<RetryJobResponce> {
     const operation = (): Observable<RetryJobResponce> =>
       this.http.post<RetryJobResponce>(
-        `${this.API_BASE}/job/${jobId}/retry`,
+        `${this.API_BASE}/job/${jobId}/restart`,
         {},
         { withCredentials: true },
       );
@@ -61,41 +61,5 @@ export class JobStatusService {
       operation: 'cancelJob',
       metadata: { jobId },
     });
-  }
-
-  /**
-   * Get single job status - useful for polling job progress
-   */
-  public getJobStatus(jobId: string): Observable<UserJob> {
-    const operation = (): Observable<UserJob> =>
-      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}`, { withCredentials: true });
-
-    return this.retryService.retryWithCategory(operation, 'listing', {
-      operation: 'getJobStatus',
-      metadata: { jobId },
-    });
-  }
-
-  /**
-   * Poll job status until completion (if you need this feature)
-   */
-  public pollJobStatus(jobId: string): Observable<UserJob> {
-    const operation = (): Observable<UserJob> =>
-      this.http.get<UserJob>(`${this.API_BASE}/job/${jobId}/status`, { withCredentials: true });
-
-    // Use background category with more aggressive retry for polling
-    return this.retryService.retryWithOverrides(
-      operation,
-      'background',
-      {
-        maxRetries: 8,
-        initialDelay: 2000,
-        maxDelay: 15000,
-      },
-      {
-        operation: 'pollJobStatus',
-        metadata: { jobId, polling: true },
-      },
-    );
   }
 }

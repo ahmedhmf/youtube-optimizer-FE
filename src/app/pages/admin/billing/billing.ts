@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './billing.html',
   styleUrl: './billing.scss',
 })
-export class Billing {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class Billing {}

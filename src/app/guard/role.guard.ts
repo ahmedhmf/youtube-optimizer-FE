@@ -12,17 +12,15 @@ export class RoleGuard implements CanActivate {
     const requiredRoles = route.data['roles'] as string[];
     const requiredPermissions = route.data['permissions'] as string[];
 
-    if (requiredRoles && !this.authService.hasAnyRole(requiredRoles)) {
+    if (!this.authService.hasAnyRole(requiredRoles)) {
       void this.router.navigate(['/unauthorized']);
       return false;
     }
 
-    if (requiredPermissions) {
-      for (const permission of requiredPermissions) {
-        if (!this.authService.hasRole(permission)) {
-          void this.router.navigate(['/unauthorized']);
-          return false;
-        }
+    for (const permission of requiredPermissions) {
+      if (!this.authService.hasRole(permission)) {
+        void this.router.navigate(['/unauthorized']);
+        return false;
       }
     }
 

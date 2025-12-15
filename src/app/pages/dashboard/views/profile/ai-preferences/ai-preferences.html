@@ -1,0 +1,199 @@
+<div class="ai-preferences">
+  <div class="preferences-header">
+    <h3>AI Preferences</h3>
+    @if (!isEditing() && preferences()) {
+      <button class="edit-button" (click)="enableEditing()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+        Edit
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading preferences...</p>
+    </div>
+  } @else {
+    <div class="preferences-content">
+      @if (successMessage()) {
+        <div class="message success-message">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="message error-message">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (isEditing() || !preferences()) {
+        <form class="preferences-form" (ngSubmit)="savePreferences()">
+          <div class="form-group">
+            <label for="language">Language</label>
+            <select
+              id="language"
+              [(ngModel)]="language"
+              name="language"
+              required
+              class="form-control"
+            >
+              <option value="" disabled>Select a language</option>
+              @for (lang of availableLanguages; track lang.value) {
+                <option [value]="lang.value">{{ lang.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tone">Tone</label>
+            <select id="tone" [(ngModel)]="tone" name="tone" required class="form-control">
+              <option value="" disabled>Select a tone</option>
+              @for (toneOption of availableTones; track toneOption.value) {
+                <option [value]="toneOption.value">{{ toneOption.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="thumbnailStyle">Thumbnail Style</label>
+            <select
+              id="thumbnailStyle"
+              [(ngModel)]="thumbnailStyle"
+              name="thumbnailStyle"
+              required
+              class="form-control"
+            >
+              <option value="" disabled>Select a thumbnail style</option>
+              @for (style of availableThumbnailStyles; track style.value) {
+                <option [value]="style.value">{{ style.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="imageStyle">Image Style</label>
+            <select
+              id="imageStyle"
+              [(ngModel)]="imageStyle"
+              name="imageStyle"
+              required
+              class="form-control"
+            >
+              <option value="" disabled>Select an image style</option>
+              @for (style of availableImageStyles; track style.value) {
+                <option [value]="style.value">{{ style.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="customInstructions">Custom Instructions</label>
+            <textarea
+              id="customInstructions"
+              [(ngModel)]="customInstructions"
+              name="customInstructions"
+              required
+              class="form-control"
+              rows="4"
+              placeholder="Enter any custom instructions for AI generation..."
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="save-button"
+              [disabled]="
+                isSaving() || !language() || !tone() || !thumbnailStyle() || !imageStyle()
+              "
+            >
+              @if (isSaving()) {
+                <span class="button-spinner"></span>
+                Saving...
+              } @else {
+                Save Preferences
+              }
+            </button>
+
+            @if (preferences()) {
+              <button
+                type="button"
+                class="cancel-button"
+                (click)="cancelEditing()"
+                [disabled]="isSaving()"
+              >
+                Cancel
+              </button>
+            }
+          </div>
+        </form>
+      } @else {
+        <div class="preferences-display">
+          <div class="preference-item">
+            <span class="preference-label">Language:</span>
+            <span class="preference-value">{{ getLanguageLabel(language()) }}</span>
+          </div>
+          <div class="preference-item">
+            <span class="preference-label">Tone:</span>
+            <span class="preference-value">{{ getToneLabel(tone()) }}</span>
+          </div>
+          <div class="preference-item">
+            <span class="preference-label">Thumbnail Style:</span>
+            <span class="preference-value">{{ getThumbnailStyleLabel(thumbnailStyle()) }}</span>
+          </div>
+          <div class="preference-item">
+            <span class="preference-label">Image Style:</span>
+            <span class="preference-value">{{ getImageStyleLabel(imageStyle()) }}</span>
+          </div>
+          <div class="preference-item full-width">
+            <span class="preference-label">Custom Instructions:</span>
+            <span class="preference-value">{{ customInstructions() }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

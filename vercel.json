@@ -1,0 +1,13 @@
+{
+  "buildCommand": "NODE_ENV=production npm run build:prod",
+  "outputDirectory": "dist/youtube-optimizer-FE/browser",
+  "installCommand": "npm ci",
+  "devCommand": "npm run start",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

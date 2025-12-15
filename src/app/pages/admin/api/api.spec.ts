@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { Api } from './api';
 
@@ -8,9 +9,8 @@ describe('Api', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Api]
-    })
-    .compileComponents();
+      imports: [Api],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Api);
     component = fixture.componentInstance;

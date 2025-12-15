@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { DashboardValueCard } from './dashboard-value-card';
 
@@ -8,9 +9,8 @@ describe('DashboardValueCard', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardValueCard]
-    })
-    .compileComponents();
+      imports: [DashboardValueCard],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardValueCard);
     component = fixture.componentInstance;

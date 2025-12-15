@@ -25,7 +25,7 @@ export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
 
   const authService = inject(AuthService);
 
-  // Skip JWT for auth endpoints (login, register, csrf)
+  // Skip JWT for auth endpoints (login, register)
   if (shouldSkipJwt(request.url)) {
     return next(request);
   }
@@ -101,8 +101,6 @@ function shouldSkipJwt(url: string): boolean {
     '/auth/login',
     '/auth/register',
     '/auth/refresh',
-    '/auth/csrf-token',
-    '/csrf/token',
     '/public/',
     '/login',
     '/register',

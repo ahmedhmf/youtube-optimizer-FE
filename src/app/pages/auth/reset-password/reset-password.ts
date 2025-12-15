@@ -114,8 +114,8 @@ export class ResetPasswordComponent implements OnInit {
 
     this.loading.set(true);
 
-    const newPassword = this.form.value.password;
-    const resetToken = this.token();
+    // const newPassword = this.form.value.password;
+    // const resetToken = this.token();
 
     // this.authService.resetPassword(resetToken, newPassword).subscribe({
     //   next: () => {

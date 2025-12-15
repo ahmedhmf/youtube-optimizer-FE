@@ -1,0 +1,29 @@
+<div class="max-w-3xl mx-auto">
+  <div class="flex space-x-4 mb-6">
+    <img
+      [src]="analyzeStore.analysisResults()?.thumbnailUrl"
+      alt="video thumbnail"
+      class="w-40 rounded-lg shadow"
+    />
+    <div>
+      <h2 class="text-xl font-bold">{{ analyzeStore.analysisResults()?.title }}</h2>
+      <p class="text-gray-500">{{ analyzeStore.analysisResults()?.category }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    @for (item of analyzeStore.generations(); track item) {
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="{{ item.value }}" [(ngModel)]="item.enabled" />
+        <span class="text-lg">{{ item.label }}</span>
+      </label>
+    }
+  </div>
+
+  <button
+    (click)="next()"
+    class="mt-10 w-full py-3 bg-blue-600 text-white rounded-lg font-semibold"
+  >
+    Continue
+  </button>
+</div>

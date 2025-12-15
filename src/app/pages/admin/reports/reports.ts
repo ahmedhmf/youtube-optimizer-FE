@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
 })
-export class Reports {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class Reports {}

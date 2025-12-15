@@ -65,6 +65,38 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/dashboard/views/profile/profile').then((m) => m.Profile),
       },
+      {
+        path: 'analyze',
+        loadComponent: () =>
+          import('./pages/dashboard/views/analyze/analyze').then((m) => m.Analyze),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/dashboard/views/analyze/url/url').then((m) => m.Url),
+            pathMatch: 'full',
+          },
+          {
+            path: 'generation',
+            loadComponent: () =>
+              import('./pages/dashboard/views/analyze/generation/generation').then(
+                (m) => m.Generation,
+              ),
+          },
+          {
+            path: 'thumbnail-style',
+            loadComponent: () =>
+              import('./pages/dashboard/views/analyze/thumbnail-style/thumbnail-style').then(
+                (m) => m.ThumbnailStyle,
+              ),
+          },
+          {
+            path: 'results',
+            loadComponent: () =>
+              import('./pages/dashboard/views/analyze/results/results').then((m) => m.Results),
+          },
+        ],
+      },
     ],
   },
   {

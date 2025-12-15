@@ -24,7 +24,6 @@ export class OAuthCallback implements OnInit {
   private readonly REDIRECT_DELAY = 2000;
 
   public ngOnInit(): void {
-    // Backend redirects here with tokens in query params after successful OAuth
     this.route.queryParams.subscribe((params) => {
       const success = params['success'];
       const error = params['error'];
@@ -37,56 +36,71 @@ export class OAuthCallback implements OnInit {
       sessionStorage.removeItem('oauth_state');
 
       if (state !== storedState) {
-        this.message = 'Security validation failed';
-        setTimeout(() => {
-          void this.router.navigate(['/login'], {
-            queryParams: { error: 'Invalid state parameter' },
-          });
-        }, this.REDIRECT_DELAY);
+        this.securityValidationFailed();
         return;
       }
 
       if (error) {
-        this.message = 'Authentication failed';
-        setTimeout(() => {
-          void this.router.navigate(['/login'], {
-            queryParams: { error: decodeURIComponent(error) },
-          });
-        }, this.REDIRECT_DELAY);
+        this.error(error);
         return;
       }
 
       if (success === 'true' && accessToken && refreshToken) {
-        // Save tokens from OAuth callback
-        localStorage.setItem('access_token', accessToken);
-        localStorage.setItem('refresh_token', refreshToken);
-
-        // Re-initialize auth state to load user info
-        this.message = 'Loading your account...';
-
-        this.authService.initialize().subscribe({
-          next: (isAuthenticated) => {
-            if (isAuthenticated) {
-              void this.router.navigate(['/dashboard']);
-            } else {
-              void this.router.navigate(['/login'], {
-                queryParams: { error: 'Authentication failed' },
-              });
-            }
-          },
-          error: () => {
-            void this.router.navigate(['/login'], {
-              queryParams: { error: 'Failed to initialize session' },
-            });
-          },
-        });
+        this.success(accessToken, refreshToken);
       } else {
-        // No success or error params - invalid callback
-        this.message = 'Invalid callback';
-        setTimeout(() => {
-          void this.router.navigate(['/login']);
-        }, this.REDIRECT_DELAY);
+        this.failed();
       }
     });
+  }
+
+  private securityValidationFailed(): void {
+    this.message = 'Security validation failed';
+    setTimeout(() => {
+      void this.router.navigate(['/login'], {
+        queryParams: { error: 'Invalid state parameter' },
+      });
+    }, this.REDIRECT_DELAY);
+  }
+
+  private error(error: unknown): void {
+    this.message = 'Authentication failed';
+    setTimeout(() => {
+      void this.router.navigate(['/login'], {
+        queryParams: { error: decodeURIComponent(String(error)) },
+      });
+    }, this.REDIRECT_DELAY);
+  }
+
+  private success(accessToken: string, refreshToken: string): void {
+    // Save tokens from OAuth callback
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+
+    // Re-initialize auth state to load user info
+    this.message = 'Loading your account...';
+
+    this.authService.initialize().subscribe({
+      next: (isAuthenticated) => {
+        if (isAuthenticated) {
+          void this.router.navigate(['/dashboard']);
+        } else {
+          void this.router.navigate(['/login'], {
+            queryParams: { error: 'Authentication failed' },
+          });
+        }
+      },
+      error: () => {
+        void this.router.navigate(['/login'], {
+          queryParams: { error: 'Failed to initialize session' },
+        });
+      },
+    });
+  }
+
+  private failed(): void {
+    this.message = 'Invalid callback';
+    setTimeout(() => {
+      void this.router.navigate(['/login']);
+    }, this.REDIRECT_DELAY);
   }
 }

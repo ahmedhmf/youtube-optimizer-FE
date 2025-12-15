@@ -57,9 +57,9 @@ export class ForgotPasswordComponent {
 
     this.loading.set(true);
 
-    const email = this.form.value.email;
+    // const email = this.form.value.email;
 
-    // this.authService.requestPasswordReset(email).subscribe({
+    // this.authService.(email).subscribe({
     //   next: () => {
     //     this.loading.set(false);
     //     this.success.set(true);

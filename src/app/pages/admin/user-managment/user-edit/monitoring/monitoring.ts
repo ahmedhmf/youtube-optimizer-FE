@@ -40,42 +40,42 @@ export class Monitoring implements OnInit {
     this.store.setEditValueForField(key, undefined as never);
   }
 
-  public saveField(field: string): void {
-    // const value = this.store.editValues()[field as keyof UserData];
-    this.store.setIsSaving(true);
+  // public saveField(field: string): void {
+  //   // const value = this.store.editValues()[field as keyof UserData];
+  //   this.store.setIsSaving(true);
 
-    // this.http
-    //   .patch<UserData>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}`, {
-    //     [field]: value,
-    //   })
-    //   .subscribe({
-    //     next: (updated) => {
-    //       this.store.setUserData(updated);
-    //       this.editMode[field] = false;
-    //       this.showSuccess(`${field} updated successfully`);
-    //       this.store.setIsSaving(false);
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //       this.store.setErrorMessage(error.error?.message ?? `Failed to update ${field}`);
-    //       this.store.setIsSaving(false);
-    //     },
-    //   });
-  }
+  // this.http
+  //   .patch<UserData>(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}`, {
+  //     [field]: value,
+  //   })
+  //   .subscribe({
+  //     next: (updated) => {
+  //       this.store.setUserData(updated);
+  //       this.editMode[field] = false;
+  //       this.showSuccess(`${field} updated successfully`);
+  //       this.store.setIsSaving(false);
+  //     },
+  //     error: (error: HttpErrorResponse) => {
+  //       this.store.setErrorMessage(error.error?.message ?? `Failed to update ${field}`);
+  //       this.store.setIsSaving(false);
+  //     },
+  //   });
+  // }
 
-  public rerunAnalysis(videoId: string): void {
-    if (!this.store.user()) {
-    }
+  // public rerunAnalysis(videoId: string): void {
+  //   if (!this.store.user()) {
+  //   }
 
-    // this.http
-    //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
-    //   .subscribe({
-    //     next: () => {
-    //       this.showSuccess('Video analysis rerun successfully');
-    //       this.loadVideoHistory(this.store.user().id);
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //       this.store.setErrorMessage(error.error?.message ?? 'Failed to rerun analysis');
-    //     },
-    //   });
-  }
+  //   // this.http
+  //   //   .post(`${environment.backendURL}/api/v1/admin/users/${this.store.user().id}/rerun/${videoId}`, {})
+  //   //   .subscribe({
+  //   //     next: () => {
+  //   //       this.showSuccess('Video analysis rerun successfully');
+  //   //       this.loadVideoHistory(this.store.user().id);
+  //   //     },
+  //   //     error: (error: HttpErrorResponse) => {
+  //   //       this.store.setErrorMessage(error.error?.message ?? 'Failed to rerun analysis');
+  //   //     },
+  //   //   });
+  // }
 }

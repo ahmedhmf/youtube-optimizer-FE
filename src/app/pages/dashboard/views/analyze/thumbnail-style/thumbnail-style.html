@@ -1,0 +1,154 @@
+<div class="max-w-6xl mx-auto p-6">
+  @if (recommendedTemplate && !showConfigForm()) {
+    <!-- Recommended Template Display -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold mb-4">Recommended Thumbnail Template</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        Based on your video category "{{ videoCategory }}", we recommend:
+      </p>
+
+      <div class="dark:bg-gray-800 rounded-xl shadow-lg p-6 max-w-2xl mx-auto">
+        <img
+          [src]="getTemplateInfo(recommendedTemplate)?.preview"
+          [alt]="recommendedTemplate"
+          class="w-full rounded-lg shadow-md mb-4"
+        />
+        <h3 class="text-2xl font-bold mb-2">{{ getTemplateInfo(recommendedTemplate)?.name }}</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-2">
+          {{ getTemplateInfo(recommendedTemplate)?.description }}
+        </p>
+        <p class="text-sm text-blue-600 dark:text-blue-400 italic">
+          {{ recommendedTemplate }}
+        </p>
+
+        <div class="flex gap-4 justify-center mt-6">
+          <button
+            (click)="useRecommendedTemplate()"
+            class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Customize This Template
+          </button>
+          <button
+            (click)="openTemplateSelector()"
+            class="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+          >
+            Browse All Templates
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!recommendedTemplate && !showConfigForm()) {
+    <!-- Loading State -->
+    <div class="text-center py-12">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"
+      ></div>
+      <p class="text-gray-600 dark:text-gray-400">Loading recommended template...</p>
+    </div>
+  }
+
+  <!-- Configuration Form -->
+  @if (showConfigForm() && selectedTemplate()) {
+    <div class="config-section">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold">
+          Configure: {{ getTemplateInfo(selectedTemplate()!)?.name }}
+        </h2>
+        <button
+          (click)="backToRecommendation()"
+          class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        >
+          Back
+        </button>
+      </div>
+
+      <div class="dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <app-thumbnail-config-form [templateType]="selectedTemplate()!" />
+      </div>
+
+      <div class="flex justify-between mt-6">
+        <button
+          (click)="prevStep()"
+          class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        >
+          Previous Step
+        </button>
+        <button
+          (click)="nextStep()"
+          [disabled]="!analyzeStore.thumbnailConfig()"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+        >
+          Next Step
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Template Selector Modal -->
+  @if (showTemplateSelector()) {
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      (click)="closeTemplateSelector()"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-6 z-10">
+          <div class="flex justify-between items-center">
+            <h2 class="text-3xl font-bold">Select a Template</h2>
+            <button
+              (click)="closeTemplateSelector()"
+              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (template of templateLibrary; track template.id) {
+              <div
+                class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                [class.ring-2]="selectedTemplate() === template.id"
+                [class.ring-blue-500]="selectedTemplate() === template.id"
+                (click)="selectDifferentTemplate(template.id)"
+              >
+                <img
+                  [src]="template.preview"
+                  [alt]="template.name"
+                  class="w-full rounded-lg mb-3 h-48 object-cover"
+                />
+                <h3 class="text-lg font-bold mb-2">{{ template.name }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  {{ template.description }}
+                </p>
+                <div class="flex flex-wrap gap-1">
+                  @for (tag of template.bestFor; track tag) {
+                    <span
+                      class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded"
+                    >
+                      {{ tag }}
+                    </span>
+                  }
+                </div>
+                @if (template.id === recommendedTemplate) {
+                  <div class="mt-2">
+                    <span
+                      class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded font-semibold"
+                    >
+                      ✓ Recommended
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

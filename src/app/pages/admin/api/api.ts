@@ -6,6 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './api.html',
   styleUrl: './api.scss',
 })
-export class Api {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+export class Api {}
